@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.1
+
+### Patch Changes
+
+- 9345217: Obfuscate emails and phone numbers in HTML using modern web technology 👀
+
 ## 2.1.3
 
 ### Patch Changes
