@@ -33,7 +33,6 @@ final class HTMLObfuscator
         private HTMLDocument $document,
         private bool $isPartial
     ) {
-
     }
 
     /**
@@ -41,7 +40,7 @@ final class HTMLObfuscator
      */
     public static function createFromDocument(HTMLDocument $document): self
     {
-        return new self($document, isPartial: false);
+        return new self(Support::createDocument($document->saveHTML()), isPartial: false);
     }
 
     /**
@@ -54,11 +53,13 @@ final class HTMLObfuscator
         return new self(Support::createDocument($source), isPartial: $isPartial);
     }
 
+
     public function emails(bool $bool = true): self
     {
         $this->emails = $bool;
         return $this;
     }
+
 
     public function phoneNumbers(bool $bool = true): self
     {
