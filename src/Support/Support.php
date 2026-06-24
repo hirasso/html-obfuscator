@@ -58,11 +58,11 @@ final class Support
     {
         /** No tags? We don't need hydration */
         if (!str_contains($node->data, '<')) {
-            return;
+            return; // @codeCoverageIgnore
         }
 
         if (!$document = $node->ownerDocument) {
-            throw new RuntimeException('Text nodes without ownerDocument can\'t be hydrated');
+            throw new RuntimeException('Text nodes without ownerDocument can\'t be hydrated'); // @codeCoverageIgnore
         }
 
         $parsed = self::parseHtml($node->data);

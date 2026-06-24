@@ -30,3 +30,21 @@ test('getTextNodes() ignores text inside <script>, <style> etc...', function () 
     expect(count($nodes))->toBe(1);
     expect(trim($nodes[0]->data))->toBe("Keep this");
 });
+
+test('extractBodyHTML() returns innerHTML of body', function () {
+    $doc = Support::createDocument('<p>hello</p>');
+    expect(Support::extractBodyHTML($doc))->toBe('<p>hello</p>');
+});
+
+test('normalizeWhitespace() collapses multiple spaces and converts &nbsp;', function () {
+    expect(Support::normalizeWhitespace('hello   world'))->toBe('hello world');
+    expect(Support::normalizeWhitespace('&nbsp;'))->toBe(' ');
+});
+
+test('trimLines() trims each line individually', function () {
+    expect(Support::trimLines("  hello  \n  world  "))->toBe("hello\nworld");
+});
+
+test('trimWhitespace() removes newlines and trims each line', function () {
+    expect(Support::trimWhitespace("  hello  \n  world  "))->toBe("helloworld");
+});

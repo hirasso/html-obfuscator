@@ -199,7 +199,7 @@ final class HTMLObfuscator
     private function obfuscateElement(Element $el): Element
     {
         if (!$el->ownerDocument) {
-            throw new RuntimeException('No owner document found');
+            throw new RuntimeException('No owner document found'); // @codeCoverageIgnore
         }
         $key = $this->getKey();
 
@@ -218,7 +218,7 @@ final class HTMLObfuscator
     {
         $obfuscated = preg_replace_callback(
             "/{$regex}/",
-            fn ($matches) => $this->obfuscateString($matches[0]),
+            fn ($matches) => $this->obfuscateText($matches[0]),
             $node->data
         ) ?? $node->data;
 
@@ -233,16 +233,16 @@ final class HTMLObfuscator
     /**
      * Obfuscate a string
      */
-    private function obfuscateString(string $value): string
+    private function obfuscateText(string $value): string
     {
         $key = $this->getKey();
-        $encoded = $this->encode($value, $key);
+        $encodedValue = $this->encode($value, $key);
 
         return sprintf(
             <<<HTML
-            <obfuscated-element value="%s" key="%s"></obfuscated-element>
+            <obfuscated-text value="%s" key="%s"></obfuscated-text>
             HTML,
-            $encoded,
+            $encodedValue,
             $key
         );
     }
