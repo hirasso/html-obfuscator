@@ -1,32 +1,11 @@
 <?php
 
-use Dom\Text;
 use Dom\XPath;
 use Hirasso\HTMLObfuscator\Support\Support;
 
 test('parseHtml() preserves leading and trailing whitespace', function () {
-    $doc = Support::createDocument('<p>hello</p>');
-    $xp = new XPath($doc);
-    $node = $xp->query('//text()')->item(0);
-
-    assert($node instanceof Text);
-
-    $node->data = ' <span>hello</span> ';
-    $parsed = Support::parseHtml($node->data);
-
+    $parsed = Support::parseHtml(' <em>please</em> preserve the whitespace ');
     expect(count($parsed->childNodes ?? []))->toBe(3);
-});
-
-test('parseHtml() preserves leading and trailing white space', function () {
-    $doc = Support::createDocument('<p>hello</p>');
-    $xp = new XPath($doc);
-    $node = $xp->query('//text()')->item(0);
-
-    assert($node instanceof Text);
-
-    $node->data = ' <em>please</em> preserve the whitespace ';
-    $parsed = Support::parseHtml($node->data);
-
     expect($parsed->textContent ?? null)->toBe(" please preserve the whitespace ");
 });
 
