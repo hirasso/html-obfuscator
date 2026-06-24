@@ -71,15 +71,13 @@ final class Support
     }
 
     /**
-     * Normalize any whitespace-looking stuff from a html string
-     * \s matches regular whitespace, \xc2\xa0 matches UTF-8 non-breaking space
+     * Shuffle a string
      */
-    public static function normalizeWhitespace(string $string): string
+    public static function shuffleString(string $str): string
     {
-        $string = preg_replace('/&nbsp;/', ' ', $string) ?? $string;
-        $string = preg_replace('/^[\s\xc2\xa0]*$/i', ' ', $string) ?? $string;
-        $string = preg_replace('/\s+/', ' ', $string) ?? $string;
-        return $string;
+        $chars = mb_str_split($str);
+        shuffle($chars);
+        return implode('', $chars);
     }
 
     /** @return list<\Dom\Text> */

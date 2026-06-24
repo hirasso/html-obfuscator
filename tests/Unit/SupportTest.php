@@ -36,11 +36,6 @@ test('extractBodyHTML() returns innerHTML of body', function () {
     expect(Support::extractBodyHTML($doc))->toBe('<p>hello</p>');
 });
 
-test('normalizeWhitespace() collapses multiple spaces and converts &nbsp;', function () {
-    expect(Support::normalizeWhitespace('hello   world'))->toBe('hello world');
-    expect(Support::normalizeWhitespace('&nbsp;'))->toBe(' ');
-});
-
 test('trimLines() trims each line individually', function () {
     expect(Support::trimLines("  hello  \n  world  "))->toBe("hello\nworld");
 });

@@ -53,26 +53,30 @@ final class HTMLObfuscator
         return new self(Support::createDocument($source), isPartial: $isPartial);
     }
 
-
-    public function emails(bool $bool = true): self
+    /**
+     * Should emails be obfuscated?
+     */
+    public function emails(bool $enabled = true): self
     {
-        $this->emails = $bool;
+        $this->emails = $enabled;
         return $this;
     }
 
-
-    public function phoneNumbers(bool $bool = true): self
+    /**
+     * Should phone numbers be obfuscated?
+     */
+    public function phoneNumbers(bool $enabled = true): self
     {
-        $this->phoneNumbers = $bool;
+        $this->phoneNumbers = $enabled;
         return $this;
     }
 
     /**
      * Should the passphrase be randomized each time?
      */
-    public function randomizeKey(bool $bool = true): self
+    public function randomizeKey(bool $enabled = true): self
     {
-        $this->randomizeKey = $bool;
+        $this->randomizeKey = $enabled;
         return $this;
     }
 
@@ -91,28 +95,18 @@ final class HTMLObfuscator
     private function getKey(): string
     {
         $passphrase = $this->randomizeKey
-            ? $this->shuffleString($this->passphrase)
+            ? Support::shuffleString($this->passphrase)
             : $this->passphrase;
 
         return md5($passphrase);
     }
 
     /**
-     * Shuffle a string
-     */
-    private function shuffleString(string $str): string
-    {
-        $chars = mb_str_split($str);
-        shuffle($chars);
-        return implode('', $chars);
-    }
-
-    /**
      * Should the deobfuscation script be injected or not?
      */
-    public function injectDeobfuscationScript(bool $bool): self
+    public function injectDeobfuscationScript(bool $enabled): self
     {
-        $this->injectJS = $bool;
+        $this->injectJS = $enabled;
         return $this;
     }
 
