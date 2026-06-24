@@ -203,7 +203,7 @@ final class HTMLObfuscator
         }
         $key = $this->getKey();
 
-        $obfuscated = $el->ownerDocument->createElement('html-obfuscator-obfuscated');
+        $obfuscated = $el->ownerDocument->createElement('obfuscated-element');
         $obfuscated->setAttribute('value', $this->encode(Support::outerHTML($el), $key));
         $obfuscated->setAttribute('key', $key);
         $obfuscated->setAttribute('type', 'element');
@@ -240,7 +240,7 @@ final class HTMLObfuscator
 
         return sprintf(
             <<<HTML
-            <html-obfuscator-obfuscated value="%s" key="%s"></html-obfuscator-obfuscated>
+            <obfuscated-element value="%s" key="%s"></obfuscated-element>
             HTML,
             $encoded,
             $key
@@ -272,7 +272,7 @@ final class HTMLObfuscator
 
         $script = $document->createElement('script');
         $script->setAttribute('type', 'module');
-        $script->textContent = file_get_contents(dirname(__DIR__). '/resources/obfuscation.js') ?: '';
+        $script->textContent = file_get_contents(dirname(__DIR__). '/resources/html-obfuscator.js') ?: '';
         $document->body?->append($script);
     }
 }

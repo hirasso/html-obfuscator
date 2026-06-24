@@ -15,7 +15,7 @@ You might think that obfuscation won't work on spam bots. Turns out [it does](ht
 On the server, PHP finds emails and phone numbers in the HTML, XOR-encodes them with a key derived from a passphrase (MD5 of a shuffled version of it), base64-encodes the result, and replaces the original text with a custom HTML element:
 
 ```html
-<html-obfuscator-obfuscated value="..." key="..."></html-obfuscator-obfuscated>
+<obfuscated-element value="..." key="..."></obfuscated-element>
 ```
 
 In the browser, a Web Component registered under that tag name picks up each element on `connectedCallback`, reverses the XOR encoding, and swaps itself out with the decoded content. Spam bots crawling the raw HTML never see the actual email or phone number.
