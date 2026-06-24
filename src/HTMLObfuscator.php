@@ -21,6 +21,7 @@ final class HTMLObfuscator
     private const string PHONE_NUMBER_REGEX = "[\+\d][\d \-\(\)\.]{6,20}(?<!\s)";
 
     private string $passphrase = 'html-obfuscator';
+    private string $customElementName = 'x-obfuscated';
     private bool $randomizeKey = true;
 
     private bool $emails = true;
@@ -83,9 +84,18 @@ final class HTMLObfuscator
     /**
      * Set a custom passphrase for improved security
      */
-    public function passphrase(string $passphrase): self
+    public function withPassphrase(string $passphrase): self
     {
         $this->passphrase = $passphrase;
+        return $this;
+    }
+
+    /**
+     * Customize the name of the obfuscated element
+     */
+    public function withCustomElementName(string $name): self
+    {
+        $this->customElementName = $name;
         return $this;
     }
 
@@ -198,7 +208,7 @@ final class HTMLObfuscator
         }
         $key = $this->getKey();
 
-        $obfuscated = $el->ownerDocument->createElement('obfuscated-element');
+        $obfuscated = $el->ownerDocument->createElement($this->customElementName);
         $obfuscated->setAttribute('value', $this->encode(Support::outerHTML($el), $key));
         $obfuscated->setAttribute('key', $key);
 
@@ -234,7 +244,7 @@ final class HTMLObfuscator
 
         return sprintf(
             <<<HTML
-            <obfuscated-element value="%s" key="%s"></obfuscated-element>
+            <$this->customElementName value="%s" key="%s"></$this->customElementName>
             HTML,
             $encodedValue,
             $key
@@ -267,6 +277,7 @@ final class HTMLObfuscator
         $script = $document->createElement('script');
         $script->setAttribute('type', 'module');
         $script->textContent = file_get_contents(dirname(__DIR__). '/resources/html-obfuscator.js') ?: '';
+        $script->textContent = str_replace("x-obfuscated", $this->customElementName, $script->textContent);
         $document->body?->append($script);
     }
 }

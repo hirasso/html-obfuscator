@@ -7,7 +7,7 @@ function obfuscator(string $html, bool $injectJS = false): HTMLObfuscator
     HTMLObfuscator::$jsInjected = false;
 
     return HTMLObfuscator::createFromString($html)
-        ->passphrase('testing')
+        ->withPassphrase('testing')
         ->randomizeKey(false)
         ->injectDeobfuscationScript($injectJS);
 }
@@ -20,25 +20,25 @@ function render(string $html, bool $injectJS = false): string
 test('Obfuscates emails in links', function () {
     $result = render('<a href="mailto:mail@example.com">email</a>');
 
-    expect($result)->toBe('<obfuscated-element value="XQQSCkMDBVwXXFRQWE0KDwlUXQoiV0oDVRUIXBtWWFhDW1cPUA8PXRpQCw==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
+    expect($result)->toBe('<x-obfuscated value="XQQSCkMDBVwXXFRQWE0KDwlUXQoiV0oDVRUIXBtWWFhDW1cPUA8PXRpQCw==" key="ae2b1fca515949e5d54fb22b8ed95575"></x-obfuscated>');
 });
 
 test('Obfuscates emails in plaintext', function () {
     $result = render('mail@example.com');
 
-    expect($result)->toBe('<obfuscated-element value="DARbDnEDGwBYQVlcGloKWA==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
+    expect($result)->toBe('<x-obfuscated value="DARbDnEDGwBYQVlcGloKWA==" key="ae2b1fca515949e5d54fb22b8ed95575"></x-obfuscated>');
 });
 
 test('Obfuscates phone numbers in links', function () {
     $result = render('<a href="tel:+49 12 345 67">call us</a>');
 
-    expect($result)->toBe('<obfuscated-element value="XQQSCkMDBVwXRVBVDhJRDEQEBkZRBgdCDlJGB1ZUW1lBEEFeHgdd" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
+    expect($result)->toBe('<x-obfuscated value="XQQSCkMDBVwXRVBVDhJRDEQEBkZRBgdCDlJGB1ZUW1lBEEFeHgdd" key="ae2b1fca515949e5d54fb22b8ed95575"></x-obfuscated>');
 });
 
 test('Obfuscates phone numbers in plaintext', function () {
     $result = render('+49 12 345 67');
 
-    expect($result)->toBe('<obfuscated-element value="SlELQgBUQ1IBBBUPAw==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
+    expect($result)->toBe('<x-obfuscated value="SlELQgBUQ1IBBBUPAw==" key="ae2b1fca515949e5d54fb22b8ed95575"></x-obfuscated>');
 });
 
 test('Injects the deobfuscation JavaScript by default', function () {
@@ -55,7 +55,7 @@ test('emails(false) disables email obfuscation', function () {
         ->injectDeobfuscationScript(false)
         ->render();
     expect($result)->toContain('mailto:mail@example.com');
-    expect($result)->not->toContain('obfuscated-element');
+    expect($result)->not->toContain('x-obfuscated');
 });
 
 test('phoneNumbers(false) disables phone number obfuscation', function () {
@@ -64,16 +64,16 @@ test('phoneNumbers(false) disables phone number obfuscation', function () {
         ->injectDeobfuscationScript(false)
         ->render();
     expect($result)->toContain('tel:+49 12 345 67');
-    expect($result)->not->toContain('obfuscated-element');
+    expect($result)->not->toContain('x-obfuscated');
 });
 
 test('randomizeKey(true) produces obfuscated output', function () {
     $result = obfuscator('mail@example.com')
-        ->passphrase('testing')
+        ->withPassphrase('testing')
         ->randomizeKey(true)
         ->injectDeobfuscationScript(false)
         ->render();
-    expect($result)->toContain('<obfuscated-element');
+    expect($result)->toContain('<x-obfuscated');
 });
 
 test('render() outputs full HTML for non-partial input', function () {
@@ -95,11 +95,21 @@ test('__toString() returns the rendered output', function () {
 test('Invalid mailto: links are not obfuscated', function () {
     $result = render('<a href="mailto:not-an-email">contact</a>');
     expect($result)->toContain('mailto:not-an-email');
-    expect($result)->not->toContain('obfuscated-element');
+    expect($result)->not->toContain('x-obfuscated');
 });
 
 test('Invalid tel: links are not obfuscated', function () {
     $result = render('<a href="tel:123">call</a>');
     expect($result)->toContain('tel:123');
-    expect($result)->not->toContain('obfuscated-element');
+    expect($result)->not->toContain('x-obfuscated');
+});
+
+test('Allows to customize the custom element name', function () {
+    $result = obfuscator('mail@example.com', injectJS: true)
+        ->withCustomElementName('reveal-me')
+        ->render();
+
+    expect($result)->not->toContain('<x-obfuscated value="');
+    expect($result)->toContain('<reveal-me value="');
+    expect($result)->toContain('window.customElements.define("reveal-me", ObfuscatedElement)');
 });

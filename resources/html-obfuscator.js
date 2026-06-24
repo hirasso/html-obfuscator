@@ -23,6 +23,6 @@ class ObfuscatedElement extends HTMLElement {
   }
 }
 
-if (!window.customElements.get("obfuscated-element")) {
-  window.customElements.define("obfuscated-element", ObfuscatedElement);
+if (!window.customElements.get("x-obfuscated")) {
+  window.customElements.define("x-obfuscated", ObfuscatedElement);
 }
