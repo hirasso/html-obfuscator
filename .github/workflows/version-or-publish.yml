@@ -1,0 +1,69 @@
+name: Version or Publish
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  package-infos:
+    name: Get Package Infos
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      fullName: ${{ steps.package-infos.outputs.fullName }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Read and Write Package Infos to Output
+        id: package-infos
+        run: |
+          NAME=$(jq -r '.name' composer.json)
+          echo "fullName=${NAME}" >> $GITHUB_OUTPUT
+          cat "$GITHUB_OUTPUT"
+
+  release:
+    needs: package-infos
+    if: ${{ github.repository == needs.package-infos.outputs.fullName }}
+
+    name: Create Version PR or Publish
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Configure Git
+        run: |
+          git config --global user.email "bot@rassohilber.com"
+          git config --global user.name "Rasso Hilber's Bot"
+
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+
+      # Run changesets action either if there are unreleased changesets (= a PR must be created)
+      # or if the commit message matches the release PR (= new versions must be published to NPM)
+      - name: Create changesets PR or Publish
+        id: cs
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        with:
+          title: "[CI] Release"
+          commit: "[CI] Release"
+          version: pnpm changeset version
+          publish: pnpm changeset tag
+        env:
+          # Do not run husky/lintstaged
+          HUSKY: 0
+          # Doesn't work with GITHUB_TOKEN for some reason
+          GITHUB_TOKEN: ${{ secrets.HIRASSO_ACTIONS_TOKEN }}

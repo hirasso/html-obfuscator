@@ -1,0 +1,60 @@
+{
+  "name": "hirasso/html-obfuscator",
+  "description": "Obfuscate emails and phone numbers in HTML using modern web technology",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Rasso Hilber",
+      "email": "mail@rassohilber.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Hirasso\\HTMLObfuscator\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": ">=8.4"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.20",
+    "pestphp/pest": "^3.7",
+    "pestphp/pest-plugin-watch": "^3.0",
+    "phpstan/phpstan": "^2.1",
+    "symfony/var-dumper": ">=6.4"
+  },
+  "scripts": {
+    "format": "./vendor/bin/pint",
+    "test": "./vendor/bin/pest",
+    "test:watch": [
+      "Composer\\Config::disableProcessTimeout",
+      "vendor/bin/pest --watch"
+    ],
+    "test:coverage": "php -d zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-84-arm64.so -d xdebug.mode=coverage ./vendor/bin/pest --coverage --coverage-html ./tests/reports",
+    "test:ci": "./vendor/bin/pest --coverage-clover coverage.xml",
+    "analyse": "./vendor/bin/phpstan analyse --memory-limit=2G",
+    "post-install-cmd": [
+      "[ -n \"$CI\" ] || pnpm install",
+      "ln -s AGENTS.md CLAUDE.md || exit 0"
+    ],
+    "post-update-cmd": [
+      "[ -n \"$CI\" ] || pnpm install"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

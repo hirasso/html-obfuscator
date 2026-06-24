@@ -1,0 +1,20 @@
+# files and folders starting with a dot
+.* export-ignore
+
+# composer
+composer.lock export-ignore
+
+# node
+package.json export-ignore
+pnpm-lock.yaml export-ignore
+
+# tests
+tests export-ignore
+phpstan.neon export-ignore
+phpunit.xml export-ignore
+
+# other
+pint.json export-ignore
+AGENTS.md export-ignore
+docs export-ignore
+CHANGELOG.md export-ignore
