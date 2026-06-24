@@ -27,7 +27,7 @@ test('Obfuscates emails in links', function () {
 test('Obfuscates emails in plaintext', function () {
     $result = render('mail@example.com');
 
-    expect($result)->toBe('<obfuscated-text value="DARbDnEDGwBYQVlcGloKWA==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-text>');
+    expect($result)->toBe('<obfuscated-element value="DARbDnEDGwBYQVlcGloKWA==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
 });
 
 test('Obfuscates phone numbers in links', function () {
@@ -39,7 +39,7 @@ test('Obfuscates phone numbers in links', function () {
 test('Obfuscates phone numbers in plaintext', function () {
     $result = render('+49 12 345 67');
 
-    expect($result)->toBe('<obfuscated-text value="SlELQgBUQ1IBBBUPAw==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-text>');
+    expect($result)->toBe('<obfuscated-element value="SlELQgBUQ1IBBBUPAw==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
 });
 
 test('Injects the deobfuscation JavaScript by default', function () {
@@ -74,7 +74,7 @@ test('randomizeKey(true) produces obfuscated output', function () {
         ->randomizeKey(true)
         ->injectDeobfuscationScript(false)
         ->render();
-    expect($result)->toContain('<obfuscated-text');
+    expect($result)->toContain('<obfuscated-element');
 });
 
 test('getDocument() returns a clone of the provided HTMLDocument', function () {

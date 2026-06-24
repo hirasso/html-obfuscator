@@ -235,7 +235,7 @@ final class HTMLObfuscator
 
         return sprintf(
             <<<HTML
-            <obfuscated-text value="%s" key="%s"></obfuscated-text>
+            <obfuscated-element value="%s" key="%s"></obfuscated-element>
             HTML,
             $encodedValue,
             $key
