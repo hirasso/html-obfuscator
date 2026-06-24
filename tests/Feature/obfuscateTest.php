@@ -113,3 +113,7 @@ test('Allows to customize the custom element name', function () {
     expect($result)->toContain('<reveal-me value="');
     expect($result)->toContain('window.customElements.define("reveal-me", ObfuscatedElement)');
 });
+
+test('Exposes ->apply() as public method', function () {
+    obfuscator('mail@example.com', injectJS: true)->apply();
+});

@@ -147,7 +147,7 @@ final class HTMLObfuscator
      */
     public function getDocument(): HTMLDocument
     {
-        return $this->document;
+        return $this->document; // @codeCoverageIgnore
     }
 
     /**
@@ -165,7 +165,7 @@ final class HTMLObfuscator
             return Support::outerHTML($this->document->documentElement);
         }
 
-        return '';
+        return ''; // @codeCoverageIgnore
     }
 
     public function __toString(): string
