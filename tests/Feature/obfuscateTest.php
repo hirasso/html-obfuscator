@@ -1,6 +1,5 @@
 <?php
 
-use Dom\HTMLDocument;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
 function obfuscator(string $html, bool $injectJS = false): HTMLObfuscator
@@ -77,13 +76,6 @@ test('randomizeKey(true) produces obfuscated output', function () {
     expect($result)->toContain('<obfuscated-element');
 });
 
-test('getDocument() returns a clone of the provided HTMLDocument', function () {
-    $doc = HTMLDocument::createFromString('hello', LIBXML_NOERROR);
-    $obfuscator = HTMLObfuscator::createFromDocument($doc);
-    expect($obfuscator->getDocument())->not->toBe($doc);
-    expect($obfuscator->getDocument()->saveHTML())->toBe($doc->saveHTML());
-});
-
 test('render() outputs full HTML for non-partial input', function () {
     HTMLObfuscator::$jsInjected = false;
     $result = HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>')
@@ -91,14 +83,6 @@ test('render() outputs full HTML for non-partial input', function () {
         ->render();
     expect($result)->toContain('<html');
     expect($result)->toContain('<p>hello</p>');
-});
-
-test('createFromDocument() does not mutate the original document', function () {
-    $doc = HTMLDocument::createFromString('<p>hello@example.com</p>', LIBXML_NOERROR);
-    $originalHTML = $doc->saveHTML();
-    HTMLObfuscator::$jsInjected = false;
-    HTMLObfuscator::createFromDocument($doc)->injectDeobfuscationScript(false)->render();
-    expect($doc->saveHTML())->toBe($originalHTML);
 });
 
 test('__toString() returns the rendered output', function () {

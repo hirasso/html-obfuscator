@@ -36,11 +36,11 @@ final class HTMLObfuscator
     }
 
     /**
-     * Create a new Obfuscator instance from a HTMLDocument
+     * Create a new Obfuscator instance from a HTMLDocument (by reference)
      */
     public static function createFromDocument(HTMLDocument $document): self
     {
-        return new self(Support::createDocument($document->saveHTML()), isPartial: false);
+        return new self($document, isPartial: false);
     }
 
     /**
