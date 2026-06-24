@@ -89,7 +89,7 @@ final class Support
         return array_values(array_filter(
             [...new XPath($doc)->query('//text()[normalize-space() != ""]')],
             fn ($node) => !$node->parentElement?->closest(
-                'script, style, svg, noscript, title, textarea, select, iframe, canvas'
+                'head, script, style, svg, noscript, title, textarea, select, iframe, canvas'
             )
         ));
     }
