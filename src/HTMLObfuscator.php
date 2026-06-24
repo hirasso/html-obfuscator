@@ -8,6 +8,7 @@ use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Support\Support;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -91,11 +92,15 @@ final class HTMLObfuscator
     }
 
     /**
-     * Customize the name of the obfuscated element
+     * Customize the tag name of the obfuscated element
      */
     public function withCustomElementName(string $name): self
     {
-        $this->customElementName = $name;
+        if (!str_contains($name, '-')) {
+            throw new InvalidArgumentException('The custom element name needs to contain at least one dash');
+        }
+
+        $this->customElementName = trim($name);
         return $this;
     }
 
@@ -114,7 +119,7 @@ final class HTMLObfuscator
     /**
      * Should the deobfuscation script be injected or not?
      */
-    public function injectDeobfuscationScript(bool $enabled): self
+    public function injectDeobfuscationScript(bool $enabled = true): self
     {
         $this->injectJS = $enabled;
         return $this;

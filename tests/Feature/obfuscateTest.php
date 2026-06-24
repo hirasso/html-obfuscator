@@ -119,6 +119,11 @@ test('Exposes ->apply() as public method', function () {
     expect($obfuscator)->toBeInstanceOf(HTMLObfuscator::class);
 });
 
+test('withCustomElementName() throws if the element name is malformed', function () {
+    expect(fn () => obfuscator('mail@example.com')->withCustomElementName('foobar'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
 test('Returns a partial when receiving a partial', function () {
     expect(render('foobar'))->toBe('foobar');
 });
