@@ -115,5 +115,14 @@ test('Allows to customize the custom element name', function () {
 });
 
 test('Exposes ->apply() as public method', function () {
-    obfuscator('mail@example.com', injectJS: true)->apply();
+    $obfuscator = obfuscator('mail@example.com', injectJS: true)->apply();
+    expect($obfuscator)->toBeInstanceOf(HTMLObfuscator::class);
+});
+
+test('Returns a partial when receiving a partial', function () {
+    expect(render('foobar'))->toBe('foobar');
+});
+
+test('Returns a the full document when receiving at least a <body> element', function () {
+    expect(render('<body>foobar</body>'))->toBe('<html><head></head><body>foobar</body></html>');
 });
