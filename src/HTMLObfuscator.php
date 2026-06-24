@@ -201,7 +201,6 @@ final class HTMLObfuscator
         $obfuscated = $el->ownerDocument->createElement('obfuscated-element');
         $obfuscated->setAttribute('value', $this->encode(Support::outerHTML($el), $key));
         $obfuscated->setAttribute('key', $key);
-        $obfuscated->setAttribute('type', 'element');
 
         return $obfuscated;
     }

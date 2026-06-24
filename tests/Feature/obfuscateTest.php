@@ -20,7 +20,7 @@ function render(string $html, bool $injectJS = false): string
 test('Obfuscates emails in links', function () {
     $result = render('<a href="mailto:mail@example.com">email</a>');
 
-    expect($result)->toBe('<obfuscated-element value="XQQSCkMDBVwXXFRQWE0KDwlUXQoiV0oDVRUIXBtWWFhDW1cPUA8PXRpQCw==" key="ae2b1fca515949e5d54fb22b8ed95575" type="element"></obfuscated-element>');
+    expect($result)->toBe('<obfuscated-element value="XQQSCkMDBVwXXFRQWE0KDwlUXQoiV0oDVRUIXBtWWFhDW1cPUA8PXRpQCw==" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
 });
 
 test('Obfuscates emails in plaintext', function () {
@@ -32,7 +32,7 @@ test('Obfuscates emails in plaintext', function () {
 test('Obfuscates phone numbers in links', function () {
     $result = render('<a href="tel:+49 12 345 67">call us</a>');
 
-    expect($result)->toBe('<obfuscated-element value="XQQSCkMDBVwXRVBVDhJRDEQEBkZRBgdCDlJGB1ZUW1lBEEFeHgdd" key="ae2b1fca515949e5d54fb22b8ed95575" type="element"></obfuscated-element>');
+    expect($result)->toBe('<obfuscated-element value="XQQSCkMDBVwXRVBVDhJRDEQEBkZRBgdCDlJGB1ZUW1lBEEFeHgdd" key="ae2b1fca515949e5d54fb22b8ed95575"></obfuscated-element>');
 });
 
 test('Obfuscates phone numbers in plaintext', function () {
