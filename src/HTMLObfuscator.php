@@ -36,6 +36,7 @@ final class HTMLObfuscator
     private bool $phoneNumbers = true;
 
     private bool $injectFrontendScript = true;
+    private bool $obfuscateFrontendScript = true;
 
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
@@ -129,6 +130,15 @@ final class HTMLObfuscator
     public function injectFrontendScript(bool $enabled = true): self
     {
         $this->injectFrontendScript = $enabled;
+        return $this;
+    }
+
+    /**
+     * Should the injected deobfuscation script be obfuscated using minification and property mangling?
+     */
+    public function obfuscateFrontendScript(bool $enabled = true): self
+    {
+        $this->obfuscateFrontendScript = $enabled;
         return $this;
     }
 
@@ -325,9 +335,14 @@ final class HTMLObfuscator
         self::$hasInjectedFrontendScript = true;
 
         $scriptElement = $document->createElement('script');
-        $scriptElement->setAttribute('tag-name', $this->tagName);
 
-        $js = file_get_contents(dirname(__DIR__). '/resources/html-obfuscator.js') ?: '';
+        $rootPath = dirname(__DIR__);
+
+        $filePath = $this->obfuscateFrontendScript
+            ? '/resources/dist/html-obfuscator.min.js'
+            : '/resources/html-obfuscator.js';
+
+        $js = file_get_contents($rootPath . $filePath) ?: '';
         $js = str_replace('x-obfuscated', $this->tagName, $js);
 
         $scriptElement->textContent = $js;
