@@ -245,6 +245,7 @@ final class HTMLObfuscator
 
         return $this->createObfuscatedElement(
             value: Support::outerHTML($el),
+            charCount: mb_strlen($el->textContent ?? ''),
             document: $el->ownerDocument
         );
     }
@@ -252,14 +253,18 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated element
      */
-    private function createObfuscatedElement(string $value, HTMLDocument $document): Element
-    {
+    private function createObfuscatedElement(
+        string $value,
+        int $charCount,
+        HTMLDocument $document
+    ): Element {
         $key = $this->getKey();
 
         $el = $document->createElement($this->tagName);
         $el->setAttribute('value', $this->encode($value, $key));
         $el->setAttribute('key', $key);
         $el->setAttribute('tabindex', '0');
+        $el->setAttribute('char-count', (string) $charCount);
 
         if ($this->requireInteraction) {
             $el->setAttribute('require-interaction', $this->requireInteraction->value);
@@ -281,7 +286,9 @@ final class HTMLObfuscator
         $obfuscated = preg_replace_callback(
             "/{$regex}/",
             function ($matches) use ($node) {
-                $el = $this->createObfuscatedElement($matches[0], $node->ownerDocument);
+                $value = $matches[0];
+                $el = $this->createObfuscatedElement($value, mb_strlen($value), $node->ownerDocument);
+
                 return Support::outerHTML($el);
             },
             $node->data
