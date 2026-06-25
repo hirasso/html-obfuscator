@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator;
 
-use Dom\DocumentFragment;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
@@ -298,17 +297,9 @@ final class HTMLObfuscator
             return; // @codeCoverageIgnore
         }
 
-        /** @var DocumentFragment */
         $fragment = Support::parseHtmlFragment($obfuscated, $node->ownerDocument);
 
-        /**
-         * Store a reference to the parent element before replacing
-         */
-        $parentElement = $node->parentElement ?? $node->ownerDocument;
-
         $node->replaceWith($fragment);
-
-        // dump($parentElement->querySelectorAll($this->tagName));
     }
 
     /**
