@@ -3,8 +3,8 @@
 use Dom\XPath;
 use Hirasso\HTMLObfuscator\Support\Support;
 
-test('parseHtml() preserves leading and trailing whitespace', function () {
-    $parsed = Support::parseHtml(' <em>please</em> preserve the whitespace ');
+test('parseHtmlFragment() preserves leading and trailing whitespace', function () {
+    $parsed = Support::parseHtmlFragment(' <em>please</em> preserve the whitespace ');
     expect(count($parsed->childNodes ?? []))->toBe(3);
     expect($parsed->textContent ?? null)->toBe(" please preserve the whitespace ");
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator;
 
+use Dom\DocumentFragment;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
@@ -21,15 +22,20 @@ final class HTMLObfuscator
     private const string EMAIL_REGEX = "[^\s@]+@[^\s@]+\.[^\s@]{2,}";
     private const string PHONE_NUMBER_REGEX = "[\+\d][\d \-\(\)\.]{6,20}(?<!\s)";
 
+    public const string DEFAULT_TAG_NAME = 'x-obfuscated';
+
     private string $passphrase = 'html-obfuscator';
-    private string $customElementName = 'x-obfuscated';
+    private string $tagName = self::DEFAULT_TAG_NAME;
+    private bool $requireUserInteraction = false;
     private bool $randomizeKey = true;
 
     private bool $emails = true;
     private bool $phoneNumbers = true;
 
-    public static bool $jsInjected = false;
-    private bool $injectJS = true;
+    private bool $injectFrontendScript = true;
+
+    /** @internal */
+    public static bool $hasInjectedFrontendScript = false;
 
     private function __construct(
         private HTMLDocument $document,
@@ -93,23 +99,33 @@ final class HTMLObfuscator
 
     /**
      * Customize the tag name of the obfuscated element
+     * Must contain at least one "-", as defined by the Spec
      */
-    public function withCustomElementName(string $name): self
+    public function withTagName(string $tagName): self
     {
-        if (!str_contains($name, '-')) {
-            throw new InvalidArgumentException('The custom element name needs to contain at least one dash');
+        if (!str_contains($tagName, '-')) {
+            throw new InvalidArgumentException('The tag name needs to contain at least one dash');
         }
 
-        $this->customElementName = trim($name);
+        $this->tagName = trim($tagName);
+        return $this;
+    }
+
+    /**
+     * Require user interaction before revealing obfuscated content?
+     */
+    public function requireUserInteraction(bool $enabled = true): self
+    {
+        $this->requireUserInteraction = $enabled;
         return $this;
     }
 
     /**
      * Should the deobfuscation script be injected or not?
      */
-    public function injectDeobfuscationScript(bool $enabled = true): self
+    public function injectFrontendScript(bool $enabled = true): self
     {
-        $this->injectJS = $enabled;
+        $this->injectFrontendScript = $enabled;
         return $this;
     }
 
@@ -118,7 +134,7 @@ final class HTMLObfuscator
      */
     public function apply(): self
     {
-        $this->maybeInjectJS($this->document);
+        $this->maybeInjectFrontendScript($this->document);
         $this->obfuscateLinks($this->document);
 
         if ($this->emails) {
@@ -216,11 +232,31 @@ final class HTMLObfuscator
         }
         $key = $this->getKey();
 
-        $obfuscated = $el->ownerDocument->createElement($this->customElementName);
+        $obfuscated = $el->ownerDocument->createElement($this->tagName);
         $obfuscated->setAttribute('value', $this->encode(Support::outerHTML($el), $key));
         $obfuscated->setAttribute('key', $key);
+        $this->addAdditionalAttributes($obfuscated);
 
         return $obfuscated;
+    }
+
+    /**
+     * Add additional attributes to an obfuscated element
+     */
+    private function addAdditionalAttributes(Element $el): void
+    {
+        if (!$this->isObfuscatedElement($el)) {
+            throw new InvalidArgumentException('Not an obfuscated element');
+        }
+        $el->toggleAttribute('require-interaction', $this->requireUserInteraction);
+    }
+
+    /**
+     * Check if an element is an obfuscated element
+     */
+    private function isObfuscatedElement(Element $el): bool
+    {
+        return mb_strtolower($el->tagName) === $this->tagName;
     }
 
     /**
@@ -228,18 +264,38 @@ final class HTMLObfuscator
      */
     private function obfuscateTextNode(Text $node, string $regex): void
     {
+        if (!$node->ownerDocument || !($node->ownerDocument instanceof HTMLDocument)) {
+            throw new RuntimeException('Only text nodes within HTML documents can be obfuscated'); // @codeCoverageIgnore
+        }
+
+        /** obfuscate */
         $obfuscated = preg_replace_callback(
             "/{$regex}/",
             fn ($matches) => $this->obfuscateText($matches[0]),
             $node->data
         ) ?? $node->data;
 
+        /** nothing changed, ignore */
         if ($obfuscated === $node->data) {
             return;
         }
 
-        $node->data = $obfuscated;
-        Support::hydrateTextNode($node);
+        /** No tags? ignore */
+        if (!str_contains($obfuscated, '<')) {
+            return; // @codeCoverageIgnore
+        }
+
+        /** @var DocumentFragment */
+        $fragment = Support::parseHtmlFragment($obfuscated, $node->ownerDocument);
+
+        /**
+         * Store a reference to the parent element before replacing
+         */
+        $parentElement = $node->parentElement ?? $node->ownerDocument;
+
+        $node->replaceWith($fragment);
+
+        dump($parentElement->querySelectorAll($this->tagName));
     }
 
     /**
@@ -248,14 +304,14 @@ final class HTMLObfuscator
     private function obfuscateText(string $value): string
     {
         $key = $this->getKey();
-        $encodedValue = $this->encode($value, $key);
+        $value = $this->encode($value, $key);
 
         return sprintf(
             <<<HTML
-            <$this->customElementName value="%s" key="%s"></$this->customElementName>
+            <$this->tagName key="%s" value="%s"></$this->tagName>
             HTML,
-            $encodedValue,
-            $key
+            $key,
+            $value,
         );
     }
 
@@ -275,17 +331,20 @@ final class HTMLObfuscator
      * Inject the script that de-obfuscates obfuscated emails in the frontend.
      * This intentionally runs only ONCE per PHP process, since we only need it once
      */
-    private function maybeInjectJS(HTMLDocument $document): void
+    private function maybeInjectFrontendScript(HTMLDocument $document): void
     {
-        if (self::$jsInjected || !$this->injectJS) {
+        if (self::$hasInjectedFrontendScript || !$this->injectFrontendScript) {
             return;
         }
-        self::$jsInjected = true;
+        self::$hasInjectedFrontendScript = true;
 
-        $script = $document->createElement('script');
-        $script->setAttribute('type', 'module');
-        $script->textContent = file_get_contents(dirname(__DIR__). '/resources/html-obfuscator.js') ?: '';
-        $script->textContent = str_replace("x-obfuscated", $this->customElementName, $script->textContent);
-        $document->body?->append($script);
+        $scriptElement = $document->createElement('script');
+        $scriptElement->setAttribute('type', 'module');
+
+        $js = file_get_contents(dirname(__DIR__). '/resources/html-obfuscator.js') ?: '';
+        $js = str_replace("x-obfuscated", $this->tagName, $js);
+
+        $scriptElement->textContent = $js;
+        $document->body?->append($scriptElement);
     }
 }

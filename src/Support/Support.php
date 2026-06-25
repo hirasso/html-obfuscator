@@ -7,10 +7,8 @@ namespace Hirasso\HTMLObfuscator\Support;
 use Dom\DocumentFragment;
 use Dom\Element;
 use Dom\HTMLDocument;
-use Dom\Node;
-use Dom\Text;
 use Dom\XPath;
-use RuntimeException;
+use InvalidArgumentException;
 
 final class Support
 {
@@ -34,40 +32,25 @@ final class Support
     }
 
     /**
-     * Parse the text in a text node, if it contains HTML
+     * Parse a HTML fragment
      */
-    public static function parseHtml(string $html): DocumentFragment
+    public static function parseHtmlFragment(string $html, ?HTMLDocument $document = null): DocumentFragment
     {
-        $doc = self::createDocument($html);
-
-        $fragment = $doc->createDocumentFragment();
-        $fragment->append(...$doc->body->childNodes ?? []);
-
-        // HTML parsers strip leading whitespace from <body>; restore it manually
-        if (preg_match('/^(\s+)/', $html, $m)) {
-            $fragment->prepend($doc->createTextNode($m[1]));
+        if (str_contains($html, '</body>')) {
+            throw new InvalidArgumentException('Can only parse HTML fragments, not full documents'); // @codeCoverageIgnore
         }
+
+        $document ??= self::createDocument($html);
+
+        /** parse using ->innerHTML */
+        $div = $document->createElement('div');
+        $div->innerHTML = $html;
+
+        /** add to a document fragment */
+        $fragment = $document->createDocumentFragment();
+        $fragment->append(...$div->childNodes);
 
         return $fragment;
-    }
-
-    /**
-     * Hydrate HTML tags within a text node
-     */
-    public static function hydrateTextNode(Text $node): void
-    {
-        /** No tags? We don't need hydration */
-        if (!str_contains($node->data, '<')) {
-            return; // @codeCoverageIgnore
-        }
-
-        if (!$document = $node->ownerDocument) {
-            throw new RuntimeException('Text nodes without ownerDocument can\'t be hydrated'); // @codeCoverageIgnore
-        }
-
-        $parsed = self::parseHtml($node->data);
-
-        $node->replaceWith($document->importNode($parsed, deep: true));
     }
 
     /**
