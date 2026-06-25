@@ -20,7 +20,7 @@ export default defineConfig({
         drop_console: true,
       },
     },
-    sourcemap: true,
+    sourcemap: false,
     target: "es2020",
   },
 });
