@@ -105,18 +105,6 @@ final class HTMLObfuscator
     }
 
     /**
-     * Get the key for encoding and decoding
-     */
-    private function getKey(): string
-    {
-        $passphrase = $this->randomizeKey
-            ? Support::shuffleString($this->passphrase)
-            : $this->passphrase;
-
-        return md5($passphrase);
-    }
-
-    /**
      * Should the deobfuscation script be injected or not?
      */
     public function injectDeobfuscationScript(bool $enabled = true): self
@@ -173,9 +161,24 @@ final class HTMLObfuscator
         return ''; // @codeCoverageIgnore
     }
 
+    /**
+     * Stringable
+     */
     public function __toString(): string
     {
         return $this->render();
+    }
+
+    /**
+     * Get the key for encoding and decoding
+     */
+    private function getKey(): string
+    {
+        $passphrase = $this->randomizeKey
+            ? Support::shuffleString($this->passphrase)
+            : $this->passphrase;
+
+        return md5($passphrase);
     }
 
     /**
