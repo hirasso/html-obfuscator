@@ -48,12 +48,18 @@ test('Obfuscates phone numbers in plaintext', function () {
     expectObfuscatedElement(render('+49 12 345 67'));
 });
 
-test('Injects the deobfuscation JavaScript by default', function () {
+test('Injects the terser-obfuscated frontend script by default', function () {
     $result = render('+49 12 345 67', injectJS: true);
 
-    expect($result)->toContain('<script');
+    expect($result)->toContain('ar __defProp=Object.defineProperty');
+});
+
+test('obfuscateFrontendScript(false) loads the un-obfuscated frontend script', function () {
+    $result = obfuscate('+49 12 345 67', injectJS: true)
+        ->obfuscateFrontendScript(false)
+        ->render();
+
     expect($result)->toContain('@ts-check');
-    expect($result)->toContain('class ObfuscatedElement extends HTMLElement');
 });
 
 test('emails(false) disables email obfuscation', function () {
@@ -114,10 +120,13 @@ test('Invalid tel: links are not obfuscated', function () {
 test('Allows to customize the custom element name', function () {
     $result = obfuscate('mail@example.com', injectJS: true)
         ->withTagName('reveal-me')
+        ->obfuscateFrontendScript(false)
         ->render();
 
+    dump($result);
+
     expectObfuscatedElement($result, 'reveal-me');
-    expect($result)->toContain('window.customElements.define("reveal-me", ObfuscatedElement)');
+    expect($result)->toContain('const tagName = "reveal-me"');
 });
 
 test('Exposes ->apply() as public method', function () {
@@ -138,12 +147,10 @@ test('Returns a the full document when receiving at least a <body> element', fun
     expect(render('<body>foobar</body>'))->toBe('<html><head></head><body>foobar</body></html>');
 });
 
-test('Adds the attribute "interact" if needed', function () {
+test('Adds the attribute "require-interaction" if needed', function () {
     $result = obfuscate('mail@example.com')
         ->requireInteraction(Interaction::OnDocument)
         ->render();
-
-    dump($result);
 
     expect($result)->toContain('require-interaction');
 });
