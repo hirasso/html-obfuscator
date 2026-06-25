@@ -2,4 +2,4 @@
 "html-obfuscator": patch
 ---
 
-Rename `withTagName()` to `withCustomElementName()`
+Rename `withCustomElementName()` to `withTagName()`
