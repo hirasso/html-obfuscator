@@ -4,6 +4,21 @@
 
 class ObfuscatedElement extends HTMLElement {
   connectedCallback() {
+    if (!this.requireInteraction) {
+      return this.expand();
+    }
+    this.waitForInteraction();
+  }
+
+  get requireInteraction() {
+    return this.hasAttribute('require-interaction');
+  }
+
+  waitForInteraction() {
+    // TODO
+  }
+
+  expand() {
     const value = atob(this.getAttribute("value") ?? "");
     const key = this.getAttribute("key");
 

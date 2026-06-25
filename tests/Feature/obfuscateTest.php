@@ -2,7 +2,7 @@
 
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
-function obfuscator(string $html, bool $injectJS = false): HTMLObfuscator
+function obfuscate(string $html, bool $injectJS = false): HTMLObfuscator
 {
     HTMLObfuscator::$hasInjectedFrontendScript = false;
 
@@ -14,7 +14,7 @@ function obfuscator(string $html, bool $injectJS = false): HTMLObfuscator
 
 function render(string $html, bool $injectJS = false): string
 {
-    return obfuscator(...func_get_args())->render();
+    return obfuscate(...func_get_args())->render();
 }
 
 /** @param list<string> $customAttributes */
@@ -65,7 +65,7 @@ test('emails(false) disables email obfuscation', function () {
 });
 
 test('phoneNumbers(false) disables phone number obfuscation', function () {
-    $result = obfuscator('<a href="tel:+49 12 345 67">call us</a>')
+    $result = obfuscate('<a href="tel:+49 12 345 67">call us</a>')
         ->phoneNumbers(false)
         ->injectFrontendScript(false)
         ->render();
@@ -74,7 +74,7 @@ test('phoneNumbers(false) disables phone number obfuscation', function () {
 });
 
 test('randomizeKey(true) produces obfuscated output', function () {
-    $result = obfuscator('mail@example.com')
+    $result = obfuscate('mail@example.com')
         ->withPassphrase('testing')
         ->randomizeKey(true)
         ->injectFrontendScript(false)
@@ -93,9 +93,9 @@ test('render() outputs full HTML for non-partial input', function () {
 
 test('__toString() returns the rendered output', function () {
     HTMLObfuscator::$hasInjectedFrontendScript = false;
-    $obfuscator = HTMLObfuscator::createFromString('hello world')
+    $obfuscate = HTMLObfuscator::createFromString('hello world')
         ->injectFrontendScript(false);
-    expect((string) $obfuscator)->toBe('hello world');
+    expect((string) $obfuscate)->toBe('hello world');
 });
 
 test('Invalid mailto: links are not obfuscated', function () {
@@ -111,7 +111,7 @@ test('Invalid tel: links are not obfuscated', function () {
 });
 
 test('Allows to customize the custom element name', function () {
-    $result = obfuscator('mail@example.com', injectJS: true)
+    $result = obfuscate('mail@example.com', injectJS: true)
         ->withTagName('reveal-me')
         ->render();
 
@@ -120,12 +120,12 @@ test('Allows to customize the custom element name', function () {
 });
 
 test('Exposes ->apply() as public method', function () {
-    $obfuscator = obfuscator('mail@example.com', injectJS: true)->apply();
-    expect($obfuscator)->toBeInstanceOf(HTMLObfuscator::class);
+    $obfuscate = obfuscate('mail@example.com', injectJS: true)->apply();
+    expect($obfuscate)->toBeInstanceOf(HTMLObfuscator::class);
 });
 
 test('withTagName() throws if the element name is malformed', function () {
-    expect(fn () => obfuscator('mail@example.com')->withTagName('foobar'))
+    expect(fn () => obfuscate('mail@example.com')->withTagName('foobar'))
         ->toThrow(InvalidArgumentException::class);
 });
 
@@ -135,4 +135,14 @@ test('Returns a partial when receiving a partial', function () {
 
 test('Returns a the full document when receiving at least a <body> element', function () {
     expect(render('<body>foobar</body>'))->toBe('<html><head></head><body>foobar</body></html>');
+});
+
+test('Adds the attribute "interact" if needed', function () {
+    $result = obfuscate('mail@example.com')
+        ->requireUserInteraction()
+        ->render();
+
+    dump($result);
+
+    expect($result)->toContain('require-interaction');
 });
