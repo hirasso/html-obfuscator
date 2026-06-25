@@ -139,7 +139,7 @@ test('Returns a the full document when receiving at least a <body> element', fun
 
 test('Adds the attribute "interact" if needed', function () {
     $result = obfuscate('mail@example.com')
-        ->requireUserInteraction()
+        ->requireInteraction()
         ->render();
 
     dump($result);

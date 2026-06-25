@@ -8,6 +8,7 @@ use Dom\DocumentFragment;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
+use Hirasso\HTMLObfuscator\Enum\UserInteraction;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 use RuntimeException;
@@ -26,7 +27,9 @@ final class HTMLObfuscator
 
     private string $passphrase = 'html-obfuscator';
     private string $tagName = self::DEFAULT_TAG_NAME;
-    private bool $requireUserInteraction = false;
+
+    private UserInteraction $requireInteraction = UserInteraction::None;
+
     private bool $randomizeKey = true;
 
     private bool $emails = true;
@@ -114,9 +117,9 @@ final class HTMLObfuscator
     /**
      * Require user interaction before revealing obfuscated content?
      */
-    public function requireUserInteraction(bool $enabled = true): self
+    public function requireInteraction(UserInteraction $type = UserInteraction::General): self
     {
-        $this->requireUserInteraction = $enabled;
+        $this->requireInteraction = $type;
         return $this;
     }
 
@@ -248,7 +251,9 @@ final class HTMLObfuscator
         $el->setAttribute('value', $this->encode($value, $key));
         $el->setAttribute('key', $key);
 
-        $el->toggleAttribute('require-interaction', $this->requireUserInteraction);
+        if ($this->requireInteraction !== UserInteraction::None) {
+            $el->setAttribute('require-interaction', $this->requireInteraction->value);
+        }
 
         return $el;
     }
