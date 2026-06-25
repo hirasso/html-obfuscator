@@ -1,5 +1,6 @@
 <?php
 
+use Hirasso\HTMLObfuscator\Enum\Interaction;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
 function obfuscate(string $html, bool $injectJS = false): HTMLObfuscator
@@ -139,7 +140,7 @@ test('Returns a the full document when receiving at least a <body> element', fun
 
 test('Adds the attribute "interact" if needed', function () {
     $result = obfuscate('mail@example.com')
-        ->requireInteraction()
+        ->requireInteraction(Interaction::OnDocument)
         ->render();
 
     dump($result);

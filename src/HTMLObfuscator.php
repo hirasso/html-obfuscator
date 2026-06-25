@@ -8,7 +8,7 @@ use Dom\DocumentFragment;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
-use Hirasso\HTMLObfuscator\Enum\UserInteraction;
+use Hirasso\HTMLObfuscator\Enum\Interaction;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 use RuntimeException;
@@ -28,7 +28,7 @@ final class HTMLObfuscator
     private string $passphrase = 'html-obfuscator';
     private string $tagName = self::DEFAULT_TAG_NAME;
 
-    private UserInteraction $requireInteraction = UserInteraction::None;
+    private ?Interaction $requireInteraction = null;
 
     private bool $randomizeKey = true;
 
@@ -117,9 +117,9 @@ final class HTMLObfuscator
     /**
      * Require user interaction before revealing obfuscated content?
      */
-    public function requireInteraction(UserInteraction $type = UserInteraction::General): self
+    public function requireInteraction(Interaction $interaction): self
     {
-        $this->requireInteraction = $type;
+        $this->requireInteraction = $interaction;
         return $this;
     }
 
@@ -250,8 +250,9 @@ final class HTMLObfuscator
         $el = $document->createElement($this->tagName);
         $el->setAttribute('value', $this->encode($value, $key));
         $el->setAttribute('key', $key);
+        $el->setAttribute('tabindex', '0');
 
-        if ($this->requireInteraction !== UserInteraction::None) {
+        if ($this->requireInteraction) {
             $el->setAttribute('require-interaction', $this->requireInteraction->value);
         }
 
@@ -324,10 +325,10 @@ final class HTMLObfuscator
         self::$hasInjectedFrontendScript = true;
 
         $scriptElement = $document->createElement('script');
-        $scriptElement->setAttribute('type', 'module');
+        $scriptElement->setAttribute('tag-name', $this->tagName);
 
         $js = file_get_contents(dirname(__DIR__). '/resources/html-obfuscator.js') ?: '';
-        $js = str_replace("x-obfuscated", $this->tagName, $js);
+        $js = str_replace('x-obfuscated', $this->tagName, $js);
 
         $scriptElement->textContent = $js;
         $document->body?->append($scriptElement);

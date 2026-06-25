@@ -5,86 +5,87 @@
 (function () {
   const tagName = "x-obfuscated";
 
+  if (window.customElements.get(tagName)) {
+    return;
+  }
+
   let hasInteracted = false;
-  let hasIntentionallyInteracted = false;
 
-  (function () {
-    const c = new AbortController();
+  window.customElements.define(
+    tagName,
+    class extends HTMLElement {
+      abortController = new AbortController();
 
-    /** @param {Event} e */
-    const handler = (e) => {
-      c.abort();
-      hasInteracted = true;
-
-      if (e.target instanceof Element && e.target?.closest('[require-interaction="intentional"]')) {
-        hasIntentionallyInteracted = true;
+      static get observedAttributes() {
+        return ["require-interaction"];
       }
 
-      document
-        .querySelectorAll(tagName)
-        .forEach((el) => el.removeAttribute("require-interaction"));
-    };
-
-    [
-      "pointermove",
-      "pointerdown",
-      "keydown",
-    ].forEach((evt) => {
-      document.addEventListener(evt, handler, c);
-    });
-  })();
-
-  class ObfuscatedElement extends HTMLElement {
-    static get observedAttributes() {
-      return ["require-interaction"];
-    }
-
-    connectedCallback() {
-      if (!this.needsInteraction) {
-        this.render();
-      }
-    }
-
-    /**
-     * @param {string} name
-     * @param {string} oldValue
-     * @param {string} newValue
-     */
-    attributeChangedCallback(name, oldValue, newValue) {
-      if (name === "require-interaction" && newValue === null) {
-        this.render();
-      }
-    }
-
-    get needsInteraction() {
-      if (hasInteracted || !this.hasAttribute("require-interaction")) {
-        return false;
+      connectedCallback() {
+        if (!this.requireInteraction()) {
+          this.render();
+        }
       }
 
-      return true;
-    }
-
-    render() {
-      const value = atob(this.getAttribute("value") ?? "");
-      const key = this.getAttribute("key");
-
-      if (!value || !key) {
-        console.error("No value or key provided, destroying...");
-        this.remove();
-        return;
+      disconnectedCallback() {
+        this.abortController.abort();
       }
 
-      let result = "";
-      for (let i = 0; i < value.length; i++)
-        result += String.fromCharCode(
-          value.charCodeAt(i) ^ key.charCodeAt(i % key.length),
+      attributeChangedCallback() {
+        this.connectedCallback();
+      }
+
+      requireInteraction() {
+        const requiredInteraction = this.getAttribute("require-interaction");
+
+        if (hasInteracted || !requiredInteraction) {
+          return false;
+        }
+
+        document.addEventListener(
+          "html-obfuscator:render",
+          this.render,
+          this.abortController,
         );
 
-      this.outerHTML = result;
-    }
-  }
+        switch (requiredInteraction) {
+          case "onElement":
+            this.addEventListener("focusin", this.render, this.abortController);
+            break;
 
-  if (!window.customElements.get(tagName)) {
-    window.customElements.define(tagName, ObfuscatedElement);
-  }
+          case "onDocument":
+            ["pointermove", "pointerdown", "keydown"].forEach((evt) =>
+              document.addEventListener(evt, this.render, this.abortController),
+            );
+            break;
+
+          default:
+            break;
+        }
+
+        return true;
+      }
+
+      render = () => {
+        const value = atob(this.getAttribute("value") ?? "");
+        const key = this.getAttribute("key");
+
+        if (!value || !key) {
+          this.remove();
+          return;
+        }
+
+        const result = [...value]
+          .map((c, i) =>
+            String.fromCharCode(
+              c.charCodeAt(0) ^ key.charCodeAt(i % key.length),
+            ),
+          )
+          .join("");
+
+        this.outerHTML = result;
+
+        document.dispatchEvent(new CustomEvent("html-obfuscator:render"));
+      };
+    },
+  );
 })();
