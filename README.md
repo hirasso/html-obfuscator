@@ -50,7 +50,7 @@ use Hirasso\HTMLObfuscator\HTMLObfuscator;
 echo HTMLObfuscator::createFromString($html)
     ->phoneNumbers(false)
     ->withPassphrase('nobody will guess this!')
-    ->withCustomElementName('reveal-me')
+    ->withTagName('reveal-me')
     ->render();
 ```
 

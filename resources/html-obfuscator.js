@@ -2,27 +2,90 @@
 
 // @ts-check
 
-class ObfuscatedElement extends HTMLElement {
-  connectedCallback() {
-    const value = atob(this.getAttribute("value") ?? "");
-    const key = this.getAttribute("key");
+(function () {
+  const tagName = "x-obfuscated";
 
-    if (!value || !key) {
-      console.error("No value or key provided, destroying...");
-      this.remove();
-      return;
-    }
-
-    let result = "";
-    for (let i = 0; i < value.length; i++)
-      result += String.fromCharCode(
-        value.charCodeAt(i) ^ key.charCodeAt(i % key.length),
-      );
-
-    this.outerHTML = result;
+  if (window.customElements.get(tagName)) {
+    return;
   }
-}
 
-if (!window.customElements.get("x-obfuscated")) {
-  window.customElements.define("x-obfuscated", ObfuscatedElement);
-}
+  let hasInteracted = false;
+
+  window.customElements.define(
+    tagName,
+    class extends HTMLElement {
+      abortController = new AbortController();
+
+      static get observedAttributes() {
+        return ["require-interaction"];
+      }
+
+      connectedCallback() {
+        if (!this.requireInteraction()) {
+          this.render();
+        }
+      }
+
+      disconnectedCallback() {
+        this.abortController.abort();
+      }
+
+      attributeChangedCallback() {
+        this.connectedCallback();
+      }
+
+      requireInteraction() {
+        const requiredInteraction = this.getAttribute("require-interaction");
+
+        if (hasInteracted || !requiredInteraction) {
+          return false;
+        }
+
+        document.addEventListener(
+          "html-obfuscator:render",
+          this.render,
+          this.abortController,
+        );
+
+        switch (requiredInteraction) {
+          case "onElement":
+            this.addEventListener("focusin", this.render, this.abortController);
+            break;
+
+          case "onDocument":
+            ["pointermove", "pointerdown", "keydown"].forEach((evt) =>
+              document.addEventListener(evt, this.render, this.abortController),
+            );
+            break;
+
+          default:
+            break;
+        }
+
+        return true;
+      }
+
+      render = () => {
+        const value = atob(this.getAttribute("value") ?? "");
+        const key = this.getAttribute("key");
+
+        if (!value || !key) {
+          this.remove();
+          return;
+        }
+
+        const result = [...value]
+          .map((c, i) =>
+            String.fromCharCode(
+              c.charCodeAt(0) ^ key.charCodeAt(i % key.length),
+            ),
+          )
+          .join("");
+
+        this.outerHTML = result;
+
+        document.dispatchEvent(new CustomEvent("html-obfuscator:render"));
+      };
+    },
+  );
+})();
