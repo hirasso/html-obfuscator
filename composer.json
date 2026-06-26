@@ -41,7 +41,7 @@
     "test:coverage": "php -d zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-84-arm64.so -d xdebug.mode=coverage ./vendor/bin/pest --coverage --coverage-html ./tests/reports",
     "test:ci": "./vendor/bin/pest --coverage-clover coverage.xml",
     "analyse": "./vendor/bin/phpstan analyse --memory-limit=2G",
-    "example": "php -S localhost:8080 -t example/",
+    "serve": "php -S localhost:8080 -t example/",
     "build": "pnpm build",
     "generate-types": "bin/console typescript:transform",
     "post-install-cmd": [

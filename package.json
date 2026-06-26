@@ -5,6 +5,7 @@
   "private": true,
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
+    "@playwright/test": "^1.61.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
     "terser": "^5",
@@ -15,6 +16,7 @@
     "prepare": "husky",
     "watch": "vite build --watch",
     "build": "vite build",
-    "analyse": "pnpm exec tsc --noEmit --project tsconfig.json"
+    "analyse": "pnpm exec tsc --noEmit --project tsconfig.json",
+    "test:e2e": "playwright test"
   }
 }
