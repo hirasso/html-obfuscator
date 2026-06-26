@@ -1,10 +1,8 @@
 // @ts-check
 
 /**
- * @filename: lint-staged.config.js
  * @type {import('lint-staged').Configuration}
  */
-
 export default {
   "**/*.php": ["composer analyse", "composer format"],
   "*.ts": [() => "pnpm run build"],
