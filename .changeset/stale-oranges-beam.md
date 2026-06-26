@@ -2,4 +2,4 @@
 "html-obfuscator": patch
 ---
 
-Apply a minified and mangled version of the deobfuscation script by default
+Inject a minified and mangled version of the frontend deobfuscation script by default
