@@ -7,16 +7,10 @@
 		Object.assign(el.style, styles);
 	}
 	/**
-	* Prefix a string with our prefix
+	* Detect global interaction
 	*/
-	function prefixed(str) {
-		return `html-obfuscator:${str}`;
-	}
-	/**
-	* Dispatch custom prefixed events
-	*/
-	function dispatchPrefixedEvent(eventName) {
-		document.documentElement.dispatchEvent(new CustomEvent(prefixed(eventName), { bubbles: true }));
+	function detectGlobalInteraction() {
+		return detectInteraction(window);
 	}
 	/**
 	* Detect interaction. Dedupes and short-circuits
@@ -84,25 +78,10 @@
 		}) : e[r] = t, e;
 	}
 	//#endregion
-	//#region resources/src/html-obfuscator.ts
+	//#region resources/src/ObfuscatedElement.ts
 	/**
-	* This is the frontend script of html-obfuscator
-	* It will detect existing and new <x-obfuscated> elements
-	* and reveal them automatically.
+	* Renders an obfuscated element that can reveal itself
 	*/
-	var currentScript = document.currentScript;
-	var debug = (() => {
-		return currentScript.hasAttribute("debug") ? console : null;
-	})();
-	var tagName = currentScript.getAttribute("tag-name") ?? "x-obfuscated";
-	debug?.log(`using tag name ${tagName}`);
-	/** Detect interaction globally */
-	var hasInteractedGlobally = false;
-	detectInteraction(document.documentElement).then(() => {
-		debug?.log("user has interacted, dispatching reveal event...");
-		hasInteractedGlobally = true;
-		dispatchPrefixedEvent("reveal");
-	});
 	var ObfuscatedElement = class extends HTMLElement {
 		constructor(..._args) {
 			super(..._args);
@@ -116,7 +95,6 @@
 				}
 				const result = [...value].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
 				this.outerHTML = result;
-				dispatchPrefixedEvent("reveal");
 			});
 		}
 		static get observedAttributes() {
@@ -132,16 +110,9 @@
 			this.connectedCallback();
 		}
 		requireInteraction() {
-			const requiredInteraction = this.getAttribute("require-interaction");
-			if (hasInteractedGlobally || !requiredInteraction) return false;
+			if (!this.getAttribute("require-interaction")) return false;
 			this.showPlaceholder();
-			document.addEventListener("html-obfuscator:reveal", this.reveal, this.abortController);
-			switch (requiredInteraction) {
-				case "onElement":
-					this.addEventListener("focusin", this.reveal, this.abortController);
-					break;
-				default: break;
-			}
+			detectGlobalInteraction().then(this.reveal);
 			return true;
 		}
 		showPlaceholder() {
@@ -165,6 +136,22 @@
 			}
 		}
 	};
+	//#endregion
+	//#region resources/src/html-obfuscator.ts
+	/**
+	* This is the frontend script of html-obfuscator
+	* It will detect existing and new <x-obfuscated> elements
+	* and reveal them automatically.
+	*/
+	var currentScript = document.currentScript;
+	var debug = (() => {
+		return currentScript.hasAttribute("debug") ? console : null;
+	})();
+	var tagName = currentScript.getAttribute("tag-name") ?? "x-obfuscated";
+	debug?.log(`using tag name ${tagName}`);
+	detectGlobalInteraction().then(() => {
+		debug?.log("User has interacted");
+	});
 	/**
 	* Define the custom element, logging errors only in debug mode
 	*/
