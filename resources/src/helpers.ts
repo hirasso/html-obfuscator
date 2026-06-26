@@ -123,7 +123,7 @@ export function dispatchPrefixedEvent(eventName: string): void {
 }
 
 /**
- * Detect global interaction
+ * Detect interaction anywhere on the window
  */
 export function detectGlobalInteraction() {
   return detectInteraction(window);
