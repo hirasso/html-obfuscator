@@ -51,6 +51,7 @@ echo HTMLObfuscator::createFromString($html)
     ->phoneNumbers(false)
     ->withPassphrase('nobody will guess this!')
     ->withTagName('reveal-me')
+    ->debug(true)
     ->render();
 ```
 
