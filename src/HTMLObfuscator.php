@@ -335,12 +335,14 @@ final class HTMLObfuscator
         self::$hasInjectedFrontendScript = true;
 
         $scriptElement = $document->createElement('script');
+        $scriptElement->toggleAttribute("debug", $this->debug);
+        $scriptElement->setAttribute("tag-name", $this->tagName);
 
         $rootPath = dirname(__DIR__);
 
         $filePath = $this->debug
-            ? '/resources/dist/html-obfuscator.min.js'
-            : '/resources/html-obfuscator.js';
+            ? '/resources/dist/html-obfuscator.iife.min.js'
+            : '/resources/dist/html-obfuscator.iife.min.js';
 
         $js = file_get_contents($rootPath . $filePath) ?: '';
         $js = str_replace('x-obfuscated', $this->tagName, $js);
