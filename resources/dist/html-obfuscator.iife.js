@@ -19,27 +19,30 @@
 		document.documentElement.dispatchEvent(new CustomEvent(prefixed(eventName), { bubbles: true }));
 	}
 	/**
-	* Detect interaction
+	* Detect interaction. Dedupes and short-circuits
+	* repeated calls against the same element.
 	*/
 	var detectInteraction = (() => {
 		let hasInteracted = false;
+		const promises = /* @__PURE__ */ new Map();
 		return (target, events = void 0) => {
 			events ?? (events = [
 				"pointermove",
 				"pointerdown",
 				"keydown"
 			]);
-			const abortCtrl = new AbortController();
-			return new Promise((resolve) => {
-				if (hasInteracted) resolve();
+			if (hasInteracted) return Promise.resolve(target);
+			if (!promises.has(target)) promises.set(target, new Promise((resolve) => {
+				const abortCtrl = new AbortController();
 				events.forEach((eventName) => {
-					document.addEventListener(eventName, (e) => {
+					target.addEventListener(eventName, () => {
 						abortCtrl.abort();
 						hasInteracted = true;
-						resolve();
-					}, abortCtrl);
+						resolve(target);
+					}, { signal: abortCtrl.signal });
 				});
-			});
+			}));
+			return promises.get(target);
 		};
 	})();
 	//#endregion

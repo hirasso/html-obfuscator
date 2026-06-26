@@ -25,33 +25,39 @@ export function dispatchPrefixedEvent(eventName: string): void {
 }
 
 /**
- * Detect interaction
+ * Detect interaction. Dedupes and short-circuits
+ * repeated calls against the same element.
  */
 export const detectInteraction = (() => {
   let hasInteracted = false;
+  const promises = new Map<HTMLElement, Promise<HTMLElement>>();
 
-  return (
-    target: HTMLElement,
+  return <T extends HTMLElement>(
+    target: T,
     events: (keyof DocumentEventMap)[] | undefined = undefined,
-  ): Promise<void> => {
+  ): Promise<T> => {
     events ??= ["pointermove", "pointerdown", "keydown"];
 
-    const abortCtrl = new AbortController();
+    if (hasInteracted) return Promise.resolve(target);
 
-    return new Promise<void>((resolve) => {
-      if (hasInteracted) resolve();
+    if (!promises.has(target)) {
+      promises.set(target, new Promise<T>((resolve) => {
+        const abortCtrl = new AbortController();
 
-      events.forEach((eventName) => {
-        document.addEventListener(
-          eventName,
-          (e) => {
-            abortCtrl.abort();
-            hasInteracted = true;
-            resolve();
-          },
-          abortCtrl,
-        );
-      });
-    });
+        events.forEach((eventName) => {
+          target.addEventListener(
+            eventName,
+            () => {
+              abortCtrl.abort();
+              hasInteracted = true;
+              resolve(target);
+            },
+            { signal: abortCtrl.signal },
+          );
+        });
+      }));
+    }
+
+    return promises.get(target)! as Promise<T>;
   };
 })();
