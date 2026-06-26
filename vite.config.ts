@@ -40,6 +40,7 @@ export default defineConfig({
           entryFileNames: "[name].js",
           name: "HtmlObfuscator",
           minify: false,
+          comments: true,
         },
         {
           format: "iife",
