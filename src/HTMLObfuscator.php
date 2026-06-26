@@ -35,7 +35,7 @@ final class HTMLObfuscator
     private bool $phoneNumbers = true;
 
     private bool $injectFrontendScript = true;
-    private bool $obfuscateFrontendScript = true;
+    private bool $debug = false;
 
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
@@ -133,11 +133,13 @@ final class HTMLObfuscator
     }
 
     /**
-     * Should the injected deobfuscation script be obfuscated using minification and property mangling?
+     * Activate debug mode. Currently, this has only one effect:
+     *
+     *  - The deobfuscation JavaScript will be injected un-minified
      */
-    public function obfuscateFrontendScript(bool $enabled = true): self
+    public function debug(bool $enabled = true): self
     {
-        $this->obfuscateFrontendScript = $enabled;
+        $this->debug = $enabled;
         return $this;
     }
 
@@ -336,7 +338,7 @@ final class HTMLObfuscator
 
         $rootPath = dirname(__DIR__);
 
-        $filePath = $this->obfuscateFrontendScript
+        $filePath = $this->debug
             ? '/resources/dist/html-obfuscator.min.js'
             : '/resources/html-obfuscator.js';
 

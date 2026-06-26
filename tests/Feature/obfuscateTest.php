@@ -54,9 +54,9 @@ test('Injects the terser-obfuscated frontend script by default', function () {
     expect($result)->toContain('ar __defProp=Object.defineProperty');
 });
 
-test('obfuscateFrontendScript(false) loads the un-obfuscated frontend script', function () {
+test('debug(false) loads the un-obfuscated frontend script', function () {
     $result = obfuscate('+49 12 345 67', injectJS: true)
-        ->obfuscateFrontendScript(false)
+        ->debug(false)
         ->render();
 
     expect($result)->toContain('@ts-check');
@@ -120,7 +120,7 @@ test('Invalid tel: links are not obfuscated', function () {
 test('Allows to customize the custom element name', function () {
     $result = obfuscate('mail@example.com', injectJS: true)
         ->withTagName('reveal-me')
-        ->obfuscateFrontendScript(false)
+        ->debug(false)
         ->render();
 
     dump($result);
