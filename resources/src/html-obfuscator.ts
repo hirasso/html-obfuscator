@@ -7,7 +7,6 @@
 import { detectGlobalInteraction, settings, logger } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
-console.log(settings);
 logger?.log(settings);
 
 const { tagName, revealStrategy } = settings;

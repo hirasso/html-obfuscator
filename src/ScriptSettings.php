@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Hirasso\HTMLObfuscator\ScriptSettings;
+namespace Hirasso\HTMLObfuscator;
 
 use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
-use Hirasso\HTMLObfuscator\HTMLObfuscator;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript()]

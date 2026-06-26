@@ -38,12 +38,12 @@ export default defineConfig({
       output: [
         {
           format: "iife",
-          entryFileNames: "[name].iife.js",
+          entryFileNames: "[name].js",
           name: "HtmlObfuscator",
         },
         {
           format: "iife",
-          entryFileNames: "[name].iife.min.js",
+          entryFileNames: "[name].min.js",
           name: "HtmlObfuscator",
           plugins: [terserPlugin(terserOptions)],
         },

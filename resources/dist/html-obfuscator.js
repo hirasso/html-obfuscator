@@ -187,7 +187,6 @@
 	* It will detect existing and new <x-obfuscated> elements
 	* and reveal them automatically.
 	*/
-	console.log(settings);
 	logger?.log(settings);
 	var { tagName, revealStrategy } = settings;
 	if (revealStrategy === "oninteraction") detectGlobalInteraction().then(() => {

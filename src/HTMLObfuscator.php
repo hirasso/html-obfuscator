@@ -8,7 +8,6 @@ use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
-use Hirasso\HTMLObfuscator\ScriptSettings\ScriptSettings;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 use RuntimeException;
@@ -351,8 +350,8 @@ final class HTMLObfuscator
         $rootPath = dirname(__DIR__);
 
         $filePath = $this->debug
-            ? '/resources/dist/html-obfuscator.iife.min.js'
-            : '/resources/dist/html-obfuscator.iife.min.js';
+            ? '/resources/dist/html-obfuscator.js'
+            : '/resources/dist/html-obfuscator.min.js';
 
         $js = file_get_contents($rootPath . $filePath) ?: '';
         $js = str_replace('x-obfuscated', $this->tagName, $js);
