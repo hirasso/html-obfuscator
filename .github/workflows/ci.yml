@@ -65,6 +65,16 @@ jobs:
         with:
           report-file: tests/e2e/results/report.json
 
+  publish:
+    name: Version or Publish
+    needs: [php-tests, e2e-tests, format]
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/version-or-publish.yml
+    secrets: inherit
+    permissions:
+      contents: write
+      pull-requests: write
+
   format:
     name: Format Code
     needs: php-tests
