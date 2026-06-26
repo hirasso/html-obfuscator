@@ -1,5 +1,6 @@
 <?php
 
+use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
 const TESTS_TAG_NAME = 'tests-obfuscated';
@@ -39,7 +40,7 @@ function expectObfuscatedElement(
 }
 
 test('Obfuscates emails in links', function () {
-    expectObfuscatedElement((string) obfuscate('< href="mailto:mail@example.com">email</a>'));
+    expectObfuscatedElement((string) obfuscate('<a href="mailto:mail@example.com">email</a>'));
 });
 
 test('Obfuscates emails in plaintext', function () {
@@ -141,4 +142,22 @@ test('Returns a partial when receiving a partial', function () {
 
 test('Returns a the full document when receiving at least a <body> element', function () {
     expect((string) obfuscate('<body>foobar</body>'))->toContain('<html><head></head><body>foobar');
+});
+
+test('withRevealStrategy() sets the reveal strategy', function () {
+    $result = (string) obfuscate('mail@example.com')
+        ->withRevealStrategy(RevealStrategy::OnInteraction)
+        ->injectFrontendScript(true);
+    expectObfuscatedElement($result);
+});
+
+test('renderPlaceholders() controls placeholder rendering', function () {
+    $result = (string) obfuscate('mail@example.com')
+        ->renderPlaceholders(false);
+    expectObfuscatedElement($result);
+});
+
+test('getDocument() returns the underlying HTMLDocument', function () {
+    $obfuscator = obfuscate('mail@example.com');
+    expect($obfuscator->getDocument())->toBeInstanceOf(\Dom\HTMLDocument::class);
 });

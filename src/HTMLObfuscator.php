@@ -182,7 +182,7 @@ final class HTMLObfuscator
      */
     public function getDocument(): HTMLDocument
     {
-        return $this->document; // @codeCoverageIgnore
+        return $this->document;
     }
 
     /**
