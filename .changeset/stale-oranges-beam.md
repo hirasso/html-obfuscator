@@ -2,4 +2,4 @@
 "html-obfuscator": patch
 ---
 
-Inject an aggressively minified version of the deobfuscation script by default. Provide `->obfuscateFrontendScript(bool)` to control the behavior.
+Apply a minified and mangled version of the deobfuscation script by default

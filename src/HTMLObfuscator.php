@@ -35,7 +35,7 @@ final class HTMLObfuscator
     private bool $phoneNumbers = true;
 
     private bool $injectFrontendScript = true;
-    private bool $obfuscateFrontendScript = true;
+    private bool $debug = false;
 
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
@@ -133,11 +133,13 @@ final class HTMLObfuscator
     }
 
     /**
-     * Should the injected deobfuscation script be obfuscated using minification and property mangling?
+     * Activate debug mode. Currently, this has only one effect:
+     *
+     *  - The deobfuscation JavaScript will be injected un-minified
      */
-    public function obfuscateFrontendScript(bool $enabled = true): self
+    public function debug(bool $enabled = true): self
     {
-        $this->obfuscateFrontendScript = $enabled;
+        $this->debug = $enabled;
         return $this;
     }
 
@@ -245,6 +247,7 @@ final class HTMLObfuscator
 
         return $this->createObfuscatedElement(
             value: Support::outerHTML($el),
+            charCount: mb_strlen($el->textContent ?? ''),
             document: $el->ownerDocument
         );
     }
@@ -252,14 +255,18 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated element
      */
-    private function createObfuscatedElement(string $value, HTMLDocument $document): Element
-    {
+    private function createObfuscatedElement(
+        string $value,
+        int $charCount,
+        HTMLDocument $document
+    ): Element {
         $key = $this->getKey();
 
         $el = $document->createElement($this->tagName);
         $el->setAttribute('value', $this->encode($value, $key));
         $el->setAttribute('key', $key);
         $el->setAttribute('tabindex', '0');
+        $el->setAttribute('char-count', (string) $charCount);
 
         if ($this->requireInteraction) {
             $el->setAttribute('require-interaction', $this->requireInteraction->value);
@@ -281,7 +288,9 @@ final class HTMLObfuscator
         $obfuscated = preg_replace_callback(
             "/{$regex}/",
             function ($matches) use ($node) {
-                $el = $this->createObfuscatedElement($matches[0], $node->ownerDocument);
+                $value = $matches[0];
+                $el = $this->createObfuscatedElement($value, mb_strlen($value), $node->ownerDocument);
+
                 return Support::outerHTML($el);
             },
             $node->data
@@ -329,7 +338,7 @@ final class HTMLObfuscator
 
         $rootPath = dirname(__DIR__);
 
-        $filePath = $this->obfuscateFrontendScript
+        $filePath = $this->debug
             ? '/resources/dist/html-obfuscator.min.js'
             : '/resources/html-obfuscator.js';
 
