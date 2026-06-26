@@ -20,3 +20,6 @@ tests/reports
 CLAUDE.md
 
 TODO.md
+
+# Playwright
+tests/e2e/results
