@@ -7,7 +7,8 @@ namespace Hirasso\HTMLObfuscator;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
-use Hirasso\HTMLObfuscator\Enum\Interaction;
+use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
+use Hirasso\HTMLObfuscator\ScriptSettings\ScriptSettings;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 use RuntimeException;
@@ -26,8 +27,7 @@ final class HTMLObfuscator
 
     private string $passphrase = 'html-obfuscator';
     private string $tagName = self::DEFAULT_TAG_NAME;
-
-    private ?Interaction $requireInteraction = null;
+    private bool $debug = false;
 
     private bool $randomizeKey = true;
 
@@ -35,7 +35,8 @@ final class HTMLObfuscator
     private bool $phoneNumbers = true;
 
     private bool $injectFrontendScript = true;
-    private bool $debug = false;
+
+    private ScriptSettings $scriptSettings;
 
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
@@ -44,6 +45,7 @@ final class HTMLObfuscator
         private HTMLDocument $document,
         private bool $isPartial
     ) {
+        $this->scriptSettings = new ScriptSettings();
     }
 
     /**
@@ -111,15 +113,25 @@ final class HTMLObfuscator
         }
 
         $this->tagName = trim($tagName);
+        $this->scriptSettings->tagName = $this->tagName;
         return $this;
     }
 
     /**
-     * Require user interaction before revealing obfuscated content?
+     * Set the reveal strategy
      */
-    public function requireInteraction(Interaction $interaction): self
+    public function withRevealStrategy(RevealStrategy $revealStrategy): self
     {
-        $this->requireInteraction = $interaction;
+        $this->scriptSettings->revealStrategy = $revealStrategy;
+        return $this;
+    }
+
+    /**
+     * Should placeholders be rendered for obfuscated elements?
+     */
+    public function renderPlaceholders(bool $enabled = true): self
+    {
+        $this->scriptSettings->renderPlaceholders = $enabled;
         return $this;
     }
 
@@ -140,6 +152,7 @@ final class HTMLObfuscator
     public function debug(bool $enabled = true): self
     {
         $this->debug = $enabled;
+        $this->scriptSettings->debug = $this->debug;
         return $this;
     }
 
@@ -268,10 +281,6 @@ final class HTMLObfuscator
         $el->setAttribute('tabindex', '0');
         $el->setAttribute('char-count', (string) $charCount);
 
-        if ($this->requireInteraction) {
-            $el->setAttribute('require-interaction', $this->requireInteraction->value);
-        }
-
         return $el;
     }
 
@@ -334,10 +343,11 @@ final class HTMLObfuscator
         }
         self::$hasInjectedFrontendScript = true;
 
-        $scriptElement = $document->createElement('script');
-        $scriptElement->toggleAttribute("debug", $this->debug);
-        $scriptElement->setAttribute("tag-name", $this->tagName);
-
+        $script = $document->createElement('script');
+        $script->setAttribute('data-settings', \json_encode(
+            value: $this->scriptSettings,
+            flags: JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
+        ));
         $rootPath = dirname(__DIR__);
 
         $filePath = $this->debug
@@ -347,7 +357,7 @@ final class HTMLObfuscator
         $js = file_get_contents($rootPath . $filePath) ?: '';
         $js = str_replace('x-obfuscated', $this->tagName, $js);
 
-        $scriptElement->textContent = $js;
-        $document->body?->append($scriptElement);
+        $script->textContent = $js;
+        $document->body?->append($script);
     }
 }

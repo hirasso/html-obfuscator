@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+use Hirasso\HTMLObfuscator\Commands\GenerateTypeScriptCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+$application->addCommand(new GenerateTypeScriptCommand());
+
+$application->run();

@@ -1,3 +1,101 @@
+const prefix = "html-obfuscator";
+
+/**
+ * Load data from an `application/json` script tag
+ */
+type ScriptSettings = Hirasso.HTMLObfuscator.ScriptSettings;
+const defaults: ScriptSettings = {
+  tagName: "x-obfuscated",
+  debug: false,
+  revealStrategy: "onload",
+  renderPlaceholders: false,
+};
+
+/**
+ * Load the settings from the script tag
+ */
+export const settings: ScriptSettings = (() => {
+  const attr = document.currentScript?.getAttribute("data-settings");
+  if (!attr) return defaults;
+
+  try {
+    return JSON.parse(attr);
+  } catch (e) {
+    return defaults;
+  }
+})();
+
+/**
+ * Get a minimal logger with a prefix, if settings.debug = true
+ */
+export const logger = (() => {
+  if (!settings.debug) {
+    return null;
+  }
+
+  const style = [
+    "background: linear-gradient(to right, #a960ee, #f78ed4)",
+    "color: white",
+    "padding-inline: 4px",
+    "border-radius: 2px",
+    "font-family: monospace",
+  ].join(";");
+
+  return {
+    log: (...args: any[]) => console.log(`%c${prefix}`, style, ...args),
+    warn: (...args: any[]) => console.warn(`%c${prefix}`, style, ...args),
+    error: (...args: any[]) => console.error(`%c${prefix}`, style, ...args),
+  };
+})();
+
+/**
+ * Load the data from a json script tag
+ */
+export const loadSettingsFromJsonScriptTag = (() => {
+  const store = new Map<string, any>();
+
+  return function <T>(selector: string): T {
+    if (store.has(selector)) {
+      return store.get(selector);
+    }
+
+    const el = document.getElementById(selector);
+    if (!el) {
+      throw new Error(`No script data element found for "${selector}"`);
+    }
+
+    let value: any;
+    try {
+      value = JSON.parse(el.textContent ?? "");
+    } catch {
+      throw new Error(`Failed to parse script data for "${selector}"`);
+    }
+
+    if (!value.settings) {
+      throw new Error(`No settings found in script data for "${selector}"`);
+    }
+
+    store.set(selector, value.settings);
+
+    return value.settings as T;
+  };
+})();
+
+/**
+ * Get an attribute, validate it
+ */
+function attr<T extends string>(
+  el: HTMLElement,
+  attribute: string,
+  allowedValues: readonly T[],
+): T | null {
+  const value = el.getAttribute(attribute);
+  if (value !== null && (allowedValues as readonly string[]).includes(value)) {
+    return value as T;
+  }
+  return null;
+}
+
 /**
  * Apply styles to an element, with intellisense support
  */
@@ -12,7 +110,7 @@ export function applyStyles(
  * Prefix a string with our prefix
  */
 export function prefixed(str: string): string {
-  return `html-obfuscator:${str}`;
+  return `${prefix}:${str}`;
 }
 
 /**

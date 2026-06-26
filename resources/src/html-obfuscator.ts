@@ -4,20 +4,19 @@
  * and reveal them automatically.
  */
 
-import { detectGlobalInteraction, dispatchPrefixedEvent } from "./helpers.js";
+import { detectGlobalInteraction, settings, logger } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
-const currentScript = document.currentScript!;
-const debug = (() => {
-  return currentScript.hasAttribute("debug") ? console : null;
-})();
-const defaultTagName = "x-obfuscated";
-const tagName = currentScript!.getAttribute("tag-name") ?? defaultTagName;
-debug?.log(`using tag name ${tagName}`);
+console.log(settings);
+logger?.log(settings);
 
-detectGlobalInteraction().then(() => {
-  debug?.log('User has interacted');
-});
+const { tagName, revealStrategy } = settings;
+
+if (revealStrategy === "oninteraction") {
+  detectGlobalInteraction().then(() => {
+    logger?.log("User has interacted");
+  });
+}
 
 /**
  * Define the custom element, logging errors only in debug mode
@@ -25,5 +24,5 @@ detectGlobalInteraction().then(() => {
 try {
   window.customElements.define(tagName, ObfuscatedElement);
 } catch (e) {
-  debug?.error(e);
+  logger?.error(e);
 }

@@ -1,64 +1,25 @@
-import { applyStyles, detectGlobalInteraction } from "./helpers.js";
+import {
+  applyStyles,
+  detectGlobalInteraction,
+  settings,
+} from "./helpers.js";
+
+const { revealStrategy } = settings;
 
 /**
  * Renders an obfuscated element that can reveal itself
  */
 export class ObfuscatedElement extends HTMLElement {
-  abortController = new AbortController();
-
-  static get observedAttributes() {
-    return ["require-interaction"];
-  }
 
   connectedCallback() {
-    if (!this.requireInteraction()) {
-      this.reveal();
-    }
-  }
-
-  disconnectedCallback() {
-    this.abortController.abort();
-  }
-
-  attributeChangedCallback() {
-    this.connectedCallback();
-  }
-
-  requireInteraction() {
-    const requiredInteraction = this.getAttribute("require-interaction");
-
-    if (!requiredInteraction) {
-      return false;
+    if (revealStrategy === "onload") {
+      return this.reveal();
     }
 
-    this.showPlaceholder();
+    renderPlaceholder(this);
 
-    detectGlobalInteraction().then(this.reveal);
-
-    return true;
-  }
-
-  showPlaceholder() {
-    applyStyles(this, {
-      display: "inline-flex",
-      alignItems: "center",
-      flexWrap: "wrap",
-      cursor: "pointer",
-    });
-
-    const charCount = parseInt(this.getAttribute("char-count") ?? "0", 10);
-
-    const span = document.createElement("span");
-    applyStyles(span, {
-      display: "inline-block",
-      width: "0.38ch",
-      height: "1em",
-      background: "black",
-    });
-
-    for (let i = 0; i < charCount; i++) {
-      const clone = span.cloneNode();
-      this.append(clone);
+    if (revealStrategy === "oninteraction") {
+      detectGlobalInteraction().then(this.reveal);
     }
   }
 
@@ -79,4 +40,31 @@ export class ObfuscatedElement extends HTMLElement {
 
     this.outerHTML = result;
   };
+}
+
+/**
+ * Render a placeholder (private method)
+ */
+function renderPlaceholder(el: ObfuscatedElement) {
+  applyStyles(el, {
+    display: "inline-flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    cursor: "pointer",
+  });
+
+  const charCount = parseInt(el.getAttribute("char-count") ?? "0", 10);
+
+  const span = document.createElement("span");
+  applyStyles(span, {
+    display: "inline-block",
+    width: "0.38ch",
+    height: "1em",
+    background: "black",
+  });
+
+  for (let i = 0; i < charCount; i++) {
+    const clone = span.cloneNode();
+    el.append(clone);
+  }
 }
