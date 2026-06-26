@@ -33,18 +33,19 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: false,
     target: "es2020",
-    minify: false,
     rolldownOptions: {
       output: [
         {
           format: "iife",
           entryFileNames: "[name].js",
           name: "HtmlObfuscator",
+          minify: false,
         },
         {
           format: "iife",
           entryFileNames: "[name].min.js",
           name: "HtmlObfuscator",
+          minify: true,
           plugins: [terserPlugin(terserOptions)],
         },
       ],

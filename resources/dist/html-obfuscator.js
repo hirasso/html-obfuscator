@@ -1,5 +1,7 @@
 (function() {
-	//#region resources/src/helpers.ts
+
+
+//#region resources/src/helpers.ts
 	var prefix = "html-obfuscator";
 	var defaults = {
 		tagName: "x-obfuscated",
@@ -7,9 +9,6 @@
 		revealStrategy: "onload",
 		renderPlaceholders: false
 	};
-	/**
-	* Load the settings from the script tag
-	*/
 	var settings = (() => {
 		const attr = document.currentScript?.getAttribute("data-settings");
 		if (!attr) return defaults;
@@ -19,9 +18,6 @@
 			return defaults;
 		}
 	})();
-	/**
-	* Get a minimal logger with a prefix, if settings.debug = true
-	*/
 	var logger = (() => {
 		if (!settings.debug) return null;
 		const style = [
@@ -37,7 +33,7 @@
 			error: (...args) => console.error(`%c${prefix}`, style, ...args)
 		};
 	})();
-	(() => {
+	var loadSettingsFromJsonScriptTag = (() => {
 		const store = /* @__PURE__ */ new Map();
 		return function(selector) {
 			if (store.has(selector)) return store.get(selector);
@@ -54,22 +50,12 @@
 			return value.settings;
 		};
 	})();
-	/**
-	* Apply styles to an element, with intellisense support
-	*/
 	function applyStyles(el, styles) {
 		Object.assign(el.style, styles);
 	}
-	/**
-	* Detect interaction anywhere on the window
-	*/
 	function detectGlobalInteraction() {
 		return detectInteraction(window);
 	}
-	/**
-	* Detect interaction. Dedupes and short-circuits
-	* repeated calls against the same element.
-	*/
 	var detectInteraction = (() => {
 		let hasInteracted = false;
 		const promises = /* @__PURE__ */ new Map();
@@ -93,12 +79,10 @@
 			return promises.get(target);
 		};
 	})();
-	//#endregion
-	//#region resources/src/ObfuscatedElement.ts
+
+//#endregion
+//#region resources/src/ObfuscatedElement.ts
 	var { revealStrategy: revealStrategy$1 } = settings;
-	/**
-	* Renders an obfuscated element that can reveal itself
-	*/
 	var ObfuscatedElement = class extends HTMLElement {
 		constructor(..._args) {
 			super(..._args);
@@ -119,9 +103,6 @@
 			if (revealStrategy$1 === "oninteraction") detectGlobalInteraction().then(this.reveal);
 		}
 	};
-	/**
-	* Render a placeholder (private method)
-	*/
 	function renderPlaceholder(el) {
 		applyStyles(el, {
 			display: "inline-flex",
@@ -142,25 +123,19 @@
 			el.append(clone);
 		}
 	}
-	//#endregion
-	//#region resources/src/html-obfuscator.ts
-	/**
-	* This is the frontend script of html-obfuscator
-	* It will detect existing and new <x-obfuscated> elements
-	* and reveal them automatically.
-	*/
+
+//#endregion
+//#region resources/src/html-obfuscator.ts
 	logger?.log(settings);
 	var { tagName, revealStrategy } = settings;
 	if (revealStrategy === "oninteraction") detectGlobalInteraction().then(() => {
 		logger?.log("User has interacted");
 	});
-	/**
-	* Define the custom element, logging errors only in debug mode
-	*/
 	try {
 		window.customElements.define(tagName, ObfuscatedElement);
 	} catch (e) {
 		logger?.error(e);
 	}
-	//#endregion
+
+//#endregion
 })();
