@@ -1,3 +1,5 @@
+import { ObfuscatedElement } from "./ObfuscatedElement.js";
+
 const prefix = "html-obfuscator";
 
 /**
@@ -97,16 +99,6 @@ function attr<T extends string>(
 }
 
 /**
- * Apply styles to an element, with intellisense support
- */
-export function applyStyles(
-  el: HTMLElement,
-  styles: Partial<CSSStyleDeclaration>,
-): void {
-  Object.assign(el.style, styles);
-}
-
-/**
  * Prefix a string with our prefix
  */
 export function prefixed(str: string): string {
@@ -167,5 +159,51 @@ export const detectInteraction = (() => {
     }
 
     return promises.get(target)! as Promise<T>;
+  };
+})();
+
+/**
+ * Inject styles into the head
+ */
+function injectStyles(styles: string) {
+  const el = document.createElement("style");
+  el.textContent = styles;
+  document.head.append(el);
+  return el;
+}
+
+/**
+ * Render a placeholder for the obfuscated element
+ */
+export const renderPlaceholder = (() => {
+  let injectedStyles = false;
+
+  const styles = /* css */ `
+    :where(x-obfuscated) {
+      display: inline-flex;
+      cursor: pointer
+    }
+    :where(x-obfuscated > span) {
+      width: 0.8ch;
+      height: 1.3cap;
+      overflow: hidden;
+      border: 1px solid;
+      background: black;
+    }
+  `;
+
+  return (el: ObfuscatedElement) => {
+    if (!injectedStyles) {
+      injectStyles(styles);
+    }
+    injectedStyles = true;
+
+    const charCount = parseInt(el.getAttribute("char-count") ?? "0", 10);
+    const span = document.createElement("span");
+    span.textContent = "e";
+    for (let i = 0; i < charCount; i++) {
+      const clone = span.cloneNode(true);
+      el.append(clone);
+    }
   };
 })();
