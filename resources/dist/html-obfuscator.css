@@ -1,0 +1,3 @@
+/*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
+:where(x-obfuscated){cursor:pointer;align-items:flex-start;display:inline-flex}:where(x-obfuscated>span){background:#000;width:.8ch;height:1.4cap}
+/*$vite$:1*/

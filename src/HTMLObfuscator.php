@@ -342,20 +342,26 @@ final class HTMLObfuscator
         }
         self::$hasInjectedFrontendScript = true;
 
+        $rootPath = dirname(__DIR__);
+
+        /** the style tag */
+        $style = $document->createElement('style');
+        $css = file_get_contents("{$rootPath}/resources/dist/html-obfuscator.css") ?: '';
+        $css = str_replace('x-obfuscated', $this->tagName, $css);
+        $style->textContent = $css;
+        $document->body?->append($style);
+
+        /** the script tag */
         $script = $document->createElement('script');
         $script->setAttribute('data-settings', \json_encode(
             value: $this->scriptSettings,
             flags: JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
         ));
-        $rootPath = dirname(__DIR__);
-
-        $filePath = $this->debug
-            ? '/resources/dist/html-obfuscator.js'
-            : '/resources/dist/html-obfuscator.min.js';
-
-        $js = file_get_contents($rootPath . $filePath) ?: '';
+        $scriptFileName = $this->debug
+            ? 'html-obfuscator.js'
+            : 'html-obfuscator.min.js';
+        $js = file_get_contents("{$rootPath}/resources/dist/{$scriptFileName}") ?: '';
         $js = str_replace('x-obfuscated', $this->tagName, $js);
-
         $script->textContent = $js;
         $document->body?->append($script);
     }

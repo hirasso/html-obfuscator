@@ -92,45 +92,6 @@
 			return promises.get(target);
 		};
 	})();
-	/**
-	* Inject styles into the head
-	*/
-	function injectStyles(styles) {
-		const el = document.createElement("style");
-		el.textContent = styles;
-		document.head.append(el);
-		return el;
-	}
-	/**
-	* Render a placeholder for the obfuscated element
-	*/
-	var renderPlaceholder = (() => {
-		let injectedStyles = false;
-		const styles = `
-    :where(x-obfuscated) {
-      display: inline-flex;
-      cursor: pointer
-    }
-    :where(x-obfuscated > span) {
-      width: 0.8ch;
-      height: 1.3cap;
-      overflow: hidden;
-      border: 1px solid;
-      background: black;
-    }
-  `;
-		return (el) => {
-			if (!injectedStyles) injectStyles(styles);
-			injectedStyles = true;
-			const charCount = parseInt(el.getAttribute("char-count") ?? "0", 10);
-			const span = document.createElement("span");
-			span.textContent = "e";
-			for (let i = 0; i < charCount; i++) {
-				const clone = span.cloneNode(true);
-				el.append(clone);
-			}
-		};
-	})();
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
@@ -154,8 +115,21 @@
 		}
 		connectedCallback() {
 			if (revealStrategy$1 === "onload") return this.reveal();
-			if (renderPlaceholders) renderPlaceholder(this);
+			this.renderPlaceholder();
 			if (revealStrategy$1 === "oninteraction") detectGlobalInteraction().then(this.reveal);
+		}
+		/**
+		* Render a placeholder for this element
+		*/
+		renderPlaceholder() {
+			if (!renderPlaceholders) return;
+			const charCount = parseInt(this.getAttribute("char-count") ?? "0", 10);
+			const span = document.createElement("span");
+			span.textContent = "";
+			for (let i = 0; i < charCount; i++) {
+				const clone = span.cloneNode(true);
+				this.append(clone);
+			}
 		}
 	};
 

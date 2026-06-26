@@ -3,6 +3,8 @@
 import { detectGlobalInteraction, settings, logger } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
+import './html-obfuscator.css';
+
 logger?.log(settings);
 
 const { tagName, revealStrategy } = settings;

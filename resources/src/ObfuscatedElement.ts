@@ -1,8 +1,4 @@
-import {
-  detectGlobalInteraction,
-  renderPlaceholder,
-  settings,
-} from "./helpers.js";
+import { detectGlobalInteraction, settings } from "./helpers.js";
 
 const { revealStrategy, renderPlaceholders } = settings;
 
@@ -10,15 +6,12 @@ const { revealStrategy, renderPlaceholders } = settings;
  * Renders an obfuscated element that can reveal itself
  */
 export class ObfuscatedElement extends HTMLElement {
-
   connectedCallback() {
     if (revealStrategy === "onload") {
       return this.reveal();
     }
 
-    if (renderPlaceholders) {
-      renderPlaceholder(this);
-    }
+    this.renderPlaceholder();
 
     if (revealStrategy === "oninteraction") {
       detectGlobalInteraction().then(this.reveal);
@@ -42,5 +35,19 @@ export class ObfuscatedElement extends HTMLElement {
 
     this.outerHTML = result;
   };
-}
 
+  /**
+   * Render a placeholder for this element
+   */
+  renderPlaceholder(): void {
+    if (!renderPlaceholders) return;
+
+    const charCount = parseInt(this.getAttribute("char-count") ?? "0", 10);
+    const span = document.createElement("span");
+    span.textContent = "";
+    for (let i = 0; i < charCount; i++) {
+      const clone = span.cloneNode(true);
+      this.append(clone);
+    }
+  }
+}
