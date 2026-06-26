@@ -7,7 +7,7 @@ declare namespace Hirasso {
       renderPlaceholders: boolean;
     };
     namespace Enum {
-      export type RevealStrategy = "onload" | "oninteraction" | "manually";
+      export type RevealStrategy = "onload" | "oninteraction" | "none";
     }
   }
 }

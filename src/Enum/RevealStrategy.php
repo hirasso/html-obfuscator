@@ -10,6 +10,6 @@ enum RevealStrategy: string
     case OnLoad = 'onload';
     /** require interaction with the site before rendering */
     case OnInteraction = 'oninteraction';
-    /** require the developer to manually reveal the element */
-    case Manually = 'manually';
+    /** let the developer reveal manually */
+    case None = 'none';
 };

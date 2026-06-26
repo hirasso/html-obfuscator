@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "checkJs": true,
     "strict": true,
     "target": "ES2017",
     "lib": ["ES2020", "DOM"]
   },
-  "include": ["resources"]
+  "include": ["resources/src"]
 }
