@@ -1,0 +1,38 @@
+name: Deploy Examples
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Examples to FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Install Production Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Build Assets
+        run: pnpm build
+
+      - name: Prepare Deploy Directory
+        run: |
+          mkdir -p deploy/resources
+          cp -r examples vendor src deploy/
+          cp -r resources/dist deploy/resources/dist
+
+      - name: Deploy to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy/
+          server-dir: /
