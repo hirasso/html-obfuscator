@@ -37,22 +37,34 @@ composer require hirasso/html-obfuscator
 ## Minimal Example
 
 ```php
-use Hirasso\HTMLObfuscator\HTMLObfuscator;
+use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo HTMLObfuscator::createFromString($html)->render();
+echo obfuscate($html);
 ```
 
 ## Maximal Example
 
 ```php
-use Hirasso\HTMLObfuscator\HTMLObfuscator;
+use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo HTMLObfuscator::createFromString($html)
+echo obfuscate($html)
     ->phoneNumbers(false)
     ->withPassphrase('nobody will guess this!')
     ->withTagName('reveal-me')
-    ->debug(true)
-    ->render();
+    ->debug(true);
+```
+
+## With a `\Dom\HTMLDocument`
+
+When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
+
+```php
+use Dom\HTMLDocument;
+use function Hirasso\HTMLObfuscator\obfuscate;
+
+$doc = HTMLDocument::createFromString($html);
+obfuscate($doc)->apply();
+// $doc is now obfuscated in place
 ```
 
 &rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.
