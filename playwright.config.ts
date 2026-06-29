@@ -14,8 +14,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'composer examples',
-    url: 'http://localhost:8080',
+    command: 'php -S localhost:8765 -t examples/',
+    url: 'http://localhost:8765',
     reuseExistingServer: true,
   },
 });
