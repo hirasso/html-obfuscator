@@ -4,11 +4,11 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage (whatever that entails)](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Obfuscate emails and phone numbers in HTML using modern web technology**
+**Obfuscate emails and phone numbers in HTML using PHP and modern web features**
 
 ## Why
 
-You might think that obfuscation won't work on spam bots. Turns out [it does](https://spencermortensen.com/articles/email-obfuscation/) if done right!
+You might think that obfuscation won't work against spam bots. Turns out [it does](https://spencermortensen.com/articles/email-obfuscation/) if done right!
 
 ## How it works
 
