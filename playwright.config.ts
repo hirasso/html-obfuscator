@@ -14,7 +14,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'composer serve',
+    command: 'composer examples',
     url: 'http://localhost:8080',
     reuseExistingServer: true,
   },
