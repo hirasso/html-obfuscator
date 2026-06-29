@@ -161,3 +161,11 @@ test('getDocument() returns the underlying HTMLDocument', function () {
     $obfuscator = obfuscate('mail@example.com');
     expect($obfuscator->getDocument())->toBeInstanceOf(\Dom\HTMLDocument::class);
 });
+
+
+test('obfuscates emails and phone numbers within the same text node', function () {
+    $result = (string) obfuscate('this is an email: mail@example.com and a phone number: +49 12 345 67');
+    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect($result)->not->toContain('mail@example.com');
+    expect($result)->not->toContain('+49 12 345 67');
+});

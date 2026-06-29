@@ -17,6 +17,7 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "analyse": "pnpm exec tsc --noEmit --project tsconfig.json",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   }
 }

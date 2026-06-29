@@ -1,21 +1,26 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
+
+const baseURL = "http://localhost:8765";
 
 export default defineConfig({
-  testDir: './tests/e2e',
-  outputDir: './tests/e2e/results',
-  reporter: [['list'], ['json', { outputFile: 'tests/e2e/results/report.json' }]],
+  testDir: "./tests/e2e",
+  outputDir: "./tests/e2e/results",
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "tests/e2e/results/report.json" }],
+  ],
   use: {
-    baseURL: 'http://localhost:8080',
+    baseURL,
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
   webServer: {
-    command: 'composer serve',
-    url: 'http://localhost:8080',
+    command: "php -S localhost:8765 -t examples/",
+    url: baseURL,
     reuseExistingServer: true,
   },
 });

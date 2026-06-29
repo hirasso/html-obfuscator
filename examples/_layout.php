@@ -40,10 +40,26 @@ function render_example(RevealStrategy $strategy): void
         <nav><a href="index.php">&larr; back</a>{$nav}</nav>
         <h1>strategy: {$label}</h1>
         <table>
-            <tr><td>email text</td><td>mail@example.com</td></tr>
-            <tr><td>email link</td><td><a href="mailto:contact@example.com">contact@example.com</a></td></tr>
-            <tr><td>phone text</td><td>+1 555 123 4567</td></tr>
-            <tr><td>phone link</td><td><a href="tel:+15551234567">+1 555 123-4567</a></td></tr>
+            <tr>
+                <td>email text</td>
+                <td>mail@example.com</td>
+            </tr>
+            <tr>
+                <td>email link</td>
+                <td>
+                    <a href="mailto:contact@example.com">contact@example.com</a>
+                </td>
+            </tr>
+            <tr>
+                <td>phone text</td>
+                <td>+1 555 123 4567</td>
+            </tr>
+            <tr>
+                <td>phone link</td>
+                <td>
+                    <a href="tel:+15551234567">+1 555 123-4567</a>
+                </td>
+            </tr>
         </table>
     </body>
     </html>
