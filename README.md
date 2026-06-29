@@ -4,7 +4,7 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage (whatever that entails)](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Obfuscate email addresses and phone numbers using PHP and modern web festures 👀**
+**Obfuscate email addresses and phone numbers using PHP and modern web features 👀**
 
 ## Why
 
