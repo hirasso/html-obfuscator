@@ -249,6 +249,8 @@ final class HTMLObfuscator
         $obfuscated->setAttribute('attr', $attibuteName);
         $obfuscated->setAttribute('style', 'display:none');
         $el->prepend("\n", $obfuscated, "\n");
+        /** clear the original attribute value */
+        $el->setAttribute($attibuteName, '');
     }
 
     /**
