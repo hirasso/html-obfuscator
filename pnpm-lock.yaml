@@ -20,6 +20,9 @@ importers:
       lint-staged:
         specifier: ^15.4.3
         version: 15.4.3
+      prettier:
+        specifier: ^3.8.4
+        version: 3.8.4
       terser:
         specifier: ^5
         version: 5.48.0
@@ -887,6 +890,11 @@ packages:
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
+
+  prettier@3.8.4:
+    resolution: {integrity: sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==}
+    engines: {node: '>=14'}
     hasBin: true
 
   queue-microtask@1.2.3:
@@ -1859,6 +1867,8 @@ snapshots:
       source-map-js: 1.2.1
 
   prettier@2.8.8: {}
+
+  prettier@3.8.4: {}
 
   queue-microtask@1.2.3: {}
 
