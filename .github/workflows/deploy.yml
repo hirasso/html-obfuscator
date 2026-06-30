@@ -1,4 +1,4 @@
-name: Deploy Examples
+name: Deploy Demo
 
 on:
   release:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Examples to FTP
+    name: Deploy Demo to FTP
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       - name: Prepare Deploy Directory
         run: |
           mkdir -p deploy/resources
-          cp -r examples vendor src deploy/
+          cp -r demo vendor src deploy/
           cp -r resources/dist deploy/resources/dist
 
       - name: Deploy to FTP
