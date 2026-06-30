@@ -160,28 +160,18 @@
 	function renderPlaceholder(el) {
 		const value = getDecodedValue(el);
 		if (!value) return;
-		const injectSpan = () => {
+		const ctx = document.createElement("canvas").getContext("2d");
+		ctx.font = getComputedStyle(el).font;
+		const oneChWidth = ctx.measureText("0").width;
+		for (const char of value) {
 			const span = document.createElement("span");
-			el.append(span);
 			span.style.overflow = "hidden";
 			span.style.display = "inline-block";
 			span.style.whiteSpace = "pre";
-			return span;
-		};
-		const span = injectSpan();
-		span.style.width = "1ch";
-		const { width: oneChWidth } = span.getBoundingClientRect();
-		span.remove();
-		const spans = [...value].map((char) => {
-			const span = injectSpan();
-			span.textContent = char;
-			return span;
-		});
-		const widths = spans.map((span) => span.getBoundingClientRect().width);
-		spans.forEach((span, i) => {
-			span.style.width = `${widths[i] / oneChWidth}ch`;
+			span.style.width = `${ctx.measureText(char).width / oneChWidth}ch`;
 			span.textContent = "\xA0";
-		});
+			el.append(span);
+		}
 	}
 
 //#endregion
