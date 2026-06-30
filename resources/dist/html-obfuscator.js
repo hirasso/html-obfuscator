@@ -168,15 +168,18 @@
 		};
 		const span = injectSpan();
 		span.style.width = "1ch";
-		const { width: oneChInPixels } = span.getBoundingClientRect();
+		const { width: oneChWidth } = span.getBoundingClientRect();
 		span.remove();
-		[...value].forEach((char) => {
+		const spans = [...value].map((char) => {
 			const span = injectSpan();
 			span.textContent = char;
-			const { width } = span.getBoundingClientRect();
+			return span;
+		});
+		const widths = spans.map((span) => span.getBoundingClientRect().width);
+		spans.forEach((span, i) => {
 			span.style.overflow = "hidden";
-			span.style.width = `${width / oneChInPixels}ch`;
-			span.innerHTML = "&nbsp;";
+			span.style.width = `${widths[i] / oneChWidth}ch`;
+			span.textContent = "\xA0";
 		});
 	}
 
