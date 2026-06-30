@@ -163,7 +163,9 @@
 		const injectSpan = () => {
 			const span = document.createElement("span");
 			el.append(span);
+			span.style.overflow = "hidden";
 			span.style.display = "inline-block";
+			span.style.whiteSpace = "pre";
 			return span;
 		};
 		const span = injectSpan();
@@ -177,7 +179,6 @@
 		});
 		const widths = spans.map((span) => span.getBoundingClientRect().width);
 		spans.forEach((span, i) => {
-			span.style.overflow = "hidden";
 			span.style.width = `${widths[i] / oneChWidth}ch`;
 			span.textContent = "\xA0";
 		});
