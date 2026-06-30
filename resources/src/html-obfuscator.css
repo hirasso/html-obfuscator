@@ -1,5 +1,3 @@
-/*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
-
 :where(x-obfuscated) {
   display: inline-flex;
   flex-wrap: wrap;
