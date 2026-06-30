@@ -1,6 +1,5 @@
 <?php
 
-use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
 const TESTS_TAG_NAME = 'tests-obfuscated';
@@ -57,7 +56,7 @@ test('Obfuscates phone numbers in plaintext', function () {
 
 test('debug(false) Injects the minified and mangled frontend script', function () {
     $result = (string) obfuscate('')->debug(false)->injectFrontendScript(true);
-    expect($result)->toContain('(function(){var e={tagName:`tests-obfuscated`,debug:!1,');
+    expect($result)->toContain('(function(){var e={tagName:`tests-obfuscated`');
 });
 
 test('debug(false) injects the un-obfuscated frontend script', function () {
@@ -144,24 +143,10 @@ test('Returns a the full document when receiving at least a <body> element', fun
     expect((string) obfuscate('<body>foobar</body>'))->toContain('<html><head></head><body>foobar');
 });
 
-test('revealOn() sets the reveal trigger', function () {
-    $result = (string) obfuscate('mail@example.com')
-        ->revealOn(RevealTrigger::Interaction)
-        ->injectFrontendScript(true);
-    expectObfuscatedElement($result);
-});
-
-test('renderPlaceholders() controls placeholder rendering', function () {
-    $result = (string) obfuscate('mail@example.com')
-        ->renderPlaceholders(false);
-    expectObfuscatedElement($result);
-});
-
 test('getDocument() returns the underlying HTMLDocument', function () {
     $obfuscator = obfuscate('mail@example.com');
     expect($obfuscator->getDocument())->toBeInstanceOf(\Dom\HTMLDocument::class);
 });
-
 
 test('obfuscates emails and phone numbers within the same text node', function () {
     $result = (string) obfuscate('this is an email: mail@example.com and a phone number: +49 12 345 67');

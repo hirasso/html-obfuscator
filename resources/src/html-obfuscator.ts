@@ -7,13 +7,11 @@ import './html-obfuscator.css';
 
 logger?.log(settings);
 
-const { tagName, revealTrigger } = settings;
+const { tagName } = settings;
 
-if (revealTrigger === "interaction") {
-  detectGlobalInteraction().then(() => {
-    logger?.log("User has interacted");
-  });
-}
+detectGlobalInteraction().then(() => {
+  logger?.log("User has interacted");
+});
 
 /**
  * Define the custom element, logging errors only in debug mode

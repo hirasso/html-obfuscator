@@ -8,7 +8,6 @@ use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Enum\Regex;
-use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 
@@ -111,24 +110,6 @@ final class HTMLObfuscator
 
         $this->tagName = trim($tagName);
         $this->scriptSettings->tagName = $this->tagName;
-        return $this;
-    }
-
-    /**
-     * Set when to reveal obfuscated content
-     */
-    public function revealOn(RevealTrigger $trigger): self
-    {
-        $this->scriptSettings->revealTrigger = $trigger;
-        return $this;
-    }
-
-    /**
-     * Should placeholders be rendered for obfuscated elements?
-     */
-    public function renderPlaceholders(bool $enabled = true): self
-    {
-        $this->scriptSettings->renderPlaceholders = $enabled;
         return $this;
     }
 
@@ -249,6 +230,7 @@ final class HTMLObfuscator
         $obfuscated = $this->createObfuscatedElement($obfuscatedValue);
         $obfuscated->setAttribute('attr', $attibuteName);
         $obfuscated->setAttribute('style', 'display:none');
+
         $el->prepend("\n", $obfuscated, "\n");
         /** clear the original attribute value */
         $el->setAttribute($attibuteName, '');
@@ -264,8 +246,6 @@ final class HTMLObfuscator
         $el = $this->document->createElement($this->tagName);
         $el->setAttribute('value', $value->encoded);
         $el->setAttribute('key', $value->key);
-        $el->setAttribute('aria-hidden', 'true');
-        $el->setAttribute('char-count', (string) mb_strlen($value->original));
 
         return $el;
     }

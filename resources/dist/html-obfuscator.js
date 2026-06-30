@@ -5,9 +5,7 @@
 	var prefix = "html-obfuscator";
 	var defaults = {
 		tagName: "x-obfuscated",
-		debug: false,
-		revealTrigger: "load",
-		renderPlaceholders: false
+		debug: false
 	};
 	/**
 	* Load the settings from the script tag
@@ -43,9 +41,9 @@
 	* Load the data from a json script tag
 	*/
 	var loadSettingsFromJsonScriptTag = (() => {
-		const store = /* @__PURE__ */ new Map();
+		const cache = /* @__PURE__ */ new Map();
 		return function(selector) {
-			if (store.has(selector)) return store.get(selector);
+			if (cache.has(selector)) return cache.get(selector);
 			const el = document.getElementById(selector);
 			if (!el) throw new Error(`No script data element found for "${selector}"`);
 			let value;
@@ -55,7 +53,7 @@
 				throw new Error(`Failed to parse script data for "${selector}"`);
 			}
 			if (!value.settings) throw new Error(`No settings found in script data for "${selector}"`);
-			store.set(selector, value.settings);
+			cache.set(selector, value.settings);
 			return value.settings;
 		};
 	})();
@@ -93,56 +91,83 @@
 			return promises.get(target);
 		};
 	})();
+	/**
+	* Decode a value
+	*/
+	var decode = (el) => {
+		const value = atob(el.getAttribute("value") ?? "");
+		const key = el.getAttribute("key");
+		if (!value || !key) return;
+		return [...value].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+	};
+
+//#endregion
+//#region \0@oxc-project+runtime@0.133.0/helpers/esm/checkPrivateRedeclaration.js
+	function _checkPrivateRedeclaration(e, t) {
+		if (t.has(e)) throw new TypeError("Cannot initialize the same private elements twice on an object");
+	}
+
+//#endregion
+//#region \0@oxc-project+runtime@0.133.0/helpers/esm/classPrivateFieldInitSpec.js
+	function _classPrivateFieldInitSpec(e, t, a) {
+		_checkPrivateRedeclaration(e, t), t.set(e, a);
+	}
+
+//#endregion
+//#region \0@oxc-project+runtime@0.133.0/helpers/esm/assertClassBrand.js
+	function _assertClassBrand(e, t, n) {
+		if ("function" == typeof e ? e === t : e.has(t)) return arguments.length < 3 ? t : n;
+		throw new TypeError("Private element is not present on this object");
+	}
+
+//#endregion
+//#region \0@oxc-project+runtime@0.133.0/helpers/esm/classPrivateFieldGet2.js
+	function _classPrivateFieldGet2(s, a) {
+		return s.get(_assertClassBrand(s, a));
+	}
+
+//#endregion
+//#region \0@oxc-project+runtime@0.133.0/helpers/esm/classPrivateFieldSet2.js
+	function _classPrivateFieldSet2(s, a, r) {
+		return s.set(_assertClassBrand(s, a), r), r;
+	}
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
-	var { revealTrigger: revealTrigger$1, renderPlaceholders } = settings;
+	var _decodedValue = /* @__PURE__ */ new WeakMap();
 	/**
 	* Render an obfuscated element that can reveal itself or a parent element's attribute
 	*/
 	var ObfuscatedElement = class extends HTMLElement {
-		constructor(..._args) {
-			super(..._args);
-			this.reveal = () => {
-				const value = this.decode();
-				if (!value) {
-					this.remove();
-					return;
-				}
-				if (revealAttribute(this, value)) {
-					this.remove();
-					return;
-				}
-				this.outerHTML = value;
-			};
-			this.decode = (() => {
-				let value;
-				return () => {
-					return value ?? (value = getDecodedValue(this));
-				};
-			})();
-		}
 		get attr() {
 			return this.getAttribute("attr");
 		}
+		constructor() {
+			super();
+			_classPrivateFieldInitSpec(this, _decodedValue, void 0);
+			this.reveal = () => {
+				if (!_classPrivateFieldGet2(_decodedValue, this)) {
+					this.remove();
+					return;
+				}
+				if (revealAttribute(this, _classPrivateFieldGet2(_decodedValue, this))) {
+					this.remove();
+					return;
+				}
+				this.outerHTML = _classPrivateFieldGet2(_decodedValue, this);
+			};
+			this.shadow = this.attachShadow({ mode: "closed" });
+		}
 		connectedCallback() {
-			if (revealTrigger$1 === "load") return this.reveal();
-			if (renderPlaceholders && !this.attr) renderPlaceholder(this);
-			if (revealTrigger$1 === "interaction") detectGlobalInteraction().then(this.reveal);
+			_classPrivateFieldSet2(_decodedValue, this, decode(this));
+			if (!_classPrivateFieldGet2(_decodedValue, this)) {
+				this.remove();
+				return;
+			}
+			if (!this.attr) this.shadow.textContent = _classPrivateFieldGet2(_decodedValue, this);
+			detectGlobalInteraction().then(this.reveal);
 		}
 	};
-	/**
-	* Get the decoded value
-	*/
-	function getDecodedValue(el) {
-		const value = atob(el.getAttribute("value") ?? "");
-		const key = el.getAttribute("key");
-		if (!value || !key) {
-			el.remove();
-			return;
-		}
-		return [...value].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
-	}
 	/**
 	* Reveal a parent element's attribute value
 	*/
@@ -154,32 +179,13 @@
 		target.setAttribute(attr, value);
 		return true;
 	}
-	/**
-	* Render a placeholder for an obfuscated element
-	*/
-	function renderPlaceholder(el) {
-		const value = getDecodedValue(el);
-		if (!value) return;
-		const ctx = document.createElement("canvas").getContext("2d");
-		ctx.font = getComputedStyle(el).font;
-		const oneChWidth = ctx.measureText("0").width;
-		for (const char of value) {
-			const span = document.createElement("span");
-			span.style.overflow = "hidden";
-			span.style.display = "inline-block";
-			span.style.whiteSpace = "pre";
-			span.style.width = `${ctx.measureText(char).width / oneChWidth}ch`;
-			span.textContent = "\xA0";
-			el.append(span);
-		}
-	}
 
 //#endregion
 //#region resources/src/html-obfuscator.ts
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 	logger?.log(settings);
-	var { tagName, revealTrigger } = settings;
-	if (revealTrigger === "interaction") detectGlobalInteraction().then(() => {
+	var { tagName } = settings;
+	detectGlobalInteraction().then(() => {
 		logger?.log("User has interacted");
 	});
 	/**

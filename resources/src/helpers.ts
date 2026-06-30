@@ -8,9 +8,7 @@ const prefix = "html-obfuscator";
 type ScriptSettings = Hirasso.HTMLObfuscator.ScriptSettings;
 const defaults: ScriptSettings = {
   tagName: "x-obfuscated",
-  debug: false,
-  revealTrigger: "load",
-  renderPlaceholders: false,
+  debug: false
 };
 
 /**
@@ -54,11 +52,11 @@ export const logger = (() => {
  * Load the data from a json script tag
  */
 export const loadSettingsFromJsonScriptTag = (() => {
-  const store = new Map<string, any>();
+  const cache = new Map<string, any>();
 
   return function <T>(selector: string): T {
-    if (store.has(selector)) {
-      return store.get(selector);
+    if (cache.has(selector)) {
+      return cache.get(selector);
     }
 
     const el = document.getElementById(selector);
@@ -77,26 +75,11 @@ export const loadSettingsFromJsonScriptTag = (() => {
       throw new Error(`No settings found in script data for "${selector}"`);
     }
 
-    store.set(selector, value.settings);
+    cache.set(selector, value.settings);
 
     return value.settings as T;
   };
 })();
-
-/**
- * Get an attribute, validate it
- */
-function attr<T extends string>(
-  el: HTMLElement,
-  attribute: string,
-  allowedValues: readonly T[],
-): T | null {
-  const value = el.getAttribute(attribute);
-  if (value !== null && (allowedValues as readonly string[]).includes(value)) {
-    return value as T;
-  }
-  return null;
-}
 
 /**
  * Prefix a string with our prefix
@@ -162,3 +145,21 @@ export const detectInteraction = (() => {
     return promises.get(target)! as Promise<T>;
   };
 })();
+
+/**
+ * Decode a value
+ */
+export const decode = (el: ObfuscatedElement): string | undefined => {
+  const value = atob(el.getAttribute("value") ?? "");
+  const key = el.getAttribute("key");
+
+  if (!value || !key) {
+    return undefined;
+  }
+
+  return [...value]
+    .map((c, i) =>
+      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+    )
+    .join("");
+};
