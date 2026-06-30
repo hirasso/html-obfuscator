@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "php -S localhost:8765 -t examples/",
+    command: "composer demo",
     url: baseURL,
     reuseExistingServer: true,
   },
