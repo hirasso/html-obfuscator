@@ -20,8 +20,9 @@ use InvalidArgumentException;
 final class HTMLObfuscator
 {
     public const string DEFAULT_TAG_NAME = 'x-obfuscated';
+    public const string DEFAULT_PASSPHRASE = self::class;
 
-    private string $passphrase = 'html-obfuscator';
+    private string $passphrase = self::DEFAULT_PASSPHRASE;
     private string $tagName = self::DEFAULT_TAG_NAME;
     private bool $debug = false;
 
@@ -327,27 +328,31 @@ final class HTMLObfuscator
         }
         self::$hasInjectedFrontendScript = true;
 
-        $rootPath = dirname(__DIR__);
-
         /** the style tag */
         $style = $this->document->createElement('style');
-        $css = file_get_contents("{$rootPath}/resources/dist/html-obfuscator.css") ?: '';
-        $css = str_replace('x-obfuscated', $this->tagName, $css);
-        $style->textContent = $css;
+        $style->textContent = $this->getResource('html-obfuscator.css');
         $this->document->body?->append($style);
 
         /** the script tag */
         $script = $this->document->createElement('script');
+        $script->textContent = $this->getResource($this->debug
+            ? 'html-obfuscator.js'
+            : 'html-obfuscator.min.js');
         $script->setAttribute('data-settings', \json_encode(
             value: $this->scriptSettings,
             flags: JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
         ));
-        $scriptFileName = $this->debug
-            ? 'html-obfuscator.js'
-            : 'html-obfuscator.min.js';
-        $js = file_get_contents("{$rootPath}/resources/dist/{$scriptFileName}") ?: '';
-        $js = str_replace('x-obfuscated', $this->tagName, $js);
-        $script->textContent = $js;
         $this->document->body?->append($script);
+    }
+
+    /**
+     * Get a resource, replace the default tag name with the actual tag name
+     */
+    private function getResource(string $path): string
+    {
+        $root = dirname(__DIR__);
+        $path = ltrim($path, "/");
+        $resource = file_get_contents("{$root}/resources/dist/$path") ?: '';
+        return str_replace(self::DEFAULT_TAG_NAME, $this->tagName, $resource);
     }
 }
