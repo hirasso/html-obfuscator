@@ -1,6 +1,6 @@
 import { detectGlobalInteraction, settings } from "./helpers.js";
 
-const { revealStrategy, renderPlaceholders } = settings;
+const { revealTrigger, renderPlaceholders } = settings;
 
 /**
  * Render an obfuscated element that can reveal itself or a parent element's attribute
@@ -11,7 +11,7 @@ export class ObfuscatedElement extends HTMLElement {
   }
 
   connectedCallback() {
-    if (revealStrategy === "onload") {
+    if (revealTrigger === "load") {
       return this.reveal();
     }
 
@@ -19,7 +19,7 @@ export class ObfuscatedElement extends HTMLElement {
       renderPlaceholder(this);
     }
 
-    if (revealStrategy === "oninteraction") {
+    if (revealTrigger === "interaction") {
       detectGlobalInteraction().then(this.reveal);
     }
   }

@@ -9,7 +9,7 @@ type ScriptSettings = Hirasso.HTMLObfuscator.ScriptSettings;
 const defaults: ScriptSettings = {
   tagName: "x-obfuscated",
   debug: false,
-  revealStrategy: "onload",
+  revealTrigger: "load",
   renderPlaceholders: false,
 };
 

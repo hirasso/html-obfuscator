@@ -1,6 +1,6 @@
 <?php
 
-use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
+use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
 const TESTS_TAG_NAME = 'tests-obfuscated';
@@ -144,9 +144,9 @@ test('Returns a the full document when receiving at least a <body> element', fun
     expect((string) obfuscate('<body>foobar</body>'))->toContain('<html><head></head><body>foobar');
 });
 
-test('withRevealStrategy() sets the reveal strategy', function () {
+test('revealOn() sets the reveal trigger', function () {
     $result = (string) obfuscate('mail@example.com')
-        ->withRevealStrategy(RevealStrategy::OnInteraction)
+        ->revealOn(RevealTrigger::Interaction)
         ->injectFrontendScript(true);
     expectObfuscatedElement($result);
 });

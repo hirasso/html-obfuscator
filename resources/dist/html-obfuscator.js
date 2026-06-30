@@ -6,7 +6,7 @@
 	var defaults = {
 		tagName: "x-obfuscated",
 		debug: false,
-		revealStrategy: "onload",
+		revealTrigger: "load",
 		renderPlaceholders: false
 	};
 	/**
@@ -96,7 +96,7 @@
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
-	var { revealStrategy: revealStrategy$1, renderPlaceholders } = settings;
+	var { revealTrigger: revealTrigger$1, renderPlaceholders } = settings;
 	/**
 	* Render an obfuscated element that can reveal itself or a parent element's attribute
 	*/
@@ -126,9 +126,9 @@
 			return this.getAttribute("attr");
 		}
 		connectedCallback() {
-			if (revealStrategy$1 === "onload") return this.reveal();
+			if (revealTrigger$1 === "load") return this.reveal();
 			if (renderPlaceholders && !this.attr) renderPlaceholder(this);
-			if (revealStrategy$1 === "oninteraction") detectGlobalInteraction().then(this.reveal);
+			if (revealTrigger$1 === "interaction") detectGlobalInteraction().then(this.reveal);
 		}
 	};
 	/**
@@ -178,8 +178,8 @@
 //#region resources/src/html-obfuscator.ts
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 	logger?.log(settings);
-	var { tagName, revealStrategy } = settings;
-	if (revealStrategy === "oninteraction") detectGlobalInteraction().then(() => {
+	var { tagName, revealTrigger } = settings;
+	if (revealTrigger === "interaction") detectGlobalInteraction().then(() => {
 		logger?.log("User has interacted");
 	});
 	/**

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
+use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 
-function render_example(RevealStrategy $strategy): void
+function render_example(RevealTrigger $strategy): void
 {
     $label = $strategy->value;
-    $withPlaceholders = $strategy !== RevealStrategy::OnLoad;
+    $withPlaceholders = $strategy !== RevealTrigger::Load;
 
     $nav = implode('', array_map(
-        fn (RevealStrategy $s) => sprintf(
+        fn (RevealTrigger $s) => sprintf(
             '<a href="strategy-%s.php"%s>%s</a>',
             $s->value,
             $s === $strategy ? ' class="active"' : '',
             $s->value,
         ),
-        RevealStrategy::cases()
+        RevealTrigger::cases()
     ));
 
     $html = <<<HTML
@@ -67,7 +67,7 @@ function render_example(RevealStrategy $strategy): void
 
     $obfuscator = HTMLObfuscator::createFromString($html)
         ->debug(true)
-        ->withRevealStrategy($strategy);
+        ->revealOn($strategy);
 
     if ($withPlaceholders) {
         $obfuscator->renderPlaceholders();

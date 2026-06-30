@@ -7,9 +7,9 @@ import './html-obfuscator.css';
 
 logger?.log(settings);
 
-const { tagName, revealStrategy } = settings;
+const { tagName, revealTrigger } = settings;
 
-if (revealStrategy === "oninteraction") {
+if (revealTrigger === "interaction") {
   detectGlobalInteraction().then(() => {
     logger?.log("User has interacted");
   });

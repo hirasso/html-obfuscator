@@ -45,12 +45,14 @@ echo obfuscate($html);
 ## Maximal Example
 
 ```php
+use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 echo obfuscate($html)
     ->phoneNumbers(false)
     ->withPassphrase('nobody will guess this!')
     ->withTagName('reveal-me')
+    ->revealOn(RevealTrigger::Interaction)
     ->debug(true);
 ```
 

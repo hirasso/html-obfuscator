@@ -8,7 +8,7 @@ use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Enum\Regex;
-use Hirasso\HTMLObfuscator\Enum\RevealStrategy;
+use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 
@@ -114,11 +114,11 @@ final class HTMLObfuscator
     }
 
     /**
-     * Set the reveal strategy
+     * Set when to reveal obfuscated content
      */
-    public function withRevealStrategy(RevealStrategy $revealStrategy): self
+    public function revealOn(RevealTrigger $trigger): self
     {
-        $this->scriptSettings->revealStrategy = $revealStrategy;
+        $this->scriptSettings->revealTrigger = $trigger;
         return $this;
     }
 
