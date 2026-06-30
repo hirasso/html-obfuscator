@@ -14,7 +14,7 @@ final class ScriptSettings
         public bool $debug = false,
         public RevealStrategy $revealStrategy = RevealStrategy::OnLoad,
         public string $tagName = HTMLObfuscator::DEFAULT_TAG_NAME,
-        public bool $renderPlaceholders = false,
+        public bool $renderPlaceholders = true,
     ) {
     }
 }

@@ -52,7 +52,7 @@ function render_example(RevealStrategy $strategy): void
             </tr>
             <tr>
                 <td>phone text</td>
-                <td>+1 555 123 4567</td>
+                <td>+1 555 123 4567 and some more text</td>
             </tr>
             <tr>
                 <td>phone link</td>
