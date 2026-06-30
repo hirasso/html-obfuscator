@@ -2,11 +2,8 @@
 
 :where(x-obfuscated) {
   display: inline-flex;
-  align-items: flex-start;
-  cursor: pointer;
+  flex-wrap: wrap;
 }
 :where(x-obfuscated > span) {
-  width: 0.8ch;
-  height: 1.4cap;
   background: black;
 }

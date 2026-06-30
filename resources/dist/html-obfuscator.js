@@ -86,6 +86,7 @@
 						abortCtrl.abort();
 						hasInteracted = true;
 						resolve(target);
+						logger?.log({ eventName });
 					}, { signal: abortCtrl.signal });
 				});
 			}));
@@ -97,13 +98,13 @@
 //#region resources/src/ObfuscatedElement.ts
 	var { revealStrategy: revealStrategy$1, renderPlaceholders } = settings;
 	/**
-	* Renders an obfuscated element that can reveal itself
+	* Render an obfuscated element that can reveal itself or a parent element's attribute
 	*/
 	var ObfuscatedElement = class extends HTMLElement {
 		constructor(..._args) {
 			super(..._args);
 			this.reveal = () => {
-				const value = getDecodedValue(this);
+				const value = this.decode();
 				if (!value) {
 					this.remove();
 					return;
@@ -114,10 +115,19 @@
 				}
 				this.outerHTML = value;
 			};
+			this.decode = (() => {
+				let value;
+				return () => {
+					return value ?? (value = getDecodedValue(this));
+				};
+			})();
+		}
+		get attr() {
+			return this.getAttribute("attr");
 		}
 		connectedCallback() {
 			if (revealStrategy$1 === "onload") return this.reveal();
-			maybeRenderPlaceholder(this);
+			if (renderPlaceholders && !this.attr) renderPlaceholder(this);
 			if (revealStrategy$1 === "oninteraction") detectGlobalInteraction().then(this.reveal);
 		}
 	};
@@ -137,7 +147,7 @@
 	* Reveal a parent element's attribute value
 	*/
 	function revealAttribute(el, value) {
-		const attr = el.getAttribute("attr");
+		const attr = el.attr;
 		if (!attr) return false;
 		const target = el.parentElement?.closest(`[${attr}]`);
 		if (!target) return false;
@@ -147,16 +157,27 @@
 	/**
 	* Render a placeholder for an obfuscated element
 	*/
-	function maybeRenderPlaceholder(el) {
-		if (el.hasAttribute("attr")) return;
-		if (!renderPlaceholders) return;
-		const charCount = parseInt(el.getAttribute("char-count") ?? "0", 10);
-		const span = document.createElement("span");
-		span.textContent = "";
-		for (let i = 0; i < charCount; i++) {
-			const clone = span.cloneNode(true);
-			el.append(clone);
-		}
+	function renderPlaceholder(el) {
+		const value = getDecodedValue(el);
+		if (!value) return;
+		const injectSpan = () => {
+			const span = document.createElement("span");
+			el.append(span);
+			span.style.display = "inline-block";
+			return span;
+		};
+		const span = injectSpan();
+		span.style.width = "1ch";
+		const { width: oneChInPixels } = span.getBoundingClientRect();
+		span.remove();
+		[...value].forEach((char) => {
+			const span = injectSpan();
+			span.textContent = char;
+			const { width } = span.getBoundingClientRect();
+			span.style.overflow = "hidden";
+			span.style.width = `${width / oneChInPixels}ch`;
+			span.innerHTML = "&nbsp;";
+		});
 	}
 
 //#endregion

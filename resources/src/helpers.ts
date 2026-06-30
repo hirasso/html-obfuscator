@@ -150,6 +150,7 @@ export const detectInteraction = (() => {
                 abortCtrl.abort();
                 hasInteracted = true;
                 resolve(target);
+                logger?.log({ eventName });
               },
               { signal: abortCtrl.signal },
             );
@@ -161,13 +162,3 @@ export const detectInteraction = (() => {
     return promises.get(target)! as Promise<T>;
   };
 })();
-
-/**
- * Inject styles into the head
- */
-function injectStyles(styles: string) {
-  const el = document.createElement("style");
-  el.textContent = styles;
-  document.head.append(el);
-  return el;
-}

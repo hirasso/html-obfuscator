@@ -3,15 +3,21 @@ import { detectGlobalInteraction, settings } from "./helpers.js";
 const { revealStrategy, renderPlaceholders } = settings;
 
 /**
- * Renders an obfuscated element that can reveal itself
+ * Render an obfuscated element that can reveal itself or a parent element's attribute
  */
 export class ObfuscatedElement extends HTMLElement {
+  get attr() {
+    return this.getAttribute("attr");
+  }
+
   connectedCallback() {
     if (revealStrategy === "onload") {
       return this.reveal();
     }
 
-    maybeRenderPlaceholder(this);
+    if (renderPlaceholders && !this.attr) {
+      renderPlaceholder(this);
+    }
 
     if (revealStrategy === "oninteraction") {
       detectGlobalInteraction().then(this.reveal);
@@ -19,7 +25,7 @@ export class ObfuscatedElement extends HTMLElement {
   }
 
   reveal = () => {
-    const value = getDecodedValue(this);
+    const value = this.decode();
 
     if (!value) {
       this.remove();
@@ -33,6 +39,13 @@ export class ObfuscatedElement extends HTMLElement {
 
     this.outerHTML = value;
   };
+
+  decode = (() => {
+    let value;
+    return () => {
+      return (value ??= getDecodedValue(this));
+    };
+  })();
 }
 
 /**
@@ -58,7 +71,7 @@ function getDecodedValue(el: ObfuscatedElement): string | undefined {
  * Reveal a parent element's attribute value
  */
 function revealAttribute(el: ObfuscatedElement, value: string): boolean {
-  const attr = el.getAttribute("attr");
+  const attr = el.attr;
   if (!attr) return false;
 
   const target = el.parentElement?.closest(`[${attr}]`);
@@ -68,20 +81,31 @@ function revealAttribute(el: ObfuscatedElement, value: string): boolean {
   return true;
 }
 
-
 /**
  * Render a placeholder for an obfuscated element
  */
-function maybeRenderPlaceholder(el: ObfuscatedElement): void {
-  if (el.hasAttribute("attr")) return;
+function renderPlaceholder(el: ObfuscatedElement): void {
+  const value = getDecodedValue(el);
+  if (!value) return;
 
-  if (!renderPlaceholders) return;
+  const injectSpan = () => {
+    const span = document.createElement("span");
+    el.append(span);
+    span.style.display = "inline-block";
+    return span;
+  };
 
-  const charCount = parseInt(el.getAttribute("char-count") ?? "0", 10);
-  const span = document.createElement("span");
-  span.textContent = "";
-  for (let i = 0; i < charCount; i++) {
-    const clone = span.cloneNode(true);
-    el.append(clone);
-  }
+  const span = injectSpan();
+  span.style.width = "1ch";
+  const { width: oneChInPixels } = span.getBoundingClientRect();
+  span.remove();
+
+  [...value].forEach((char) => {
+    const span = injectSpan();
+    span.textContent = char;
+    const { width } = span.getBoundingClientRect();
+    span.style.overflow = "hidden";
+    span.style.width = `${width / oneChInPixels}ch`;
+    span.innerHTML = "&nbsp;";
+  });
 }
