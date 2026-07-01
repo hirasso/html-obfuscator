@@ -19,8 +19,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "composer fixture",
+    // `composer fixture` runs pkill via `sh -c "pkill -f 'php -S localhost:8766' || true"`,
+    // which on Linux matches itself (the string appears in argv) and self-terminates with SIGTERM
+    // before `|| true` can suppress it, causing exit code 143. Run PHP directly instead.
+    command: "php -S localhost:8766 -t tests/e2e/fixtures/",
     url: baseURL,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
 });
