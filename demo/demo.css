@@ -32,6 +32,12 @@ a[href=""] {
   text-decoration: none;
 }
 
-h3 {
-  --pico-font-size: 1.25rem;
+summary {
+  font-weight: bold;
+  width: max-content;
+}
+
+pre[class*="language-"] {
+  font-size: 1rem;
+  border-radius: 1rem;
 }

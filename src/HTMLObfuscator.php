@@ -226,7 +226,7 @@ final class HTMLObfuscator
         $obfuscated->setAttribute('attr', $attibuteName);
         $obfuscated->setAttribute('style', 'display:none');
 
-        $el->prepend("\n", $obfuscated, "\n");
+        $el->prepend($obfuscated);
         /** clear the original attribute value */
         $el->setAttribute($attibuteName, '');
     }
@@ -290,6 +290,7 @@ final class HTMLObfuscator
         $fragment = Support::parseHtmlFragment($value, $this->document);
 
         $node->replaceWith($fragment);
+
     }
 
     /**
