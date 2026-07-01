@@ -120,4 +120,4 @@ echo obfuscate(\$html, passphrase: 'my-unique-passphrase');</code></pre>
 </html>
 HTML;
 
-echo obfuscate($html, 'demo')->debug();
+echo obfuscate($html, 'demo');

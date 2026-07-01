@@ -54,6 +54,7 @@ export default defineConfig([
         codeSplitting: false,
         dir: "resources/dist",
         minify: true,
+        comments: false,
         plugins: [terserPlugin(terserOptions)],
       },
     ],
