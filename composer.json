@@ -49,6 +49,11 @@
       "pkill -f 'php -S localhost:8765' || true",
       "php -S localhost:8765 -t demo/"
     ],
+    "fixture": [
+      "Composer\\Config::disableProcessTimeout",
+      "pkill -f 'php -S localhost:8766' || true",
+      "php -S localhost:8766 -t tests/e2e/fixtures/"
+    ],
     "build": "pnpm build",
     "generate-types": "bin/console typescript:transform",
     "post-install-cmd": [

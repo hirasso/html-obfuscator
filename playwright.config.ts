@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = "http://localhost:8765";
+const baseURL = "http://localhost:8766";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "composer demo",
+    command: "composer fixture",
     url: baseURL,
     reuseExistingServer: true,
   },
