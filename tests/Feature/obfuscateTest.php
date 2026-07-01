@@ -56,7 +56,7 @@ test('Obfuscates phone numbers in plaintext', function () {
 
 test('debug(false) Injects the minified and mangled frontend script', function () {
     $result = (string) obfuscate('')->debug(false)->injectFrontendScript(true);
-    expect($result)->toContain('(function(){var e={tagName:`tests-obfuscated`');
+    expect($result)->toContain('try{window.customElements.define(`tests-obfuscated`,r)}');
 });
 
 test('debug(false) injects the un-obfuscated frontend script', function () {
@@ -119,10 +119,8 @@ test('Allows to customize the custom element name', function () {
         ->injectFrontendScript(true)
         ->render();
 
-    dump($result);
-
     expectObfuscatedElement($result, 'reveal-me');
-    expect($result)->toContain('tagName: "reveal-me"');
+    expect($result)->toContain('const tagName = "reveal-me";');
 });
 
 test('Exposes ->apply() as public method', function () {

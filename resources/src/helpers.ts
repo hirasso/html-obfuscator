@@ -23,39 +23,6 @@ export const createLogger = () => {
 };
 
 /**
- * Load the data from a json script tag
- */
-export const loadSettingsFromJsonScriptTag = (() => {
-  const cache = new Map<string, any>();
-
-  return function <T>(selector: string): T {
-    if (cache.has(selector)) {
-      return cache.get(selector);
-    }
-
-    const el = document.getElementById(selector);
-    if (!el) {
-      throw new Error(`No script data element found for "${selector}"`);
-    }
-
-    let value: any;
-    try {
-      value = JSON.parse(el.textContent ?? "");
-    } catch {
-      throw new Error(`Failed to parse script data for "${selector}"`);
-    }
-
-    if (!value.settings) {
-      throw new Error(`No settings found in script data for "${selector}"`);
-    }
-
-    cache.set(selector, value.settings);
-
-    return value.settings as T;
-  };
-})();
-
-/**
  * Prefix a string with our prefix
  */
 export function prefixed(str: string): string {

@@ -15,26 +15,6 @@ const createLogger = () => {
 	};
 };
 /**
-* Load the data from a json script tag
-*/
-const loadSettingsFromJsonScriptTag = (() => {
-	const cache = /* @__PURE__ */ new Map();
-	return function(selector) {
-		if (cache.has(selector)) return cache.get(selector);
-		const el = document.getElementById(selector);
-		if (!el) throw new Error(`No script data element found for "${selector}"`);
-		let value;
-		try {
-			value = JSON.parse(el.textContent ?? "");
-		} catch {
-			throw new Error(`Failed to parse script data for "${selector}"`);
-		}
-		if (!value.settings) throw new Error(`No settings found in script data for "${selector}"`);
-		cache.set(selector, value.settings);
-		return value.settings;
-	};
-})();
-/**
 * Detect interaction anywhere on the window
 */
 function detectGlobalInteraction() {
