@@ -1,7 +1,6 @@
 declare namespace Hirasso {
   namespace HTMLObfuscator {
     export type ScriptSettings = {
-      debug: boolean;
       tagName: string;
     };
     namespace Enum {

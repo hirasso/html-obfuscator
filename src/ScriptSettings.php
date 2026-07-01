@@ -10,7 +10,6 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 final class ScriptSettings
 {
     public function __construct(
-        public bool $debug = false,
         public string $tagName = HTMLObfuscator::DEFAULT_TAG_NAME,
     ) {
     }

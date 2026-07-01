@@ -7,8 +7,7 @@ const prefix = "html-obfuscator";
  */
 type ScriptSettings = Hirasso.HTMLObfuscator.ScriptSettings;
 const defaults: ScriptSettings = {
-  tagName: "x-obfuscated",
-  debug: false
+  tagName: "x-obfuscated"
 };
 
 /**
@@ -26,13 +25,10 @@ export const settings: ScriptSettings = (() => {
 })();
 
 /**
- * Get a minimal logger with a prefix, if settings.debug = true
+ * Create a minimal logger with a prefix, if settings.debug = true
  */
-export const logger = (() => {
-  if (!settings.debug) {
-    return null;
-  }
-
+export type Logger = ReturnType<typeof createLogger>;
+export const createLogger = () => {
   const style = [
     "background: linear-gradient(to right, #a960ee, #f78ed4)",
     "color: white",
@@ -46,7 +42,7 @@ export const logger = (() => {
     warn: (...args: any[]) => console.warn(`%c${prefix}`, style, ...args),
     error: (...args: any[]) => console.error(`%c${prefix}`, style, ...args),
   };
-})();
+};
 
 /**
  * Load the data from a json script tag
@@ -133,7 +129,6 @@ export const detectInteraction = (() => {
                 abortCtrl.abort();
                 hasInteracted = true;
                 resolve(target);
-                logger?.log({ eventName });
               },
               { signal: abortCtrl.signal },
             );

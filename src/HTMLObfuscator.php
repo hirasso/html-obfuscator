@@ -130,7 +130,6 @@ final class HTMLObfuscator
     public function debug(bool $enabled = true): self
     {
         $this->debug = $enabled;
-        $this->scriptSettings->debug = $this->debug;
         return $this;
     }
 
@@ -311,8 +310,8 @@ final class HTMLObfuscator
         /** the script tag */
         $script = $this->document->createElement('script');
         $script->textContent = $this->getResource($this->debug
-            ? 'html-obfuscator.js'
-            : 'html-obfuscator.min.js');
+            ? 'index.js'
+            : 'index.min.js');
         $script->setAttribute('data-settings', \json_encode(
             value: $this->scriptSettings,
             flags: JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
