@@ -1,10 +1,21 @@
-import { decode, detectGlobalInteraction, logger } from "./helpers.js";
+import { decode, detectGlobalInteraction, Logger, logger } from "./helpers.js";
 
 /**
  * Render an obfuscated element that can reveal itself or a parent element's attribute
  */
 export class ObfuscatedElement extends HTMLElement {
   shadow: ShadowRoot;
+
+  /**
+   * Define the custom element
+   */
+  static register(tagName: string, logger?: Logger) {
+    try {
+      window.customElements.define(tagName, ObfuscatedElement);
+    } catch (e) {
+      logger?.error(e);
+    }
+  }
 
   get attr() {
     return this.getAttribute("attr");

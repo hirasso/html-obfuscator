@@ -13,17 +13,10 @@ import { ObfuscatedElement } from "./ObfuscatedElement.js";
   logger?.log({ tagName, key });
 
   detectGlobalInteraction().then(() => {
-    logger?.log("Interaction detected, lifting obfuscation");
+    logger?.log("Interaction detected. Obfuscated content revealed.");
   });
 
-  /**
-   * Define the custom element, logging errors only in debug mode
-   */
-  try {
-    window.customElements.define(tagName, ObfuscatedElement);
-  } catch (e) {
-    logger?.error(e);
-  }
+  ObfuscatedElement.register(tagName, logger);
 
   /**
    * Remove this script from the DOM immediately after execution when not in debug mode

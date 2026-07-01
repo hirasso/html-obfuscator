@@ -76,7 +76,17 @@ const decode = (() => {
 /**
 * Render an obfuscated element that can reveal itself or a parent element's attribute
 */
-var ObfuscatedElement = class extends HTMLElement {
+var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
+	/**
+	* Define the custom element
+	*/
+	static register(tagName, logger) {
+		try {
+			window.customElements.define(tagName, ObfuscatedElement);
+		} catch (e) {
+			logger?.error(e);
+		}
+	}
 	get attr() {
 		return this.getAttribute("attr");
 	}
@@ -121,16 +131,9 @@ var ObfuscatedElement = class extends HTMLElement {
 		key
 	});
 	detectGlobalInteraction().then(() => {
-		logger?.log("Interaction detected, lifting obfuscation");
+		logger?.log("Interaction detected. Obfuscated content revealed.");
 	});
-	/**
-	* Define the custom element, logging errors only in debug mode
-	*/
-	try {
-		window.customElements.define(tagName, ObfuscatedElement);
-	} catch (e) {
-		logger?.error(e);
-	}
+	ObfuscatedElement.register(tagName, logger);
 	/**
 	* Remove this script from the DOM immediately after execution when not in debug mode
 	*/
