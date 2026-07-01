@@ -1,0 +1,28 @@
+:root {
+  --pico-font-size: 18px;
+}
+
+body {
+  padding-block: 2rem;
+}
+
+main > * + * {
+  margin-block-start: 3rem;
+}
+
+.hint {
+  font-style: italic;
+  opacity: 0.6;
+}
+
+pre {
+  overflow-x: auto;
+}
+
+details + details {
+  margin-block-start: 0.5rem;
+}
+
+a[href=""] {
+  text-decoration: none;
+}
