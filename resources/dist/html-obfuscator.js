@@ -196,6 +196,10 @@
 	} catch (e) {
 		logger?.error(e);
 	}
+	/**
+	* Remove this script from the DOM immediately after execution
+	*/
+	document.currentScript?.remove();
 
 //#endregion
 })();

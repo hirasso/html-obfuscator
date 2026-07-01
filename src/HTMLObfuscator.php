@@ -308,11 +308,6 @@ final class HTMLObfuscator
         }
         self::$hasInjectedFrontendScript = true;
 
-        /** the style tag */
-        $style = $this->document->createElement('style');
-        $style->textContent = $this->getResource('html-obfuscator.css');
-        $this->document->body?->append($style);
-
         /** the script tag */
         $script = $this->document->createElement('script');
         $script->textContent = $this->getResource($this->debug

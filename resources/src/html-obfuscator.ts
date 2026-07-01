@@ -3,8 +3,6 @@
 import { detectGlobalInteraction, settings, logger } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
-import './html-obfuscator.css';
-
 logger?.log(settings);
 
 const { tagName } = settings;
@@ -21,3 +19,8 @@ try {
 } catch (e) {
   logger?.error(e);
 }
+
+/**
+ * Remove this script from the DOM immediately after execution
+ */
+document.currentScript?.remove();

@@ -41,3 +41,8 @@ test("mailto href is revealed after interaction", async ({ page }) => {
   await page.mouse.move(100, 100);
   await expect(page.locator('a[href="mailto:mail@example.com"]')).toBeVisible();
 });
+
+test("script tag is removed from DOM after execution", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("script[data-settings]")).toHaveCount(0);
+});

@@ -1,7 +1,0 @@
-:where(x-obfuscated) {
-  display: inline-flex;
-  flex-wrap: wrap;
-}
-:where(x-obfuscated > span) {
-  background: black;
-}
