@@ -13,7 +13,7 @@ echo obfuscate(<<<HTML
   <meta charset="utf-8">
   <title>Fixture</title>
     <style>
-        x-obfuscated, a[href=""] { color: red }
+        reveal-me, a[href=""] { color: red }
     </style>
 </head>
 <body>
@@ -24,4 +24,6 @@ echo obfuscate(<<<HTML
   <a href="mailto:mail@example.com">Send email</a>
 </body>
 </html>
-HTML);
+HTML)
+    ->debug()
+    ->withTagName('reveal-me');

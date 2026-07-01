@@ -1,18 +1,5 @@
 //#region resources/src/helpers.ts
 const prefix = "html-obfuscator";
-const defaults = { tagName: "x-obfuscated" };
-/**
-* Load the settings from the script tag
-*/
-const settings = (() => {
-	const attr = document.currentScript?.getAttribute("data-settings");
-	if (!attr) return defaults;
-	try {
-		return JSON.parse(attr);
-	} catch (e) {
-		return defaults;
-	}
-})();
 const createLogger = () => {
 	const style = [
 		"background: linear-gradient(to right, #a960ee, #f78ed4)",
@@ -142,10 +129,10 @@ function revealAttribute(el, value) {
 //#region resources/src/index.ts
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 const logger = createLogger();
-logger?.log(settings);
-const { tagName } = settings;
+const tagName = "x-obfuscated";
+logger?.log({ tagName });
 detectGlobalInteraction().then(() => {
-	logger?.log("User has interacted");
+	logger?.log("Interaction detected, lifting obfuscation");
 });
 /**
 * Define the custom element, logging errors only in debug mode

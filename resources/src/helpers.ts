@@ -3,28 +3,6 @@ import { ObfuscatedElement } from "./ObfuscatedElement.js";
 const prefix = "html-obfuscator";
 
 /**
- * Load data from an `application/json` script tag
- */
-type ScriptSettings = Hirasso.HTMLObfuscator.ScriptSettings;
-const defaults: ScriptSettings = {
-  tagName: "x-obfuscated"
-};
-
-/**
- * Load the settings from the script tag
- */
-export const settings: ScriptSettings = (() => {
-  const attr = document.currentScript?.getAttribute("data-settings");
-  if (!attr) return defaults;
-
-  try {
-    return JSON.parse(attr);
-  } catch (e) {
-    return defaults;
-  }
-})();
-
-/**
  * Create a minimal logger with a prefix, if settings.debug = true
  */
 export type Logger = ReturnType<typeof createLogger>;

@@ -32,8 +32,6 @@ final class HTMLObfuscator
 
     private bool $injectFrontendScript = true;
 
-    private ScriptSettings $scriptSettings;
-
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
 
@@ -41,7 +39,6 @@ final class HTMLObfuscator
         private HTMLDocument $document,
         private bool $isPartial
     ) {
-        $this->scriptSettings = new ScriptSettings();
     }
 
     /**
@@ -109,7 +106,6 @@ final class HTMLObfuscator
         }
 
         $this->tagName = trim($tagName);
-        $this->scriptSettings->tagName = $this->tagName;
         return $this;
     }
 
@@ -309,13 +305,7 @@ final class HTMLObfuscator
 
         /** the script tag */
         $script = $this->document->createElement('script');
-        $script->textContent = $this->getResource($this->debug
-            ? 'index.js'
-            : 'index.min.js');
-        $script->setAttribute('data-settings', \json_encode(
-            value: $this->scriptSettings,
-            flags: JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
-        ));
+        $script->textContent = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
         $this->document->body?->append($script);
     }
 
