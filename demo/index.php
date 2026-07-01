@@ -12,9 +12,8 @@ $contactHtml = <<<HTML
 <p>You can reach me by email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or by phone at <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
 HTML;
 
-$rawObfuscated = (string) obfuscate($contactHtml)
-    ->injectFrontendScript(false)
-    ->randomizeKey(false);
+$rawObfuscated = (string) obfuscate($contactHtml, passphrase: 'demo')
+    ->injectFrontendScript(false);
 
 $rawObfuscated = htmlspecialchars($rawObfuscated);
 
@@ -86,15 +85,22 @@ $html = <<<HTML
 
         <pre><code class="language-php">use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate(\$html);</code></pre>
+echo obfuscate(\$html, passphrase: 'my-unique-passphrase');</code></pre>
 
-        <p>Each email or phone number in the source becomes:</p>
-        <pre><code class="language-html">&lt;x-obfuscated value="base64..." key="md5..."&gt;&lt;/x-obfuscated&gt;</code></pre>
+        <p>Each email or phone number in text nodes becomes:</p>
+        <pre><code class="language-html">&lt;x-obfuscated value="base64..."&gt;&lt;/x-obfuscated&gt;</code></pre>
         <p>
             In the browser, a Web Component registered under that tag name decodes the value on
-            <code>connectedCallback</code> and renders it into a closed shadow root. After the first
-            real user interaction, it replaces itself with the decoded content in the live DOM.
+            <code>connectedCallback</code> and renders it into a closed shadow root, invisible to headless crawlers
+            <strong>but completely accessible to normal users</strong>.
+            After the first interaction, it replaces itself with the decoded content in the live DOM.
             The deobfuscation script is injected automatically and removes itself from the DOM after execution.
+        </p>
+        <p>Each <code>a[href^="mailto:"]</code> or <code>a[href^="tel:"]</code> gets a <code>x-obfuscated[attr="href"]</code> injected:</p>
+        <pre><code class="language-html">&lt;x-obfuscated value="base64..." attr="href"&gt;&lt;/x-obfuscated&gt;</code></pre>
+        <p>
+            In the browser, the Web Component replaces it's parent element's <code>href</code> with the decoded
+            value on <code>connectedCallback</code> and removes itself afterwards.
         </p>
     </section>
 
@@ -112,4 +118,4 @@ echo obfuscate(\$html);</code></pre>
 </html>
 HTML;
 
-echo obfuscate($html)->randomizeKey(false);
+echo obfuscate($html, 'demo');

@@ -24,6 +24,6 @@ echo obfuscate(<<<HTML
   <a href="mailto:mail@example.com">Send email</a>
 </body>
 </html>
-HTML)
+HTML, passphrase: 'html obfuscator')
     ->debug()
     ->withTagName('reveal-me');

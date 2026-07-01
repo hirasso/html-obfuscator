@@ -18,12 +18,11 @@
 ### Contact block
 - Mailto link: `mail@rassohilber.com` (textContent = email address)
 - Tel link: `+49 176 200 20 805` (textContent = phone number)
-- Both obfuscated via PHP, within prose text (not as a list). 
+- Both obfuscated via PHP, within prose text (not as a list).
 - Hint: "Move your mouse or press any key to reveal"
 
 ### Details: What can non-JS crawlers see?
 - `<details>` with raw obfuscated HTML in `<pre><code>`
-- Generated with `randomizeKey(false)` so output is deterministic
 
 ### Details: What can JS crawlers see before interaction?
 - `<details>` with prose only
@@ -41,6 +40,5 @@
 - Resulting `<x-obfuscated>` HTML output
 
 ## Implementation notes
-- Pre-generate raw obfuscated contact block with `->injectFrontendScript(false)->randomizeKey(false)` for the details display
+- Pre-generate raw obfuscated contact block with `->injectFrontendScript(false)` for the details display
 - Reset `HTMLObfuscator::$hasInjectedFrontendScript = false` before the full-page obfuscation call
-- Full-page obfuscation uses `->randomizeKey(false)` so values match the details block

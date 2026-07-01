@@ -7,6 +7,7 @@ import { ObfuscatedElement } from "./ObfuscatedElement.js";
 const debug = process.env.NODE_ENV === "development";
 const logger = debug ? createLogger() : undefined;
 
+const key = "fill-me";
 const tagName = "x-obfuscated";
 
 logger?.log({ tagName });

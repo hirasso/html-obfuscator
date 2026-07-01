@@ -10,15 +10,13 @@ const TESTS_TAG_NAME = 'tests-obfuscated';
  *
  * Customize/Override options on a per-test basis by chaining them like so:
  *
- * obfuscate('value')->withPassphrase('my-custom-passphrase')
+ * obfuscate('value')->debug(false)
  */
 function obfuscate(string $html): HTMLObfuscator
 {
     HTMLObfuscator::$hasInjectedFrontendScript = false;
 
-    return HTMLObfuscator::createFromString($html)
-        ->withPassphrase('testing')
-        ->randomizeKey(false)
+    return HTMLObfuscator::createFromString($html, 'test')
         ->withTagName(TESTS_TAG_NAME)
         ->injectFrontendScript(false)
         ->debug(true);
@@ -33,13 +31,17 @@ function expectObfuscatedElement(
     expect($html)->toContain("<$elementName ");
     expect($html)->toContain("</$elementName>");
 
-    foreach (['value', 'key', ...$customAttributes] as $attr) {
+    foreach (['value', ...$customAttributes] as $attr) {
         expect($html)->toContain($attr . '="');
     }
 }
 
 test('Obfuscates emails in links', function () {
-    expectObfuscatedElement((string) obfuscate('<a href="mailto:mail@example.com">email</a>'));
+    expectObfuscatedElement(
+        (string) obfuscate('<a href="mailto:mail@example.com">email</a>'),
+        TESTS_TAG_NAME,
+        customAttributes: ['attr']
+    );
 });
 
 test('Obfuscates emails in plaintext', function () {
@@ -56,7 +58,7 @@ test('Obfuscates phone numbers in plaintext', function () {
 
 test('debug(false) Injects the minified and mangled frontend script', function () {
     $result = (string) obfuscate('')->debug(false)->injectFrontendScript(true);
-    expect($result)->toContain('try{window.customElements.define(`tests-obfuscated`,r)}');
+    expect($result)->toContain('try{window.customElements.define(`tests-obfuscated`,a)}');
 });
 
 test('debug(false) injects the un-obfuscated frontend script', function () {
@@ -81,16 +83,9 @@ test('phoneNumbers(false) disables phone number obfuscation', function () {
     expect($result)->not->toContain('tests-obfuscated');
 });
 
-test('randomizeKey(true) produces obfuscated output', function () {
-    $result = (string) obfuscate('mail@example.com')
-        ->randomizeKey(true);
-    expect($result)->toContain('<tests-obfuscated');
-});
-
-test('(string) obfuscate() outputs full HTML for non-partial input', function () {
+test('obfuscate() outputs full HTML for non-partial input', function () {
     HTMLObfuscator::$hasInjectedFrontendScript = false;
-    $result = HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>')
-        ->render();
+    $result = (string) HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>', 'test');
     expect($result)->toContain('<html');
     expect($result)->toContain('<p>hello</p>');
 });

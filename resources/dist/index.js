@@ -1,5 +1,7 @@
 //#region resources/src/helpers.ts
 const prefix = "html-obfuscator";
+const key = document.currentScript?.getAttribute("data-key");
+const keyLength = key.length;
 const createLogger = () => {
 	const style = [
 		"background: linear-gradient(to right, #a960ee, #f78ed4)",
@@ -52,9 +54,8 @@ const detectInteraction = (() => {
 */
 const decode = (el) => {
 	const value = atob(el.getAttribute("value") ?? "");
-	const key = el.getAttribute("key");
-	if (!value || !key) return;
-	return [...value].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+	if (!value) return;
+	return [...value].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % keyLength))).join("");
 };
 
 //#endregion

@@ -19,13 +19,11 @@ use InvalidArgumentException;
 final class HTMLObfuscator
 {
     public const string DEFAULT_TAG_NAME = 'x-obfuscated';
-    public const string DEFAULT_PASSPHRASE = self::class;
 
-    private string $passphrase = self::DEFAULT_PASSPHRASE;
     private string $tagName = self::DEFAULT_TAG_NAME;
-    private bool $debug = false;
 
-    private bool $randomizeKey = true;
+    private string $key;
+    private bool $debug = false;
 
     private bool $emails = true;
     private bool $phoneNumbers = true;
@@ -37,26 +35,28 @@ final class HTMLObfuscator
 
     private function __construct(
         private HTMLDocument $document,
-        private bool $isPartial
+        string $passphrase,
+        private bool $isPartial,
     ) {
+        $this->key = md5($passphrase);
     }
 
     /**
      * Create a new Obfuscator instance from a HTMLDocument (by reference)
      */
-    public static function createFromDocument(HTMLDocument $document): self
+    public static function createFromDocument(HTMLDocument $document, string $passphrase): self
     {
-        return new self($document, isPartial: false);
+        return new self($document, passphrase: $passphrase, isPartial: false);
     }
 
     /**
      * Create a new Obfuscator instance from a HTML string
      */
-    public static function createFromString(string $source): self
+    public static function createFromString(string $source, string $passphrase): self
     {
         $isPartial = !str_contains($source, '</body>');
 
-        return new self(Support::createDocument($source), isPartial: $isPartial);
+        return new self(Support::createDocument($source), passphrase: $passphrase, isPartial: $isPartial);
     }
 
     /**
@@ -74,24 +74,6 @@ final class HTMLObfuscator
     public function phoneNumbers(bool $enabled = true): self
     {
         $this->phoneNumbers = $enabled;
-        return $this;
-    }
-
-    /**
-     * Should the passphrase be randomized each time?
-     */
-    public function randomizeKey(bool $enabled = true): self
-    {
-        $this->randomizeKey = $enabled;
-        return $this;
-    }
-
-    /**
-     * Set a custom passphrase for improved security
-     */
-    public function withPassphrase(string $passphrase): self
-    {
-        $this->passphrase = $passphrase;
         return $this;
     }
 
@@ -177,18 +159,6 @@ final class HTMLObfuscator
     }
 
     /**
-     * Get the key for encoding and decoding
-     */
-    private function getKey(): string
-    {
-        $passphrase = $this->randomizeKey
-            ? Support::shuffleString($this->passphrase)
-            : $this->passphrase;
-
-        return md5($passphrase);
-    }
-
-    /**
      * Obfuscate links
      */
     private function obfuscateLinks(): void
@@ -221,7 +191,7 @@ final class HTMLObfuscator
             return;
         }
 
-        $obfuscatedValue = new ObfuscatedValue($value, $this->getKey());
+        $obfuscatedValue = new ObfuscatedValue($value, $this->key);
         $obfuscated = $this->createObfuscatedElement($obfuscatedValue);
         $obfuscated->setAttribute('attr', $attibuteName);
         $obfuscated->setAttribute('style', 'display:none');
@@ -240,7 +210,6 @@ final class HTMLObfuscator
 
         $el = $this->document->createElement($this->tagName);
         $el->setAttribute('value', $value->encoded);
-        $el->setAttribute('key', $value->key);
 
         return $el;
     }
@@ -269,7 +238,7 @@ final class HTMLObfuscator
         $value = preg_replace_callback(
             "/{$regex->value}/",
             function ($matches) {
-                $obfuscated = new ObfuscatedValue($matches[0], $this->getKey());
+                $obfuscated = new ObfuscatedValue($matches[0], $this->key);
                 $el = $this->createObfuscatedElement($obfuscated);
                 return Support::outerHTML($el);
             },
@@ -299,15 +268,24 @@ final class HTMLObfuscator
      */
     private function maybeInjectFrontendScript(): void
     {
+        if (!$this->document->body) {
+            return;
+        }
+
         if (self::$hasInjectedFrontendScript || !$this->injectFrontendScript) {
             return;
         }
+
         self::$hasInjectedFrontendScript = true;
 
         /** the script tag */
         $script = $this->document->createElement('script');
-        $script->textContent = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
-        $this->document->body?->append($script);
+        $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
+        $js = str_replace('__KEY__', $this->key, $js);
+        $script->textContent = $js;
+        $script->setAttribute('data-key', $this->key);
+        $this->document->body->append($script);
+
     }
 
     /**

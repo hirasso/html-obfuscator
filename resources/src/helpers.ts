@@ -1,6 +1,8 @@
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const prefix = "html-obfuscator";
+const key = document.currentScript?.getAttribute('data-key')!;
+const keyLength = key.length;
 
 /**
  * Create a minimal logger with a prefix, if settings.debug = true
@@ -91,15 +93,14 @@ export const detectInteraction = (() => {
  */
 export const decode = (el: ObfuscatedElement): string | undefined => {
   const value = atob(el.getAttribute("value") ?? "");
-  const key = el.getAttribute("key");
 
-  if (!value || !key) {
+  if (!value) {
     return undefined;
   }
 
   return [...value]
     .map((c, i) =>
-      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % keyLength)),
     )
     .join("");
 };
