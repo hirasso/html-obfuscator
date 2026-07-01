@@ -28,6 +28,7 @@ echo obfuscate(<<<HTML
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HTML Obfuscator</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css">
   <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -46,24 +47,20 @@ echo obfuscate(<<<HTML
     </section>
 
     <section>
-        <details>
 
-        <summary>What can non-JS crawlers see?</summary>
-        <p>The original email and phone number are gone. Only the encoded custom element remains:</p>
+        <h3>What can non-JS crawlers see?</h3>
+        <p>The original email and phone number are gone. Only 4 encoded custom elements remain. One for each <code>href</code> attribute, one for each plaintext value:</p>
+        <pre><code class="language-html">{$rawObfuscated}</code></pre>
 
-        <pre><code>{$rawObfuscated}</code></pre>
 
-        </details>
-
-      <details>
-        <summary>What can JS crawlers see before interaction?</summary>
+        <h3>What can JS crawlers see before interaction?</h3>
         <p>
             Not much more. The Web Component does decode the value on <code>connectedCallback</code>,
             but renders it into a <strong>closed</strong> shadow root — inaccessible from outside JavaScript (verified via e2e tests).
             The <code>href</code> attribute also stays empty until interaction
             (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
         </p>
-        </details>
+
     </section>
 
     <section>
@@ -83,12 +80,12 @@ echo obfuscate(<<<HTML
             derived from a randomized passphrase, and replaces each match with a custom element:
         </p>
 
-        <pre><code>use function Hirasso\HTMLObfuscator\obfuscate;
+        <pre><code class="language-php">use function Hirasso\HTMLObfuscator\obfuscate;
 
 echo obfuscate(\$html);</code></pre>
 
         <p>Each email or phone number in the source becomes:</p>
-        <pre><code>&lt;x-obfuscated value="base64..." key="md5..."&gt;&lt;/x-obfuscated&gt;</code></pre>
+        <pre><code class="language-html">&lt;x-obfuscated value="base64..." key="md5..."&gt;&lt;/x-obfuscated&gt;</code></pre>
         <p>
             In the browser, a Web Component registered under that tag name decodes the value on
             <code>connectedCallback</code> and renders it into a closed shadow root. After the first
@@ -98,6 +95,8 @@ echo obfuscate(\$html);</code></pre>
     </section>
 
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>
 HTML)->randomizeKey(false);

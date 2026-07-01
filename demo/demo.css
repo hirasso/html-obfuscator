@@ -19,10 +19,19 @@ pre {
   overflow-x: auto;
 }
 
+pre[class*="language-"],
+code[class*="language-"] {
+  font-size: 0.875em;
+}
+
 details + details {
   margin-block-start: 0.5rem;
 }
 
 a[href=""] {
   text-decoration: none;
+}
+
+h3 {
+  --pico-font-size: 1.25rem;
 }
