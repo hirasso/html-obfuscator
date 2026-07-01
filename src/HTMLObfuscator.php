@@ -279,10 +279,19 @@ final class HTMLObfuscator
         self::$hasInjectedFrontendScript = true;
 
         /** the script tag */
-        $script = $this->document->createElement('script');
         $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
-        $js = str_replace('__KEY__', $this->key, $js);
+        $wrapper = $this->document->createElement('html-obfuscator');
+        $wrapper->innerHTML = <<<HTML
+            <template shadowrootmode="closed">
+                <script data-tagname="$this->tagName" data-key="$this->key">
+                    $js
+                </script>
+            </template>
+        HTML;
+        $script = $this->document->createElement('script');
+
         $script->textContent = $js;
+        $script->setAttribute('data-tagname', $this->tagName);
         $script->setAttribute('data-key', $this->key);
         $this->document->body->append($script);
 

@@ -1,8 +1,11 @@
+//#region resources/src/env.ts
+const tagName = document.currentScript?.getAttribute("data-tagname") ?? "";
+const key = document.currentScript?.getAttribute("data-key") ?? "";
+
+//#endregion
 //#region resources/src/helpers.ts
 const prefix = "html-obfuscator";
-const logger = createLogger();
-const key = document.currentScript?.getAttribute("data-key") ?? "";
-if (!key) throw new Error("No key provided");
+const logger = true ? createLogger() : void 0;
 function createLogger() {
 	const style = [
 		"background: linear-gradient(to right, #a960ee, #f78ed4)",
@@ -105,22 +108,33 @@ var ObfuscatedElement = class extends HTMLElement {
 //#endregion
 //#region resources/src/index.ts
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
-const tagName = "x-obfuscated";
-logger?.log({ tagName });
-detectGlobalInteraction().then(() => {
-	logger?.log("Interaction detected, lifting obfuscation");
-});
-/**
-* Define the custom element, logging errors only in debug mode
-*/
-try {
-	window.customElements.define(tagName, ObfuscatedElement);
-} catch (e) {
-	logger?.error(e);
-}
-/**
-* Remove this script from the DOM immediately after execution when not in debug mode
-*/
-if (!true) document.currentScript?.remove();
+(() => {
+	if (!key || !tagName) {
+		logger?.error("required properties are missing:", {
+			tagName,
+			key
+		});
+		return;
+	}
+	logger?.log({
+		tagName,
+		key
+	});
+	detectGlobalInteraction().then(() => {
+		logger?.log("Interaction detected, lifting obfuscation");
+	});
+	/**
+	* Define the custom element, logging errors only in debug mode
+	*/
+	try {
+		window.customElements.define(tagName, ObfuscatedElement);
+	} catch (e) {
+		logger?.error(e);
+	}
+	/**
+	* Remove this script from the DOM immediately after execution when not in debug mode
+	*/
+	if (!true) document.currentScript?.remove();
+})();
 
 //#endregion

@@ -1,16 +1,9 @@
+import { debug, key } from "./env.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const prefix = "html-obfuscator";
 
-// @ts-ignore will be replaced by rolldown at build time
-export const debug = process.env.NODE_ENV === "development";
 export const logger = debug ? createLogger() : undefined;
-
-const key = document.currentScript?.getAttribute("data-key") ?? "";
-
-if (!key) {
-  throw new Error("No key provided");
-}
 
 /**
  * Create a minimal logger with a prefix, if settings.debug = true
