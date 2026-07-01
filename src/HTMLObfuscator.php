@@ -162,7 +162,7 @@ final class HTMLObfuscator
         }
 
         if ($this->document->documentElement) {
-            return Support::outerHTML($this->document->documentElement);
+            return $this->document->saveHtml();
         }
 
         return ''; // @codeCoverageIgnore
