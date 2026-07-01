@@ -56,10 +56,9 @@ echo obfuscate(<<<HTML
         <summary>What can JS crawlers see before interaction?</summary>
         <p>
           Not much more. The Web Component does decode the value on <code>connectedCallback</code>,
-          but renders it into a <strong>closed</strong> shadow root — inaccessible from outside JavaScript.
-          The <code>href</code> attribute also stays empty until a real user interaction
-          (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>),
-          so links remain non-functional.
+          but renders it into a <strong>closed</strong> shadow root — inaccessible from outside JavaScript (verified via e2e tests).
+          The <code>href</code> attribute also stays empty until interaction
+          (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
         </p>
       </details>
     </section>
@@ -70,8 +69,7 @@ echo obfuscate(<<<HTML
         You might think spam bots are too clever for this. Turns out they aren't —
         <a href="https://spencermortensen.com/articles/email-obfuscation/">research by Spencer Mortensen</a>
         shows that even moderate obfuscation dramatically reduces harvesting. Most bots scan raw HTML
-        and don't simulate user interaction. Requiring a real gesture before revealing contact info
-        puts the cost on the crawler, not you.
+        and don't simulate user interaction. My best guess is that it's just too expensive for them.
       </p>
     </section>
 
