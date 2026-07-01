@@ -18,6 +18,8 @@ $rawObfuscated = (string) obfuscate($contactHtml)
 
 $rawObfuscated = htmlspecialchars($rawObfuscated);
 
+$currentYear = date('Y');
+
 HTMLObfuscator::$hasInjectedFrontendScript = false;
 
 $html = <<<HTML
@@ -97,6 +99,13 @@ echo obfuscate(\$html);</code></pre>
     </section>
 
   </main>
+  <footer class="container">
+    <small>
+        Motivated by <a href="https://spencermortensen.com/articles/email-obfuscation/">this article</a> by Spencer Mortensen.
+        Demo page built using <a href="https://picocss.com/">Pico CSS</a> and <a href="https://prismjs.com/">Prism.js</a>.
+        © $currentYear by <a href="https://github.com/hirasso">Rasso Hilber</a> 👋
+    </small>
+  </footer>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
