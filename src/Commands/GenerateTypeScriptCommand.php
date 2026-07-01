@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Hirasso\HTMLObfuscator\Commands;
 
 use Spatie\TypeScriptTransformer\Enums\RunnerMode;
+use Spatie\TypeScriptTransformer\Formatters\PrettierFormatter;
 use Spatie\TypeScriptTransformer\Runners\Runner;
 use Spatie\TypeScriptTransformer\Support\Loggers\SymfonyConsoleLogger;
 use Spatie\TypeScriptTransformer\Transformers\AttributedClassTransformer;
@@ -34,6 +35,7 @@ class GenerateTypeScriptCommand extends Command
             ->transformer(new EnumTransformer())
             ->transformDirectories(dirname(__DIR__))
             ->writer(new GlobalNamespaceWriter())
+            ->formatter(new PrettierFormatter())
             ->outputDirectory(dirname(__DIR__, 2) . '/resources/src/generated')
             ->get();
 

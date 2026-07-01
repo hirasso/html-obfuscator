@@ -3,38 +3,10 @@ import { ObfuscatedElement } from "./ObfuscatedElement.js";
 const prefix = "html-obfuscator";
 
 /**
- * Load data from an `application/json` script tag
+ * Create a minimal logger with a prefix, if settings.debug = true
  */
-type ScriptSettings = Hirasso.HTMLObfuscator.ScriptSettings;
-const defaults: ScriptSettings = {
-  tagName: "x-obfuscated",
-  debug: false,
-  revealTrigger: "load",
-  renderPlaceholders: false,
-};
-
-/**
- * Load the settings from the script tag
- */
-export const settings: ScriptSettings = (() => {
-  const attr = document.currentScript?.getAttribute("data-settings");
-  if (!attr) return defaults;
-
-  try {
-    return JSON.parse(attr);
-  } catch (e) {
-    return defaults;
-  }
-})();
-
-/**
- * Get a minimal logger with a prefix, if settings.debug = true
- */
-export const logger = (() => {
-  if (!settings.debug) {
-    return null;
-  }
-
+export type Logger = ReturnType<typeof createLogger>;
+export const createLogger = () => {
   const style = [
     "background: linear-gradient(to right, #a960ee, #f78ed4)",
     "color: white",
@@ -48,55 +20,7 @@ export const logger = (() => {
     warn: (...args: any[]) => console.warn(`%c${prefix}`, style, ...args),
     error: (...args: any[]) => console.error(`%c${prefix}`, style, ...args),
   };
-})();
-
-/**
- * Load the data from a json script tag
- */
-export const loadSettingsFromJsonScriptTag = (() => {
-  const store = new Map<string, any>();
-
-  return function <T>(selector: string): T {
-    if (store.has(selector)) {
-      return store.get(selector);
-    }
-
-    const el = document.getElementById(selector);
-    if (!el) {
-      throw new Error(`No script data element found for "${selector}"`);
-    }
-
-    let value: any;
-    try {
-      value = JSON.parse(el.textContent ?? "");
-    } catch {
-      throw new Error(`Failed to parse script data for "${selector}"`);
-    }
-
-    if (!value.settings) {
-      throw new Error(`No settings found in script data for "${selector}"`);
-    }
-
-    store.set(selector, value.settings);
-
-    return value.settings as T;
-  };
-})();
-
-/**
- * Get an attribute, validate it
- */
-function attr<T extends string>(
-  el: HTMLElement,
-  attribute: string,
-  allowedValues: readonly T[],
-): T | null {
-  const value = el.getAttribute(attribute);
-  if (value !== null && (allowedValues as readonly string[]).includes(value)) {
-    return value as T;
-  }
-  return null;
-}
+};
 
 /**
  * Prefix a string with our prefix
@@ -150,7 +74,6 @@ export const detectInteraction = (() => {
                 abortCtrl.abort();
                 hasInteracted = true;
                 resolve(target);
-                logger?.log({ eventName });
               },
               { signal: abortCtrl.signal },
             );
@@ -162,3 +85,21 @@ export const detectInteraction = (() => {
     return promises.get(target)! as Promise<T>;
   };
 })();
+
+/**
+ * Decode a value
+ */
+export const decode = (el: ObfuscatedElement): string | undefined => {
+  const value = atob(el.getAttribute("value") ?? "");
+  const key = el.getAttribute("key");
+
+  if (!value || !key) {
+    return undefined;
+  }
+
+  return [...value]
+    .map((c, i) =>
+      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+    )
+    .join("");
+};

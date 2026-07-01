@@ -8,14 +8,15 @@
     "@playwright/test": "^1.61.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
+    "prettier": "^3.8.4",
+    "rolldown": "^1.1.2",
     "terser": "^5",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.16"
+    "typescript": "^6.0.3"
   },
   "scripts": {
     "prepare": "husky",
-    "watch": "vite build --watch",
-    "build": "vite build",
+    "watch": "rolldown --config --watch",
+    "build": "rolldown --config",
     "analyse": "pnpm exec tsc --noEmit --project tsconfig.json",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

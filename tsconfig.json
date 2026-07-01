@@ -3,7 +3,6 @@
     "strict": true,
     "target": "ES2017",
     "lib": ["ES2020", "DOM"],
-    "types": ["vite/client"]
   },
   "include": ["resources/src"]
 }

@@ -8,7 +8,6 @@ use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Enum\Regex;
-use Hirasso\HTMLObfuscator\Enum\RevealTrigger;
 use Hirasso\HTMLObfuscator\Support\Support;
 use InvalidArgumentException;
 
@@ -33,8 +32,6 @@ final class HTMLObfuscator
 
     private bool $injectFrontendScript = true;
 
-    private ScriptSettings $scriptSettings;
-
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
 
@@ -42,7 +39,6 @@ final class HTMLObfuscator
         private HTMLDocument $document,
         private bool $isPartial
     ) {
-        $this->scriptSettings = new ScriptSettings();
     }
 
     /**
@@ -110,25 +106,6 @@ final class HTMLObfuscator
         }
 
         $this->tagName = trim($tagName);
-        $this->scriptSettings->tagName = $this->tagName;
-        return $this;
-    }
-
-    /**
-     * Set when to reveal obfuscated content
-     */
-    public function revealOn(RevealTrigger $trigger): self
-    {
-        $this->scriptSettings->revealTrigger = $trigger;
-        return $this;
-    }
-
-    /**
-     * Should placeholders be rendered for obfuscated elements?
-     */
-    public function renderPlaceholders(bool $enabled = true): self
-    {
-        $this->scriptSettings->renderPlaceholders = $enabled;
         return $this;
     }
 
@@ -149,7 +126,6 @@ final class HTMLObfuscator
     public function debug(bool $enabled = true): self
     {
         $this->debug = $enabled;
-        $this->scriptSettings->debug = $this->debug;
         return $this;
     }
 
@@ -249,6 +225,7 @@ final class HTMLObfuscator
         $obfuscated = $this->createObfuscatedElement($obfuscatedValue);
         $obfuscated->setAttribute('attr', $attibuteName);
         $obfuscated->setAttribute('style', 'display:none');
+
         $el->prepend("\n", $obfuscated, "\n");
         /** clear the original attribute value */
         $el->setAttribute($attibuteName, '');
@@ -264,8 +241,6 @@ final class HTMLObfuscator
         $el = $this->document->createElement($this->tagName);
         $el->setAttribute('value', $value->encoded);
         $el->setAttribute('key', $value->key);
-        $el->setAttribute('aria-hidden', 'true');
-        $el->setAttribute('char-count', (string) mb_strlen($value->original));
 
         return $el;
     }
@@ -328,20 +303,9 @@ final class HTMLObfuscator
         }
         self::$hasInjectedFrontendScript = true;
 
-        /** the style tag */
-        $style = $this->document->createElement('style');
-        $style->textContent = $this->getResource('html-obfuscator.css');
-        $this->document->body?->append($style);
-
         /** the script tag */
         $script = $this->document->createElement('script');
-        $script->textContent = $this->getResource($this->debug
-            ? 'html-obfuscator.js'
-            : 'html-obfuscator.min.js');
-        $script->setAttribute('data-settings', \json_encode(
-            value: $this->scriptSettings,
-            flags: JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
-        ));
+        $script->textContent = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
         $this->document->body?->append($script);
     }
 
