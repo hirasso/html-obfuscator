@@ -16,9 +16,9 @@ $rawObfuscated = (string) obfuscate($contactHtml)
     ->injectFrontendScript(false)
     ->randomizeKey(false);
 
-HTMLObfuscator::$hasInjectedFrontendScript = false;
+$rawObfuscated = htmlspecialchars($rawObfuscated);
 
-$rawObfuscatedEscaped = htmlspecialchars($rawObfuscated);
+HTMLObfuscator::$hasInjectedFrontendScript = false;
 
 echo obfuscate(<<<HTML
 <!DOCTYPE html>
@@ -46,50 +46,55 @@ echo obfuscate(<<<HTML
     </section>
 
     <section>
-      <details>
+        <details>
+
         <summary>What can non-JS crawlers see?</summary>
         <p>The original email and phone number are gone. Only the encoded custom element remains:</p>
-        <pre><code>{$rawObfuscatedEscaped}</code></pre>
-      </details>
+
+        <pre><code>{$rawObfuscated}</code></pre>
+
+        </details>
 
       <details>
         <summary>What can JS crawlers see before interaction?</summary>
         <p>
-          Not much more. The Web Component does decode the value on <code>connectedCallback</code>,
-          but renders it into a <strong>closed</strong> shadow root — inaccessible from outside JavaScript (verified via e2e tests).
-          The <code>href</code> attribute also stays empty until interaction
-          (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
+            Not much more. The Web Component does decode the value on <code>connectedCallback</code>,
+            but renders it into a <strong>closed</strong> shadow root — inaccessible from outside JavaScript (verified via e2e tests).
+            The <code>href</code> attribute also stays empty until interaction
+            (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
         </p>
-      </details>
+        </details>
     </section>
 
     <section>
-      <h2>Why obfuscation works</h2>
-      <p>
-        You might think spam bots are too clever for this. Turns out they aren't —
-        <a href="https://spencermortensen.com/articles/email-obfuscation/">research by Spencer Mortensen</a>
-        shows that even moderate obfuscation dramatically reduces harvesting. Most bots scan raw HTML
-        and don't simulate user interaction. My best guess is that it's just too expensive for them.
-      </p>
+        <h2>Why obfuscation works</h2>
+        <p>
+            You might think spam bots are too clever for this. Turns out they aren't —
+            <a href="https://spencermortensen.com/articles/email-obfuscation/">research by Spencer Mortensen</a>
+            shows that even moderate obfuscation dramatically reduces harvesting. Most bots scan raw HTML
+            and don't simulate user interaction. My best guess is that it's just too expensive.
+        </p>
     </section>
 
     <section>
-      <h2>How it works</h2>
-      <p>
-        On the server, PHP finds emails and phone numbers in your HTML, XOR-encodes them with a key
-        derived from a randomized passphrase, and replaces each match with a custom element:
-      </p>
-      <pre><code>use function Hirasso\HTMLObfuscator\obfuscate;
+        <h2>How it works</h2>
+        <p>
+            On the server, PHP finds emails and phone numbers in your HTML, XOR-encodes them with a key
+            derived from a randomized passphrase, and replaces each match with a custom element:
+        </p>
+
+        <pre><code>use function Hirasso\HTMLObfuscator\obfuscate;
 
 echo obfuscate(\$html);</code></pre>
-      <p>Each email or phone number in the source becomes:</p>
-      <pre><code>&lt;x-obfuscated value="base64..." key="md5..."&gt;&lt;/x-obfuscated&gt;</code></pre>
-      <p>
-        In the browser, a Web Component registered under that tag name decodes the value on
-        <code>connectedCallback</code> and renders it into a closed shadow root. After the first
-        real user interaction, it replaces itself with the decoded content in the live DOM.
-        The deobfuscation script is injected automatically and removes itself from the DOM after execution.
-      </p>
+
+        <p>Each email or phone number in the source becomes:</p>
+        <pre><code>&lt;x-obfuscated value="base64..." key="md5..."&gt;&lt;/x-obfuscated&gt;</code></pre>
+        <p>
+            In the browser, a Web Component registered under that tag name decodes the value on
+            <code>connectedCallback</code> and renders it into a closed shadow root. After the first
+            real user interaction, it replaces itself with the decoded content in the live DOM.
+            The deobfuscation script is injected automatically and removes itself from the DOM after execution.
+        </p>
     </section>
 
   </main>
