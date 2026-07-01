@@ -4,6 +4,8 @@
 
 body {
   padding-block: 2rem;
+  max-width: 1000px;
+  margin-inline: auto;
 }
 
 main > * + * {

@@ -27,18 +27,20 @@ $html = <<<HTML
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HTML Obfuscator: Require work from crawlers before revealing contact information</title>
+  <title>HTML Obfuscator</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-dracula.css">
   <link rel="stylesheet" href="demo.css">
 </head>
 <body>
-  <main class="container">
+  <main class="container-fluid">
 
     <header>
-      <h1>HTML Obfuscator</h1>
-      <p>Obfuscate email addresses and phone numbers using PHP and modern web features 👀</p>
-      <p><a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></p>
+
+        <h1>HTML Obfuscator</h1>
+        <p><strong>Tl;dr</strong>: Require work from crawlers before revealing contact information, by obfuscating email addresses and phone numbers using PHP and modern web features. <br></p>
+        <p><a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></p>
+
     </header>
 
     <section>
@@ -58,7 +60,7 @@ $html = <<<HTML
             <summary>What can JS crawlers see before interaction?</summary>
             <p>
                 Not much more. The Web Component does decode the value on <code>connectedCallback</code>,
-                but renders it into a <strong>closed</strong> shadow root — inaccessible from outside JavaScript (verified via e2e tests).
+                but renders it into a <strong>closed</strong> shadow root — <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#closed">inaccessible from outside JavaScript</a>.
                 The <code>href</code> attribute also stays empty until interaction
                 (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
             </p>
@@ -105,7 +107,7 @@ echo obfuscate(\$html, passphrase: 'my-unique-passphrase');</code></pre>
     </section>
 
   </main>
-  <footer class="container">
+  <footer class="container-fluid">
     <small>
         Motivated by <a href="https://spencermortensen.com/articles/email-obfuscation/">this article</a> by Spencer Mortensen.
         Demo page built using <a href="https://picocss.com/">Pico CSS</a> and <a href="https://prismjs.com/">Prism.js</a>.
@@ -118,4 +120,4 @@ echo obfuscate(\$html, passphrase: 'my-unique-passphrase');</code></pre>
 </html>
 HTML;
 
-echo obfuscate($html, 'demo');
+echo obfuscate($html, 'demo')->debug();

@@ -1,14 +1,22 @@
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const prefix = "html-obfuscator";
-const key = document.currentScript?.getAttribute('data-key')!;
-const keyLength = key.length;
+
+// @ts-ignore will be replaced by rolldown at build time
+export const debug = process.env.NODE_ENV === "development";
+export const logger = debug ? createLogger() : undefined;
+
+const key = document.currentScript?.getAttribute("data-key") ?? "";
+
+if (!key) {
+  throw new Error("No key provided");
+}
 
 /**
  * Create a minimal logger with a prefix, if settings.debug = true
  */
 export type Logger = ReturnType<typeof createLogger>;
-export const createLogger = () => {
+function createLogger() {
   const style = [
     "background: linear-gradient(to right, #a960ee, #f78ed4)",
     "color: white",
@@ -91,16 +99,29 @@ export const detectInteraction = (() => {
 /**
  * Decode a value
  */
-export const decode = (el: ObfuscatedElement): string | undefined => {
-  const value = atob(el.getAttribute("value") ?? "");
+export const decode = (() => {
+  const cache = new Map<string, string>();
 
-  if (!value) {
-    return undefined;
-  }
+  return (el: ObfuscatedElement, logger?: Logger): string | undefined => {
+    const encoded = atob(el.getAttribute("value") ?? "");
 
-  return [...value]
-    .map((c, i) =>
-      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % keyLength)),
-    )
-    .join("");
-};
+    if (!encoded) {
+      return undefined;
+    }
+
+    if (cache.has(encoded)) {
+      logger?.log(`Cache hit for ${encoded}`);
+      return cache.get(encoded);
+    }
+
+    const decoded = [...encoded]
+      .map((c, i) =>
+        String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+      )
+      .join("");
+
+    cache.set(encoded, decoded);
+
+    return decoded;
+  };
+})();
