@@ -2,4 +2,4 @@
 "html-obfuscator": minor
 ---
 
-Optimize the dimensions of generated placeholders
+Add dimension-optimized placeholders for obfuscated plain text

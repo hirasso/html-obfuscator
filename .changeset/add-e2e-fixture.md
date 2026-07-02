@@ -2,4 +2,4 @@
 "html-obfuscator": patch
 ---
 
-Add PHP e2e fixture and fresh Playwright tests for obfuscation in the `shadowRoot` and interaction reveal
+Add `demo/` pages, PHP e2e fixture, and Playwright tests for all three reveal triggers; rename `composer example` to `composer demo`
