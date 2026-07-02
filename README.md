@@ -36,6 +36,8 @@ composer require hirasso/html-obfuscator
 
 ## Minimal Example
 
+Obfuscate emails and phone numbers in `$html` and automatically injects the client script required for de-obfuscation of the resulting `<ob-fus-ca-ted>` custom elements:
+
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
 
@@ -51,7 +53,22 @@ echo obfuscate($html, passphrase: /** TODO */);
 echo obfuscate($html, passphrase: $config->userAuthSalt);
 ```
 
-## ->emails(bool)
+## Rendering the client script manually
+
+By default, the client `<script>` is auto-injected into the document. If you need it in a specific location (e.g. in the `<head>`), use `clientScript()` and echo it yourself:
+
+```php
+use function Hirasso\HTMLObfuscator\obfuscate;
+use function Hirasso\HTMLObfuscator\clientScript;
+
+// 1. Render the script in your <head>
+echo clientScript(passphrase: 'unique but stable passphrase');
+
+// 2. Obfuscate your HTML — script injection is skipped because it was already rendered
+echo obfuscate($html, passphrase: 'unique but stable passphrase');
+```
+
+## `->emails(bool)`
 
 Keep emails unobfuscated
 
@@ -59,7 +76,7 @@ Keep emails unobfuscated
 echo obfuscate($html, passphrase: 'unique but stable passphrase')->emails(false);
 ```
 
-## ->phoneNumbers(bool)
+## `->phoneNumbers(bool)`
 
 Keep phone numbers unobfuscated
 
@@ -69,7 +86,7 @@ echo obfuscate($html, passphrase: 'unique but stable passphrase')->phoneNumbers(
 
 ## `->debug(bool)`
 
-Inject the client script unminified and with logging:
+Inject the client script unminified and with logging
 
 ```php
 echo obfuscate($html, passphrase: 'unique but stable passphrase')->debug(true);
@@ -83,29 +100,15 @@ Customize the tag name of the custom element
 echo obfuscate($html, passphrase: 'unique but stable passphrase')->withTagName('reveal-me');
 ```
 
-## Rendering the client script manually
+## `->addRegex(string)`
 
-By default, the client `<script>` is auto-injected into the document. If you need it in a specific location (e.g. in the `<head>`), use `clientScript()` and echo it yourself:
-
-```php
-use function Hirasso\HTMLObfuscator\obfuscate;
-use function Hirasso\HTMLObfuscator\clientScript;
-
-// 1. Render the script in your <head>
-echo clientScript(passphrase: 'unique but stable passphrase');
-
-// 2. Obfuscate your HTML — script injection is skipped because it was already rendered
-echo obfuscate($html, 'unique but stable passphrase');
-```
-
-## `->addRegex()`
-
-Add custom patterns to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specificly:
+Add custom patterns to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specifically:
 
 ```php
 echo obfuscate($html, passphrase: 'unique but stable passphrase')
     ->addRegex('/[^\s@]+@/') // obfuscate the <span> text node ("verylongemailaddress@")
     ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscate the domain part ("example.com")
+;
 ```
 
 The pattern must be a valid PCRE regex with delimiters. Each call to `->addRegex()` appends one pattern; you can chain as many as you need. An `\InvalidArgumentException` is thrown for invalid patterns.
