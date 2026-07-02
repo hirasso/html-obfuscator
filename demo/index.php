@@ -13,7 +13,7 @@ HTML;
 
 $script = clientScript('demo');
 
-$rawObfuscated = (string) obfuscate($contactHtml, passphrase: 'demo')
+$rawObfuscated = (string) obfuscate($contactHtml, key: 'demo')
     ->injectClientScript(false);
 
 $rawObfuscated = htmlspecialchars($rawObfuscated);
@@ -87,12 +87,12 @@ $html = <<<HTML
         <h2>How it works</h2>
         <p>
             On the server, PHP finds emails and phone numbers in your HTML, XOR-encodes them with a key
-            derived from a randomized passphrase, and replaces each match with a custom element:
+            derived from a key, and replaces each match with a custom element:
         </p>
 
         <pre><code class="language-php">use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate(\$html, passphrase: 'my-unique-but-stable-passphrase');</code></pre>
+echo obfuscate(\$html, key: 'my-unique-but-stable-key');</code></pre>
 
         <p>Each email or phone number in text nodes becomes:</p>
         <pre><code class="language-html">&lt;x-obfuscated value="base64..."&gt;&lt;/x-obfuscated&gt;</code></pre>
