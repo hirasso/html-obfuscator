@@ -40,18 +40,18 @@ composer require hirasso/html-obfuscator
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 /** vanilla: */
-obfuscate($html, passphrase: 'unique but stable passphrase');
+echo obfuscate($html, passphrase: 'unique but stable passphrase');
 /** or in Laravel: */
-obfuscate($html, passphrase: config('app.key'));
+echo obfuscate($html, passphrase: config('app.key'));
 /** or in WordPress: */
-obfuscate($html, passphrase: wp_salt());
+echo obfuscate($html, passphrase: wp_salt());
 /** or in Kirby: */
-obfuscate($html, passphrase: /** TODO */);
+echo obfuscate($html, passphrase: /** TODO */);
 /** or in ProcessWire: */
-obfuscate($html, passphrase: $config->userAuthSalt);
+echo obfuscate($html, passphrase: $config->userAuthSalt);
 ```
 
-## Maximal Example
+## Keep Example
 
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
