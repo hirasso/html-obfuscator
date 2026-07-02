@@ -1,45 +1,18 @@
 <?php
 
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
+use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 
-const TESTS_TAG_NAME = 'tests-obfuscated';
+use function Hirasso\HTMLObfuscator\clientScript;
 
-/**
- * Obfuscate with sensible defaults for tests.
- * Use this instead of HTMLObfuscator::createFromString.
- *
- * Customize/Override options on a per-test basis by chaining them like so:
- *
- * obfuscate('value')->withPassphrase('my-custom-passphrase')
- */
-function obfuscate(string $html): HTMLObfuscator
-{
-    HTMLObfuscator::$hasInjectedFrontendScript = false;
-
-    return HTMLObfuscator::createFromString($html)
-        ->withPassphrase('testing')
-        ->randomizeKey(false)
-        ->withTagName(TESTS_TAG_NAME)
-        ->injectFrontendScript(false)
-        ->debug(true);
-}
-
-/** @param list<string> $customAttributes */
-function expectObfuscatedElement(
-    string $html,
-    string $elementName = TESTS_TAG_NAME,
-    array $customAttributes = []
-): void {
-    expect($html)->toContain("<$elementName ");
-    expect($html)->toContain("</$elementName>");
-
-    foreach (['value', 'key', ...$customAttributes] as $attr) {
-        expect($html)->toContain($attr . '="');
-    }
-}
+afterEach(fn () => ObfuscatorConfig::reset());
 
 test('Obfuscates emails in links', function () {
-    expectObfuscatedElement((string) obfuscate('<a href="mailto:mail@example.com">email</a>'));
+    expectObfuscatedElement(
+        (string) obfuscate('<a href="mailto:mail@example.com">email</a>'),
+        TESTS_TAG_NAME,
+        customAttributes: ['attr']
+    );
 });
 
 test('Obfuscates emails in plaintext', function () {
@@ -55,13 +28,13 @@ test('Obfuscates phone numbers in plaintext', function () {
 });
 
 test('debug(false) Injects the minified and mangled frontend script', function () {
-    $result = (string) obfuscate('')->debug(false)->injectFrontendScript(true);
-    expect($result)->toContain('try{window.customElements.define(`tests-obfuscated`,r)}');
+    $result = (string) obfuscate('')->debug(false)->injectClientScript(true);
+    expect($result)->toContain('new CustomEvent(o(t),{bubbles:!0}))}');
 });
 
 test('debug(false) injects the un-obfuscated frontend script', function () {
     $result = (string) obfuscate('')
-        ->injectFrontendScript(true);
+        ->injectClientScript(true);
 
     expect($result)->toContain('//#region resources/src/helpers.ts');
 });
@@ -81,22 +54,13 @@ test('phoneNumbers(false) disables phone number obfuscation', function () {
     expect($result)->not->toContain('tests-obfuscated');
 });
 
-test('randomizeKey(true) produces obfuscated output', function () {
-    $result = (string) obfuscate('mail@example.com')
-        ->randomizeKey(true);
-    expect($result)->toContain('<tests-obfuscated');
-});
-
-test('(string) obfuscate() outputs full HTML for non-partial input', function () {
-    HTMLObfuscator::$hasInjectedFrontendScript = false;
-    $result = HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>')
-        ->render();
+test('obfuscate() outputs full HTML for non-partial input', function () {
+    $result = (string) HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>', 'test');
     expect($result)->toContain('<html');
     expect($result)->toContain('<p>hello</p>');
 });
 
 test('__toString() returns the rendered output', function () {
-    HTMLObfuscator::$hasInjectedFrontendScript = false;
     $result = (string) obfuscate('hello world');
     expect($result)->toBe('hello world');
 });
@@ -113,14 +77,13 @@ test('Invalid tel: links are not obfuscated', function () {
     expect($result)->not->toContain('tests-obfuscated');
 });
 
-test('Allows to customize the custom element name', function () {
-    $result = obfuscate('mail@example.com')
+test('Allows to customize the custom element\'s tag name', function () {
+    $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
         ->withTagName('reveal-me')
-        ->injectFrontendScript(true)
+        ->injectClientScript(false)
         ->render();
 
     expectObfuscatedElement($result, 'reveal-me');
-    expect($result)->toContain('const tagName = "reveal-me";');
 });
 
 test('Exposes ->apply() as public method', function () {
@@ -151,4 +114,14 @@ test('obfuscates emails and phone numbers within the same text node', function (
     expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
     expect($result)->not->toContain('mail@example.com');
     expect($result)->not->toContain('+49 12 345 67');
+});
+
+test('renders the client script', function () {
+    $debug_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME)->debug(true);
+    expect($debug_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
+    expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
+
+    $minified_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME);
+    expect($minified_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
+    expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
 });

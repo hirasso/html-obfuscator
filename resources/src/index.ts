@@ -1,32 +1,30 @@
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 
-import { createLogger, detectGlobalInteraction } from "./helpers.js";
+import { debug, key, tagName } from "./defs.js";
+import { createLogger, detectGlobalInteraction, dispatch } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
-// @ts-ignore will be replaced by rolldown at build time
-const debug = process.env.NODE_ENV === "development";
 const logger = debug ? createLogger() : undefined;
 
-const tagName = "x-obfuscated";
+(() => {
+  if (!key || !tagName) {
+    logger?.error("required properties are missing:", { tagName, key });
+    return;
+  }
 
-logger?.log({ tagName });
+  logger?.log({ tagName, key });
 
-detectGlobalInteraction().then(() => {
-  logger?.log("Interaction detected, lifting obfuscation");
-});
+  detectGlobalInteraction().then(() => {
+    dispatch('reveal');
+    logger?.log("Interaction detected. Obfuscated content revealed.");
+  });
 
-/**
- * Define the custom element, logging errors only in debug mode
- */
-try {
-  window.customElements.define(tagName, ObfuscatedElement);
-} catch (e) {
-  logger?.error(e);
-}
+  ObfuscatedElement.register(tagName, logger);
 
-/**
- * Remove this script from the DOM immediately after execution when not in debug mode
- */
-if (!debug) {
-  document.currentScript?.remove();
-}
+  /**
+   * Remove this script from the DOM immediately after execution when not in debug mode
+   */
+  if (!debug) {
+    document.currentScript?.remove();
+  }
+})();

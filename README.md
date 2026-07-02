@@ -15,7 +15,7 @@ You might think that obfuscation won't work against spam bots. Turns out [it doe
 On the server, PHP finds emails and phone numbers in the HTML, XOR-encodes them with a key derived from a passphrase (MD5 of a shuffled version of it), base64-encodes the result, and replaces the original text with a custom HTML element:
 
 ```html
-<x-obfuscated value="..." key="..."></x-obfuscated>
+<x-obfuscated value="..."></x-obfuscated>
 ```
 
 In the browser, a Web Component registered under that tag name picks up each element on `connectedCallback`, reverses the XOR encoding, and swaps itself out with the decoded content. Spam bots crawling the raw HTML never see the actual email or phone number.
@@ -39,7 +39,16 @@ composer require hirasso/html-obfuscator
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate($html);
+/** vanilla: */
+obfuscate($html, passphrase: 'unique but stable passphrase');
+/** or in Laravel: */
+obfuscate($html, passphrase: config('app.key'));
+/** or in WordPress: */
+obfuscate($html, passphrase: wp_salt());
+/** or in Kirby: */
+obfuscate($html, passphrase: /** TODO */);
+/** or in ProcessWire: */
+obfuscate($html, passphrase: $config->userAuthSalt);
 ```
 
 ## Maximal Example
@@ -47,14 +56,13 @@ echo obfuscate($html);
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate($html)
+echo obfuscate($html, passphrase: 'unique but stable passphrase')
     ->phoneNumbers(false)
-    ->withPassphrase('nobody will guess this!')
     ->withTagName('reveal-me')
     ->debug(true);
 ```
 
-## With a `\Dom\HTMLDocument`
+## With a `HTMLDocument`
 
 When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
 
@@ -63,8 +71,23 @@ use Dom\HTMLDocument;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 $doc = HTMLDocument::createFromString($html);
-obfuscate($doc)->apply();
+obfuscate($doc, passphrase: 'unique but stable passphrase')->apply();
 // $doc is now obfuscated in place
+```
+
+## Rendering the client script manually
+
+By default, the client `<script>` is auto-injected into the document. If you need it in a specific location (e.g. in the `<head>`), use `clientScript()` and echo it yourself:
+
+```php
+use function Hirasso\HTMLObfuscator\obfuscate;
+use function Hirasso\HTMLObfuscator\clientScript;
+
+// 1. Render the script in your <head>
+echo clientScript(passphrase: 'unique but stable passphrase');
+
+// 2. Obfuscate your HTML — script injection is skipped because it was already rendered
+echo obfuscate($html, 'unique but stable passphrase');
 ```
 
 &rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.

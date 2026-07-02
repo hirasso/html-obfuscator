@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
 
+use Hirasso\HTMLObfuscator\HTMLObfuscator;
+
 use function Hirasso\HTMLObfuscator\obfuscate;
+
+$defaultTagName = HTMLObfuscator::DEFAULT_TAG_NAME;
 
 echo obfuscate(<<<HTML
 <!DOCTYPE html>
@@ -13,7 +17,7 @@ echo obfuscate(<<<HTML
   <meta charset="utf-8">
   <title>Fixture</title>
     <style>
-        reveal-me, a[href=""] { color: red }
+        $defaultTagName, a[href=""] { color: red }
     </style>
 </head>
 <body>
@@ -24,6 +28,4 @@ echo obfuscate(<<<HTML
   <a href="mailto:mail@example.com">Send email</a>
 </body>
 </html>
-HTML)
-    ->debug()
-    ->withTagName('reveal-me');
+HTML, passphrase: 'html obfuscator');

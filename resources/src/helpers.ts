@@ -1,3 +1,4 @@
+import { debug, key } from "./defs.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const prefix = "html-obfuscator";
@@ -6,7 +7,7 @@ const prefix = "html-obfuscator";
  * Create a minimal logger with a prefix, if settings.debug = true
  */
 export type Logger = ReturnType<typeof createLogger>;
-export const createLogger = () => {
+export function createLogger() {
   const style = [
     "background: linear-gradient(to right, #a960ee, #f78ed4)",
     "color: white",
@@ -20,7 +21,7 @@ export const createLogger = () => {
     warn: (...args: any[]) => console.warn(`%c${prefix}`, style, ...args),
     error: (...args: any[]) => console.error(`%c${prefix}`, style, ...args),
   };
-};
+}
 
 /**
  * Prefix a string with our prefix
@@ -32,7 +33,7 @@ export function prefixed(str: string): string {
 /**
  * Dispatch custom prefixed events
  */
-export function dispatchPrefixedEvent(eventName: string): void {
+export function dispatch(eventName: string): void {
   document.documentElement.dispatchEvent(
     new CustomEvent(prefixed(eventName), { bubbles: true }),
   );
@@ -55,10 +56,12 @@ export const detectInteraction = (() => {
 
   return <T extends HTMLElement | Document | Window>(
     target: T,
-    events: (keyof DocumentEventMap)[] | undefined = undefined,
+    events: (keyof DocumentEventMap)[] = [
+      "pointermove",
+      "pointerdown",
+      "keydown",
+    ],
   ): Promise<T> => {
-    events ??= ["pointermove", "pointerdown", "keydown"];
-
     if (hasInteracted) return Promise.resolve(target);
 
     if (!promises.has(target)) {
@@ -89,17 +92,29 @@ export const detectInteraction = (() => {
 /**
  * Decode a value
  */
-export const decode = (el: ObfuscatedElement): string | undefined => {
-  const value = atob(el.getAttribute("value") ?? "");
-  const key = el.getAttribute("key");
+export const decode = (() => {
+  const cache = new Map<string, string>();
 
-  if (!value || !key) {
-    return undefined;
-  }
+  return (el: ObfuscatedElement, logger?: Logger): string | undefined => {
+    const encoded = atob(el.getAttribute("value") ?? "");
 
-  return [...value]
-    .map((c, i) =>
-      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
-    )
-    .join("");
-};
+    if (!encoded) {
+      return undefined;
+    }
+
+    if (cache.has(encoded)) {
+      logger?.log(`Cache hit for ${encoded}`);
+      return cache.get(encoded);
+    }
+
+    const decoded = [...encoded]
+      .map((c, i) =>
+        String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+      )
+      .join("");
+
+    cache.set(encoded, decoded);
+
+    return decoded;
+  };
+})();

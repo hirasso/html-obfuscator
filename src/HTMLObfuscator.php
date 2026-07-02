@@ -9,7 +9,6 @@ use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Enum\Regex;
 use Hirasso\HTMLObfuscator\Support\Support;
-use InvalidArgumentException;
 
 /**
  * Obfuscate emails and phone numbers to protect them from spam bots
@@ -18,45 +17,59 @@ use InvalidArgumentException;
  */
 final class HTMLObfuscator
 {
-    public const string DEFAULT_TAG_NAME = 'x-obfuscated';
-    public const string DEFAULT_PASSPHRASE = self::class;
+    public const string DEFAULT_TAG_NAME = 'ob-fus-ca-ted';
 
-    private string $passphrase = self::DEFAULT_PASSPHRASE;
-    private string $tagName = self::DEFAULT_TAG_NAME;
+    private string $key;
+
     private bool $debug = false;
-
-    private bool $randomizeKey = true;
 
     private bool $emails = true;
     private bool $phoneNumbers = true;
 
-    private bool $injectFrontendScript = true;
-
-    /** @internal */
-    public static bool $hasInjectedFrontendScript = false;
+    private bool $injectClientScript = true;
 
     private function __construct(
         private HTMLDocument $document,
-        private bool $isPartial
+        string $passphrase,
+        private bool $isPartial = false,
     ) {
+        ObfuscatorConfig::setPassphrase($passphrase);
+        $this->key = md5($passphrase);
     }
 
     /**
      * Create a new Obfuscator instance from a HTMLDocument (by reference)
      */
-    public static function createFromDocument(HTMLDocument $document): self
+    public static function createFromDocument(HTMLDocument $document, string $passphrase): self
     {
-        return new self($document, isPartial: false);
+        return new self($document, passphrase: $passphrase, isPartial: false);
     }
 
     /**
      * Create a new Obfuscator instance from a HTML string
      */
-    public static function createFromString(string $source): self
+    public static function createFromString(string $source, string $passphrase): self
     {
         $isPartial = !str_contains($source, '</body>');
 
-        return new self(Support::createDocument($source), isPartial: $isPartial);
+        return new self(Support::createDocument($source), passphrase: $passphrase, isPartial: $isPartial);
+    }
+
+    /**
+     * Create an empty instance
+     */
+    public static function createEmpty(string $passphrase): self
+    {
+        return new self(HTMLDocument::createEmpty(), $passphrase);
+    }
+
+    /**
+     * Create an instance for rendering the client script only
+     */
+    public static function createForClientScript(string $passphrase): self
+    {
+        ObfuscatorConfig::$hasInjectedClientScript = false;
+        return self::createEmpty($passphrase);
     }
 
     /**
@@ -78,50 +91,28 @@ final class HTMLObfuscator
     }
 
     /**
-     * Should the passphrase be randomized each time?
-     */
-    public function randomizeKey(bool $enabled = true): self
-    {
-        $this->randomizeKey = $enabled;
-        return $this;
-    }
-
-    /**
-     * Set a custom passphrase for improved security
-     */
-    public function withPassphrase(string $passphrase): self
-    {
-        $this->passphrase = $passphrase;
-        return $this;
-    }
-
-    /**
      * Customize the tag name of the obfuscated element
      * Must contain at least one "-", as defined by the Spec
      */
     public function withTagName(string $tagName): self
     {
-        if (!str_contains($tagName, '-')) {
-            throw new InvalidArgumentException('The tag name needs to contain at least one dash');
-        }
-
-        $this->tagName = trim($tagName);
+        ObfuscatorConfig::setTagName($tagName);
         return $this;
     }
 
     /**
      * Should the deobfuscation script be injected or not?
      */
-    public function injectFrontendScript(bool $enabled = true): self
+    public function injectClientScript(bool $enabled = true): self
     {
-        $this->injectFrontendScript = $enabled;
+        $this->injectClientScript = $enabled;
         return $this;
     }
 
     /**
      * Activate debug mode. Currently, this has only one effect:
      *
-     *  - The deobfuscation JavaScript will be injected un-minified
+     *  - The client script will be injected un-minified and with a logger
      */
     public function debug(bool $enabled = true): self
     {
@@ -134,7 +125,8 @@ final class HTMLObfuscator
      */
     public function apply(): self
     {
-        $this->maybeInjectFrontendScript();
+
+        $this->maybeInjectClientScript();
 
         $this->obfuscateLinks();
         $this->obfuscateTextNodes();
@@ -177,18 +169,6 @@ final class HTMLObfuscator
     }
 
     /**
-     * Get the key for encoding and decoding
-     */
-    private function getKey(): string
-    {
-        $passphrase = $this->randomizeKey
-            ? Support::shuffleString($this->passphrase)
-            : $this->passphrase;
-
-        return md5($passphrase);
-    }
-
-    /**
      * Obfuscate links
      */
     private function obfuscateLinks(): void
@@ -221,7 +201,7 @@ final class HTMLObfuscator
             return;
         }
 
-        $obfuscatedValue = new ObfuscatedValue($value, $this->getKey());
+        $obfuscatedValue = new ObfuscatedValue($value, $this->key);
         $obfuscated = $this->createObfuscatedElement($obfuscatedValue);
         $obfuscated->setAttribute('attr', $attibuteName);
         $obfuscated->setAttribute('style', 'display:none');
@@ -238,9 +218,8 @@ final class HTMLObfuscator
         ObfuscatedValue $value,
     ): Element {
 
-        $el = $this->document->createElement($this->tagName);
+        $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('value', $value->encoded);
-        $el->setAttribute('key', $value->key);
 
         return $el;
     }
@@ -269,7 +248,7 @@ final class HTMLObfuscator
         $value = preg_replace_callback(
             "/{$regex->value}/",
             function ($matches) {
-                $obfuscated = new ObfuscatedValue($matches[0], $this->getKey());
+                $obfuscated = new ObfuscatedValue($matches[0], $this->key);
                 $el = $this->createObfuscatedElement($obfuscated);
                 return Support::outerHTML($el);
             },
@@ -297,17 +276,24 @@ final class HTMLObfuscator
      * Inject the script that de-obfuscates obfuscated emails in the frontend.
      * This intentionally runs only ONCE per PHP process, since we only need it once
      */
-    private function maybeInjectFrontendScript(): void
+    private function maybeInjectClientScript(): void
     {
-        if (self::$hasInjectedFrontendScript || !$this->injectFrontendScript) {
+        if (ObfuscatorConfig::$hasInjectedClientScript || !$this->injectClientScript) {
             return;
         }
-        self::$hasInjectedFrontendScript = true;
+
+        ObfuscatorConfig::$hasInjectedClientScript = true;
 
         /** the script tag */
+        $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
+
         $script = $this->document->createElement('script');
-        $script->textContent = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
-        $this->document->body?->append($script);
+        $script->textContent = $js;
+
+        $script->setAttribute('data-key', $this->key);
+        $script->setAttribute('data-tagname', ObfuscatorConfig::getTagName());
+
+        ($this->document->body ?? $this->document)->append($script);
     }
 
     /**
@@ -318,6 +304,6 @@ final class HTMLObfuscator
         $root = dirname(__DIR__);
         $path = ltrim($path, "/");
         $resource = file_get_contents("{$root}/resources/dist/$path") ?: '';
-        return str_replace(self::DEFAULT_TAG_NAME, $this->tagName, $resource);
+        return str_replace(self::DEFAULT_TAG_NAME, ObfuscatorConfig::getTagName(), $resource);
     }
 }

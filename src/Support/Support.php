@@ -53,16 +53,6 @@ final class Support
         return $fragment;
     }
 
-    /**
-     * Shuffle a string
-     */
-    public static function shuffleString(string $str): string
-    {
-        $chars = mb_str_split($str);
-        shuffle($chars);
-        return implode('', $chars);
-    }
-
     /** @return list<\Dom\Text> */
     public static function getTextNodes(HTMLDocument $doc): array
     {

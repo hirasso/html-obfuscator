@@ -1,28 +1,6 @@
 import { defineConfig, Plugin } from "rolldown";
 import { minify } from "terser";
-import type { MinifyOptions } from "terser";
 import { replacePlugin } from "rolldown/plugins";
-
-function terserPlugin(options: MinifyOptions): Plugin {
-  return {
-    name: "terser",
-    async renderChunk(code: string) {
-      const result = await minify(code, options);
-      return { code: result.code!, map: result.map as string | null };
-    },
-  };
-}
-
-const terserOptions: MinifyOptions = {
-  compress: {
-    passes: 2,
-    unsafe: true,
-    unsafe_arrows: true,
-    unsafe_comps: true,
-    unsafe_methods: true,
-    drop_console: true,
-  },
-};
 
 export default defineConfig([
   /** The unminified development build */
@@ -31,8 +9,7 @@ export default defineConfig([
     output: [
       {
         format: "es",
-        entryFileNames: "[name].js",
-        dir: "resources/dist",
+        file: "resources/dist/index.js",
         codeSplitting: false,
         minify: false,
         comments: true,
@@ -50,12 +27,43 @@ export default defineConfig([
     output: [
       {
         format: "es",
-        entryFileNames: "[name].min.js",
+        file: "resources/dist/index.min.js",
         codeSplitting: false,
-        dir: "resources/dist",
-        minify: true,
-        plugins: [terserPlugin(terserOptions)],
+        /** would run after terser, undoing it's changes */
+        minify: false,
+        comments: false,
+        plugins: [terserPlugin()],
       },
+    ],
+    plugins: [
+      replacePlugin({
+        "process.env.NODE_ENV": JSON.stringify("production"),
+      }),
     ],
   },
 ]);
+
+function terserPlugin(): Plugin {
+  return {
+    name: "terser",
+    async renderChunk(code: string) {
+      const result = await minify(code, {
+        mangle: {
+          toplevel: true,
+        },
+        compress: {
+          passes: 2,
+          unsafe: true,
+          unsafe_arrows: true,
+          unsafe_comps: true,
+          unsafe_methods: true,
+          drop_console: true,
+        },
+        output: {
+          max_line_len: 150,
+        },
+      });
+      return { code: result.code!, map: null };
+    },
+  };
+}

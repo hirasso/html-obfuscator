@@ -1,4 +1,6 @@
-import { decode, detectGlobalInteraction } from "./helpers.js";
+import { decode, detectGlobalInteraction, Logger } from "./helpers.js";
+
+let logger: Logger | undefined;
 
 /**
  * Render an obfuscated element that can reveal itself or a parent element's attribute
@@ -6,8 +8,17 @@ import { decode, detectGlobalInteraction } from "./helpers.js";
 export class ObfuscatedElement extends HTMLElement {
   shadow: ShadowRoot;
 
-  /** the decoded value, as a private property */
-  #decodedValue: string | undefined;
+  /**
+   * Define the custom element
+   */
+  static register(tagName: string, logger?: Logger) {
+    logger = logger;
+    try {
+      window.customElements.define(tagName, ObfuscatedElement);
+    } catch (e) {
+      logger?.error(e);
+    }
+  }
 
   get attr() {
     return this.getAttribute("attr");
@@ -19,45 +30,31 @@ export class ObfuscatedElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#decodedValue = decode(this);
+    const decoded = decode(this, logger);
 
-    if (!this.#decodedValue) {
+    if (!decoded) {
       this.remove();
       return;
     }
 
     if (!this.attr) {
-      this.shadow.textContent = this.#decodedValue;
+      this.shadow.textContent = decoded;
     }
 
-    detectGlobalInteraction().then(this.reveal);
+    detectGlobalInteraction().then(() => {
+      /** plaintext */
+      if (!this.attr) {
+        this.outerHTML = decoded;
+        return;
+      }
+
+      /** attribute */
+      this.parentElement
+        ?.closest(`[${this.attr}]`)
+        ?.setAttribute(this.attr, decoded);
+
+      /** cleanup */
+      this.remove();
+    });
   }
-
-  reveal = () => {
-    if (!this.#decodedValue) {
-      this.remove();
-      return;
-    }
-
-    if (revealAttribute(this, this.#decodedValue)) {
-      this.remove();
-      return;
-    }
-
-    this.outerHTML = this.#decodedValue;
-  };
-}
-
-/**
- * Reveal a parent element's attribute value
- */
-function revealAttribute(el: ObfuscatedElement, value: string): boolean {
-  const attr = el.attr;
-  if (!attr) return false;
-
-  const target = el.parentElement?.closest(`[${attr}]`);
-  if (!target) return false;
-
-  target.setAttribute(attr, value);
-  return true;
 }

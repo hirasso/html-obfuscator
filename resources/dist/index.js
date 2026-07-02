@@ -1,6 +1,11 @@
+//#region resources/src/defs.ts
+const tagName = document.currentScript?.getAttribute("data-tagname") ?? "";
+const key = document.currentScript?.getAttribute("data-key") ?? "";
+
+//#endregion
 //#region resources/src/helpers.ts
 const prefix = "html-obfuscator";
-const createLogger = () => {
+function createLogger() {
 	const style = [
 		"background: linear-gradient(to right, #a960ee, #f78ed4)",
 		"color: white",
@@ -13,7 +18,19 @@ const createLogger = () => {
 		warn: (...args) => console.warn(`%c${prefix}`, style, ...args),
 		error: (...args) => console.error(`%c${prefix}`, style, ...args)
 	};
-};
+}
+/**
+* Prefix a string with our prefix
+*/
+function prefixed(str) {
+	return `${prefix}:${str}`;
+}
+/**
+* Dispatch custom prefixed events
+*/
+function dispatch(eventName) {
+	document.documentElement.dispatchEvent(new CustomEvent(prefixed(eventName), { bubbles: true }));
+}
 /**
 * Detect interaction anywhere on the window
 */
@@ -27,12 +44,11 @@ function detectGlobalInteraction() {
 const detectInteraction = (() => {
 	let hasInteracted = false;
 	const promises = /* @__PURE__ */ new Map();
-	return (target, events = void 0) => {
-		events ??= [
-			"pointermove",
-			"pointerdown",
-			"keydown"
-		];
+	return (target, events = [
+		"pointermove",
+		"pointerdown",
+		"keydown"
+	]) => {
 		if (hasInteracted) return Promise.resolve(target);
 		if (!promises.has(target)) promises.set(target, new Promise((resolve) => {
 			const abortCtrl = new AbortController();
@@ -50,77 +66,92 @@ const detectInteraction = (() => {
 /**
 * Decode a value
 */
-const decode = (el) => {
-	const value = atob(el.getAttribute("value") ?? "");
-	const key = el.getAttribute("key");
-	if (!value || !key) return;
-	return [...value].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
-};
+const decode = (() => {
+	const cache = /* @__PURE__ */ new Map();
+	return (el, logger) => {
+		const encoded = atob(el.getAttribute("value") ?? "");
+		if (!encoded) return;
+		if (cache.has(encoded)) {
+			logger?.log(`Cache hit for ${encoded}`);
+			return cache.get(encoded);
+		}
+		const decoded = [...encoded].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+		cache.set(encoded, decoded);
+		return decoded;
+	};
+})();
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
+let logger$1;
 /**
 * Render an obfuscated element that can reveal itself or a parent element's attribute
 */
-var ObfuscatedElement = class extends HTMLElement {
-	/** the decoded value, as a private property */
-	#decodedValue;
+var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
+	/**
+	* Define the custom element
+	*/
+	static register(tagName, logger) {
+		logger = logger;
+		try {
+			window.customElements.define(tagName, ObfuscatedElement);
+		} catch (e) {
+			logger?.error(e);
+		}
+	}
 	get attr() {
 		return this.getAttribute("attr");
 	}
 	constructor() {
 		super();
-		this.reveal = () => {
-			if (!this.#decodedValue) {
-				this.remove();
-				return;
-			}
-			if (revealAttribute(this, this.#decodedValue)) {
-				this.remove();
-				return;
-			}
-			this.outerHTML = this.#decodedValue;
-		};
 		this.shadow = this.attachShadow({ mode: "closed" });
 	}
 	connectedCallback() {
-		this.#decodedValue = decode(this);
-		if (!this.#decodedValue) {
+		const decoded = decode(this, logger$1);
+		if (!decoded) {
 			this.remove();
 			return;
 		}
-		if (!this.attr) this.shadow.textContent = this.#decodedValue;
-		detectGlobalInteraction().then(this.reveal);
+		if (!this.attr) this.shadow.textContent = decoded;
+		detectGlobalInteraction().then(() => {
+			/** plaintext */
+			if (!this.attr) {
+				this.outerHTML = decoded;
+				return;
+			}
+			/** attribute */
+			this.parentElement?.closest(`[${this.attr}]`)?.setAttribute(this.attr, decoded);
+			/** cleanup */
+			this.remove();
+		});
 	}
 };
-/**
-* Reveal a parent element's attribute value
-*/
-function revealAttribute(el, value) {
-	const attr = el.attr;
-	if (!attr) return false;
-	const target = el.parentElement?.closest(`[${attr}]`);
-	if (!target) return false;
-	target.setAttribute(attr, value);
-	return true;
-}
 
 //#endregion
 //#region resources/src/index.ts
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
-const logger = createLogger();
-const tagName = "x-obfuscated";
-logger?.log({ tagName });
-detectGlobalInteraction().then(() => {
-	logger?.log("Interaction detected, lifting obfuscation");
-});
-/**
-* Define the custom element, logging errors only in debug mode
-*/
-try {
-	window.customElements.define(tagName, ObfuscatedElement);
-} catch (e) {
-	logger?.error(e);
-}
+const logger = true ? createLogger() : void 0;
+(() => {
+	if (!key || !tagName) {
+		logger?.error("required properties are missing:", {
+			tagName,
+			key
+		});
+		return;
+	}
+	logger?.log({
+		tagName,
+		key
+	});
+	detectGlobalInteraction().then(() => {
+		dispatch("reveal");
+		logger?.log("Interaction detected. Obfuscated content revealed.");
+	});
+	ObfuscatedElement.register(tagName, logger);
+	/**
+	* Remove this script from the DOM immediately after execution when not in debug mode
+	*/
+	if (!true) document.currentScript?.remove();
+})();
 
 //#endregion

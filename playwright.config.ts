@@ -25,5 +25,7 @@ export default defineConfig({
     command: "php -S localhost:8766 -t tests/e2e/fixtures/",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
+    stdout: "ignore",
+    stderr: "ignore",
   },
 });
