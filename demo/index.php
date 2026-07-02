@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 $contactHtml = <<<HTML
 <p>You can reach me by email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or by phone at <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
 HTML;
+
+$script = HTMLObfuscator::renderClientScript('demo');
 
 $rawObfuscated = (string) obfuscate($contactHtml, passphrase: 'demo')
     ->injectClientScript(false);
@@ -19,8 +21,6 @@ $rawObfuscated = htmlspecialchars($rawObfuscated);
 
 $currentYear = date('Y');
 
-HTMLObfuscator::$hasInjectedFrontendScript = false;
-
 $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +28,7 @@ $html = <<<HTML
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HTML Obfuscator</title>
+  {$script}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-dracula.css">
   <link rel="stylesheet" href="demo.css">

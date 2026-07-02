@@ -1,6 +1,9 @@
 <?php
 
+use Hirasso\HTMLObfuscator\HTMLObfuscator;
+
 require_once(dirname(__DIR__) . '/vendor/autoload.php');
+
 
 function dumpEnvironment(): void
 {
@@ -13,46 +16,35 @@ function dumpEnvironment(): void
 }
 dumpEnvironment();
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "pest()" function to bind a different classes or traits.
-|
-*/
+const TESTS_PASSPHRASE = 'test';
+const TESTS_TAG_NAME = 'tests-obfuscated';
 
-// pest()->extend(Tests\TestCase::class)->in('Feature');
-
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
-
-function getMaliciousAttributeValue(): string
+/**
+ * Obfuscate with sensible defaults for tests.
+ * Use this instead of HTMLObfuscator::createFromString.
+ *
+ * Customize/Override options on a per-test basis by chaining them like so:
+ *
+ * obfuscate('value')->debug(false)
+ */
+function obfuscate(string $html): HTMLObfuscator
 {
-    return '" onload="alert(\'Hacked!\')"';
+    return HTMLObfuscator::createFromString($html, TESTS_PASSPHRASE)
+        ->withTagName(TESTS_TAG_NAME)
+        ->injectClientScript(false)
+        ->debug(true);
+}
+
+/** @param list<string> $customAttributes */
+function expectObfuscatedElement(
+    string $html,
+    string $elementName = TESTS_TAG_NAME,
+    array $customAttributes = []
+): void {
+    expect($html)->toContain("<$elementName ");
+    expect($html)->toContain("</$elementName>");
+
+    foreach (['value', ...$customAttributes] as $attr) {
+        expect($html)->toContain($attr . '="');
+    }
 }

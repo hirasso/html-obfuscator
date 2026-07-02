@@ -41,4 +41,4 @@
 
 ## Implementation notes
 - Pre-generate raw obfuscated contact block with `->injectClientScript(false)` for the details display
-- Reset `HTMLObfuscator::$hasInjectedFrontendScript = false` before the full-page obfuscation call
+- Reset `HTMLObfuscator::$hasInjectedClientScript = false` before the full-page obfuscation call

@@ -1,51 +1,9 @@
 <?php
 
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
+use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 
-const TESTS_PASSPHRASE = 'test';
-const TESTS_TAG_NAME = 'tests-obfuscated';
-
-/**
- * Obfuscate with sensible defaults for tests.
- * Use this instead of HTMLObfuscator::createFromString.
- *
- * Customize/Override options on a per-test basis by chaining them like so:
- *
- * obfuscate('value')->debug(false)
- */
-function obfuscate(string $html): HTMLObfuscator
-{
-    HTMLObfuscator::$hasInjectedFrontendScript = false;
-
-    return HTMLObfuscator::createFromString($html, TESTS_PASSPHRASE)
-        ->withTagName(TESTS_TAG_NAME, force: true)
-        ->injectClientScript(false)
-        ->debug(true);
-}
-
-/** @param list<string> $customAttributes */
-function expectObfuscatedElement(
-    string $html,
-    string $elementName = TESTS_TAG_NAME,
-    array $customAttributes = []
-): void {
-    expect($html)->toContain("<$elementName ");
-    expect($html)->toContain("</$elementName>");
-
-    foreach (['value', ...$customAttributes] as $attr) {
-        expect($html)->toContain($attr . '="');
-    }
-}
-
-test('renders the client script', function () {
-    $debug_result = HTMLObfuscator::renderClientScript(TESTS_PASSPHRASE, TESTS_TAG_NAME, debug: true);
-    expect($debug_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
-    expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
-
-    $minified_result = HTMLObfuscator::renderClientScript(TESTS_PASSPHRASE, TESTS_TAG_NAME, debug: false);
-    expect($minified_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
-    expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
-});
+afterEach(fn () => ObfuscatorConfig::reset());
 
 test('Obfuscates emails in links', function () {
     expectObfuscatedElement(
@@ -95,14 +53,12 @@ test('phoneNumbers(false) disables phone number obfuscation', function () {
 });
 
 test('obfuscate() outputs full HTML for non-partial input', function () {
-    HTMLObfuscator::$hasInjectedFrontendScript = false;
     $result = (string) HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>', 'test');
     expect($result)->toContain('<html');
     expect($result)->toContain('<p>hello</p>');
 });
 
 test('__toString() returns the rendered output', function () {
-    HTMLObfuscator::$hasInjectedFrontendScript = false;
     $result = (string) obfuscate('hello world');
     expect($result)->toBe('hello world');
 });
@@ -120,9 +76,9 @@ test('Invalid tel: links are not obfuscated', function () {
 });
 
 test('Allows to customize the custom element\'s tag name', function () {
-    $result = obfuscate('mail@example.com')
-        ->withTagName('reveal-me', force: true)
-        ->injectClientScript(true)
+    $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
+        ->withTagName('reveal-me')
+        ->injectClientScript(false)
         ->render();
 
     expectObfuscatedElement($result, 'reveal-me');
@@ -156,4 +112,14 @@ test('obfuscates emails and phone numbers within the same text node', function (
     expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
     expect($result)->not->toContain('mail@example.com');
     expect($result)->not->toContain('+49 12 345 67');
+});
+
+test('renders the client script', function () {
+    $debug_result = HTMLObfuscator::renderClientScript(TESTS_PASSPHRASE, TESTS_TAG_NAME, debug: true);
+    expect($debug_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
+    expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
+
+    $minified_result = HTMLObfuscator::renderClientScript(TESTS_PASSPHRASE, TESTS_TAG_NAME, debug: false);
+    expect($minified_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
+    expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
 });

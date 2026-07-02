@@ -9,7 +9,6 @@ use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Enum\Regex;
 use Hirasso\HTMLObfuscator\Support\Support;
-use InvalidArgumentException;
 
 /**
  * Obfuscate emails and phone numbers to protect them from spam bots
@@ -21,8 +20,6 @@ final class HTMLObfuscator
     public const string DEFAULT_TAG_NAME = 'ob-fus-ca-ted';
 
     private string $key;
-    private static ?string $passphrase = null;
-    private static string $tagName = self::DEFAULT_TAG_NAME;
 
     private bool $debug = false;
 
@@ -31,19 +28,12 @@ final class HTMLObfuscator
 
     private bool $injectClientScript = true;
 
-    /** @internal */
-    public static bool $hasInjectedFrontendScript = false;
-
     private function __construct(
         private HTMLDocument $document,
         string $passphrase,
         private bool $isPartial = false,
     ) {
-        if (self::$passphrase && $passphrase !== self::$passphrase) {
-            throw new InvalidArgumentException('The passphrase needs to be globally stable');
-        }
-        self::$passphrase = $passphrase;
-
+        ObfuscatorConfig::setPassphrase($passphrase);
         $this->key = md5($passphrase);
     }
 
@@ -95,20 +85,9 @@ final class HTMLObfuscator
      * Customize the tag name of the obfuscated element
      * Must contain at least one "-", as defined by the Spec
      */
-    public function withTagName(string $tagName, bool $force = false): self
+    public function withTagName(string $tagName): self
     {
-        $tagName = trim($tagName);
-
-        if (!str_contains($tagName, '-')) {
-            throw new InvalidArgumentException('The tag name needs to contain at least one dash');
-        }
-
-        if (!$force && self::$tagName !== self::DEFAULT_TAG_NAME && $tagName !== self::$tagName) {
-            throw new InvalidArgumentException('The tag name needs to be globally stable');
-        }
-
-        self::$tagName = $tagName;
-
+        ObfuscatorConfig::setTagName($tagName);
         return $this;
     }
 
@@ -230,7 +209,7 @@ final class HTMLObfuscator
         ObfuscatedValue $value,
     ): Element {
 
-        $el = $this->document->createElement(self::$tagName);
+        $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('value', $value->encoded);
 
         return $el;
@@ -290,11 +269,11 @@ final class HTMLObfuscator
      */
     private function maybeInjectClientScript(): void
     {
-        if (self::$hasInjectedFrontendScript || !$this->injectClientScript) {
+        if (ObfuscatorConfig::$hasInjectedClientScript || !$this->injectClientScript) {
             return;
         }
 
-        self::$hasInjectedFrontendScript = true;
+        ObfuscatorConfig::$hasInjectedClientScript = true;
 
         /** the script tag */
         $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
@@ -303,7 +282,7 @@ final class HTMLObfuscator
         $script->textContent = $js;
 
         $script->setAttribute('data-key', $this->key);
-        $script->setAttribute('data-tagname', self::$tagName);
+        $script->setAttribute('data-tagname', ObfuscatorConfig::getTagName());
 
         ($this->document->body ?? $this->document)->append($script);
     }
@@ -313,13 +292,13 @@ final class HTMLObfuscator
      */
     public static function renderClientScript(
         string $passphrase,
-        string $tagName,
+        ?string $tagName = null,
         bool $debug = false
     ): string {
-        self::$hasInjectedFrontendScript = false;
+        ObfuscatorConfig::$hasInjectedClientScript = false;
 
         return self::createEmpty($passphrase)
-            ->withTagName($tagName)
+            ->withTagName($tagName ?? ObfuscatorConfig::getTagName())
             ->debug($debug)
             ->render();
     }
@@ -332,6 +311,6 @@ final class HTMLObfuscator
         $root = dirname(__DIR__);
         $path = ltrim($path, "/");
         $resource = file_get_contents("{$root}/resources/dist/$path") ?: '';
-        return str_replace(self::DEFAULT_TAG_NAME, self::$tagName, $resource);
+        return str_replace(self::DEFAULT_TAG_NAME, ObfuscatorConfig::getTagName(), $resource);
     }
 }
