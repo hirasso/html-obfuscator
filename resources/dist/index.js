@@ -1,11 +1,10 @@
-//#region resources/src/env.ts
+//#region resources/src/defs.ts
 const tagName = document.currentScript?.getAttribute("data-tagname") ?? "";
 const key = document.currentScript?.getAttribute("data-key") ?? "";
 
 //#endregion
 //#region resources/src/helpers.ts
 const prefix = "html-obfuscator";
-const logger = true ? createLogger() : void 0;
 function createLogger() {
 	const style = [
 		"background: linear-gradient(to right, #a960ee, #f78ed4)",
@@ -19,6 +18,18 @@ function createLogger() {
 		warn: (...args) => console.warn(`%c${prefix}`, style, ...args),
 		error: (...args) => console.error(`%c${prefix}`, style, ...args)
 	};
+}
+/**
+* Prefix a string with our prefix
+*/
+function prefixed(str) {
+	return `${prefix}:${str}`;
+}
+/**
+* Dispatch custom prefixed events
+*/
+function dispatch(eventName) {
+	document.documentElement.dispatchEvent(new CustomEvent(prefixed(eventName), { bubbles: true }));
 }
 /**
 * Detect interaction anywhere on the window
@@ -73,6 +84,7 @@ const decode = (() => {
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
+let logger$1;
 /**
 * Render an obfuscated element that can reveal itself or a parent element's attribute
 */
@@ -81,6 +93,7 @@ var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
 	* Define the custom element
 	*/
 	static register(tagName, logger) {
+		logger = logger;
 		try {
 			window.customElements.define(tagName, ObfuscatedElement);
 		} catch (e) {
@@ -95,7 +108,7 @@ var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
 		this.shadow = this.attachShadow({ mode: "closed" });
 	}
 	connectedCallback() {
-		const decoded = decode(this, logger);
+		const decoded = decode(this, logger$1);
 		if (!decoded) {
 			this.remove();
 			return;
@@ -118,6 +131,7 @@ var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
 //#endregion
 //#region resources/src/index.ts
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
+const logger = true ? createLogger() : void 0;
 (() => {
 	if (!key || !tagName) {
 		logger?.error("required properties are missing:", {
@@ -131,6 +145,7 @@ var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
 		key
 	});
 	detectGlobalInteraction().then(() => {
+		dispatch("reveal");
 		logger?.log("Interaction detected. Obfuscated content revealed.");
 	});
 	ObfuscatedElement.register(tagName, logger);

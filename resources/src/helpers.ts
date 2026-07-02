@@ -1,15 +1,13 @@
-import { debug, key } from "./env.js";
+import { debug, key } from "./defs.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const prefix = "html-obfuscator";
-
-export const logger = debug ? createLogger() : undefined;
 
 /**
  * Create a minimal logger with a prefix, if settings.debug = true
  */
 export type Logger = ReturnType<typeof createLogger>;
-function createLogger() {
+export function createLogger() {
   const style = [
     "background: linear-gradient(to right, #a960ee, #f78ed4)",
     "color: white",
@@ -35,7 +33,7 @@ export function prefixed(str: string): string {
 /**
  * Dispatch custom prefixed events
  */
-export function dispatchPrefixedEvent(eventName: string): void {
+export function dispatch(eventName: string): void {
   document.documentElement.dispatchEvent(
     new CustomEvent(prefixed(eventName), { bubbles: true }),
   );

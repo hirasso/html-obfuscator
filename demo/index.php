@@ -33,6 +33,11 @@ $html = <<<HTML
   <link rel="stylesheet" href="demo.css">
 </head>
 <body>
+    <script>
+        window.addEventListener('html-obfuscator:reveal', () => {
+            console.log('revealed')
+        }, { once: true });
+    </script>
   <main class="container-fluid">
 
     <header>

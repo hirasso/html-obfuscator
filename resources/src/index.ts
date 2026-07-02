@@ -1,8 +1,10 @@
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 
-import { debug, key, tagName } from "./env.js";
-import { detectGlobalInteraction, logger } from "./helpers.js";
+import { debug, key, tagName } from "./defs.js";
+import { createLogger, detectGlobalInteraction, dispatch } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
+
+const logger = debug ? createLogger() : undefined;
 
 (() => {
   if (!key || !tagName) {
@@ -13,6 +15,7 @@ import { ObfuscatedElement } from "./ObfuscatedElement.js";
   logger?.log({ tagName, key });
 
   detectGlobalInteraction().then(() => {
+    dispatch('reveal');
     logger?.log("Interaction detected. Obfuscated content revealed.");
   });
 

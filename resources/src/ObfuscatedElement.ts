@@ -1,4 +1,6 @@
-import { decode, detectGlobalInteraction, Logger, logger } from "./helpers.js";
+import { decode, detectGlobalInteraction, Logger } from "./helpers.js";
+
+let logger: Logger | undefined;
 
 /**
  * Render an obfuscated element that can reveal itself or a parent element's attribute
@@ -10,6 +12,7 @@ export class ObfuscatedElement extends HTMLElement {
    * Define the custom element
    */
   static register(tagName: string, logger?: Logger) {
+    logger = logger;
     try {
       window.customElements.define(tagName, ObfuscatedElement);
     } catch (e) {
