@@ -28,4 +28,4 @@ echo obfuscate(<<<HTML
   <a href="mailto:mail@example.com">Send email</a>
 </body>
 </html>
-HTML, passphrase: 'html obfuscator');
+HTML, key: 'html obfuscator');

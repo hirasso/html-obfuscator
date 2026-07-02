@@ -35,46 +35,46 @@ final class HTMLObfuscator
 
     private function __construct(
         private HTMLDocument $document,
-        string $passphrase,
+        string $key,
         private bool $isPartial = false,
     ) {
-        ObfuscatorConfig::setPassphrase($passphrase);
-        $this->key = md5($passphrase);
+        ObfuscatorConfig::setKey($key);
+        $this->key = md5($key);
     }
 
     /**
      * Create a new Obfuscator instance from a HTMLDocument (by reference)
      */
-    public static function createFromDocument(HTMLDocument $document, string $passphrase): self
+    public static function createFromDocument(HTMLDocument $document, string $key): self
     {
-        return new self($document, passphrase: $passphrase, isPartial: false);
+        return new self($document, key: $key, isPartial: false);
     }
 
     /**
      * Create a new Obfuscator instance from a HTML string
      */
-    public static function createFromString(string $source, string $passphrase): self
+    public static function createFromString(string $source, string $key): self
     {
         $isPartial = !str_contains($source, '</body>');
 
-        return new self(Support::createDocument($source), passphrase: $passphrase, isPartial: $isPartial);
+        return new self(Support::createDocument($source), key: $key, isPartial: $isPartial);
     }
 
     /**
      * Create an empty instance
      */
-    public static function createEmpty(string $passphrase): self
+    public static function createEmpty(string $key): self
     {
-        return new self(HTMLDocument::createEmpty(), $passphrase);
+        return new self(HTMLDocument::createEmpty(), $key);
     }
 
     /**
      * Create an instance for rendering the client script only
      */
-    public static function createForClientScript(string $passphrase): self
+    public static function createForClientScript(string $key): self
     {
         ObfuscatorConfig::$hasInjectedClientScript = false;
-        return self::createEmpty($passphrase);
+        return self::createEmpty($key);
     }
 
     /**

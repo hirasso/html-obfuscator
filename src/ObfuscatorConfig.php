@@ -13,7 +13,7 @@ use InvalidArgumentException;
  */
 final class ObfuscatorConfig
 {
-    private static ?string $passphrase = null;
+    private static ?string $key = null;
     private static string $tagName = HTMLObfuscator::DEFAULT_TAG_NAME;
     public static bool $hasInjectedClientScript = false;
 
@@ -21,12 +21,12 @@ final class ObfuscatorConfig
     {
     }
 
-    public static function setPassphrase(string $value): void
+    public static function setKey(string $value): void
     {
-        if (self::$passphrase !== null && $value !== self::$passphrase) {
-            throw new InvalidArgumentException('The passphrase needs to be globally stable');
+        if (self::$key !== null && $value !== self::$key) {
+            throw new InvalidArgumentException('The key needs to be globally stable');
         }
-        self::$passphrase = $value;
+        self::$key = $value;
     }
 
     public static function getTagName(): string
@@ -51,7 +51,7 @@ final class ObfuscatorConfig
 
     public static function reset(): void
     {
-        self::$passphrase = null;
+        self::$key = null;
         self::$tagName = HTMLObfuscator::DEFAULT_TAG_NAME;
         self::$hasInjectedClientScript = false;
     }

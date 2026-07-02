@@ -12,7 +12,7 @@ You might think that obfuscation won't work against spam bots. Turns out [it doe
 
 ## How it works
 
-On the server, PHP finds emails and phone numbers in the HTML, XOR-encodes them with a key derived from a passphrase (MD5 of a shuffled version of it), base64-encodes the result, and replaces the original text with a custom HTML element:
+On the server, PHP finds emails and phone numbers in the HTML, XOR-encodes them with a key (MD5 of the provided key), base64-encodes the result, and replaces the original text with a custom HTML element:
 
 ```html
 <x-obfuscated value="..."></x-obfuscated>
@@ -42,15 +42,15 @@ Obfuscate emails and phone numbers in `$html` and automatically injects the clie
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 /** vanilla: */
-echo obfuscate($html, passphrase: 'unique but stable passphrase');
+echo obfuscate($html, key: 'unique but stable key');
 /** or in Laravel: */
-echo obfuscate($html, passphrase: config('app.key'));
+echo obfuscate($html, key: config('app.key'));
 /** or in WordPress: */
-echo obfuscate($html, passphrase: wp_salt());
+echo obfuscate($html, key: wp_salt());
 /** or in Kirby: */
-echo obfuscate($html, passphrase: /** TODO */);
+echo obfuscate($html, key: /** TODO */);
 /** or in ProcessWire: */
-echo obfuscate($html, passphrase: $config->userAuthSalt);
+echo obfuscate($html, key: $config->userAuthSalt);
 ```
 
 ## Rendering the client script manually
@@ -62,10 +62,10 @@ use function Hirasso\HTMLObfuscator\obfuscate;
 use function Hirasso\HTMLObfuscator\clientScript;
 
 // 1. Render the script in your <head>
-echo clientScript(passphrase: 'unique but stable passphrase');
+echo clientScript(key: 'unique but stable key');
 
 // 2. Obfuscate your HTML — script injection is skipped because it was already rendered
-echo obfuscate($html, passphrase: 'unique but stable passphrase');
+echo obfuscate($html, key: 'unique but stable key');
 ```
 
 ## `->emails(bool)`
@@ -73,7 +73,7 @@ echo obfuscate($html, passphrase: 'unique but stable passphrase');
 Keep emails unobfuscated
 
 ```php
-echo obfuscate($html, passphrase: 'unique but stable passphrase')->emails(false);
+echo obfuscate($html, key: 'unique but stable key')->emails(false);
 ```
 
 ## `->phoneNumbers(bool)`
@@ -81,7 +81,7 @@ echo obfuscate($html, passphrase: 'unique but stable passphrase')->emails(false)
 Keep phone numbers unobfuscated
 
 ```php
-echo obfuscate($html, passphrase: 'unique but stable passphrase')->phoneNumbers(false);
+echo obfuscate($html, key: 'unique but stable key')->phoneNumbers(false);
 ```
 
 ## `->debug(bool)`
@@ -89,7 +89,7 @@ echo obfuscate($html, passphrase: 'unique but stable passphrase')->phoneNumbers(
 Inject the client script unminified and with logging
 
 ```php
-echo obfuscate($html, passphrase: 'unique but stable passphrase')->debug(true);
+echo obfuscate($html, key: 'unique but stable key')->debug(true);
 ```
 
 ## `->withTagName(string)`
@@ -97,7 +97,7 @@ echo obfuscate($html, passphrase: 'unique but stable passphrase')->debug(true);
 Customize the tag name of the custom element
 
 ```php
-echo obfuscate($html, passphrase: 'unique but stable passphrase')->withTagName('reveal-me');
+echo obfuscate($html, key: 'unique but stable key')->withTagName('reveal-me');
 ```
 
 ## `->addRegex(string)`
@@ -105,7 +105,7 @@ echo obfuscate($html, passphrase: 'unique but stable passphrase')->withTagName('
 Add custom patterns to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specifically:
 
 ```php
-echo obfuscate($html, passphrase: 'unique but stable passphrase')
+echo obfuscate($html, key: 'unique but stable key')
     ->addRegex('/[^\s@]+@/') // obfuscate the <span> text node ("verylongemailaddress@")
     ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscate the domain part ("example.com")
 ;
@@ -122,7 +122,7 @@ use Dom\HTMLDocument;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 $doc = HTMLDocument::createFromString($html);
-obfuscate($doc, passphrase: 'unique but stable passphrase')->apply();
+obfuscate($doc, key: 'unique but stable key')->apply();
 // $doc is now obfuscated in place
 ```
 
