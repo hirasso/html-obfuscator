@@ -39,7 +39,16 @@ composer require hirasso/html-obfuscator
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate($html, 'my unique passphrase');
+/** vanilla: */
+obfuscate($html, passphrase: 'unique but stable passphrase');
+/** or in Laravel: */
+obfuscate($html, passphrase: config('app.key'));
+/** or in WordPress: */
+obfuscate($html, passphrase: wp_salt());
+/** or in Kirby: */
+obfuscate($html, passphrase: /** TODO */);
+/** or in ProcessWire: */
+obfuscate($html, passphrase: $config->userAuthSalt);
 ```
 
 ## Maximal Example
@@ -47,13 +56,13 @@ echo obfuscate($html, 'my unique passphrase');
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate($html, passphrase: 'my unique passphrase')
+echo obfuscate($html, passphrase: 'unique but stable passphrase')
     ->phoneNumbers(false)
     ->withTagName('reveal-me')
     ->debug(true);
 ```
 
-## With a `\Dom\HTMLDocument`
+## With a `HTMLDocument`
 
 When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
 
@@ -62,7 +71,7 @@ use Dom\HTMLDocument;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 $doc = HTMLDocument::createFromString($html);
-obfuscate($doc, passphrase: 'my unique passphrase')->apply();
+obfuscate($doc, passphrase: 'unique but stable passphrase')->apply();
 // $doc is now obfuscated in place
 ```
 
@@ -75,10 +84,10 @@ use function Hirasso\HTMLObfuscator\obfuscate;
 use function Hirasso\HTMLObfuscator\clientScript;
 
 // 1. Render the script in your <head>
-echo clientScript(passphrase: 'my unique passphrase');
+echo clientScript(passphrase: 'unique but stable passphrase');
 
 // 2. Obfuscate your HTML — script injection is skipped because it was already rendered
-echo obfuscate($html, 'my unique passphrase');
+echo obfuscate($html, 'unique but stable passphrase');
 ```
 
 &rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.
