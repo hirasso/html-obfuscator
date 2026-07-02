@@ -3,6 +3,8 @@
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 
+use function Hirasso\HTMLObfuscator\clientScript;
+
 afterEach(fn () => ObfuscatorConfig::reset());
 
 test('Obfuscates emails in links', function () {
@@ -115,11 +117,11 @@ test('obfuscates emails and phone numbers within the same text node', function (
 });
 
 test('renders the client script', function () {
-    $debug_result = HTMLObfuscator::renderClientScript(TESTS_PASSPHRASE, TESTS_TAG_NAME, debug: true);
+    $debug_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME)->debug(true);
     expect($debug_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
     expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
 
-    $minified_result = HTMLObfuscator::renderClientScript(TESTS_PASSPHRASE, TESTS_TAG_NAME, debug: false);
+    $minified_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME);
     expect($minified_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
     expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
 });

@@ -14,3 +14,11 @@ function obfuscate(string|\Dom\HTMLDocument $source, string $passphrase): HTMLOb
         default => HTMLObfuscator::createFromDocument($source, $passphrase)
     };
 }
+
+/**
+ * Render the client script for manual placement (e.g. in the <head>)
+ */
+function clientScript(string $passphrase): HTMLObfuscator
+{
+    return HTMLObfuscator::createForClientScript($passphrase);
+}

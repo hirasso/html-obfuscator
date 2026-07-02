@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-use Hirasso\HTMLObfuscator\HTMLObfuscator;
-
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use function Hirasso\HTMLObfuscator\obfuscate;
+use function Hirasso\HTMLObfuscator\clientScript;
 
 $contactHtml = <<<HTML
 <p>You can reach me by email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or by phone at <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
 HTML;
 
-$script = HTMLObfuscator::renderClientScript('demo');
+$script = clientScript('demo');
 
 $rawObfuscated = (string) obfuscate($contactHtml, passphrase: 'demo')
     ->injectClientScript(false);
@@ -93,7 +92,7 @@ $html = <<<HTML
 
         <pre><code class="language-php">use function Hirasso\HTMLObfuscator\obfuscate;
 
-echo obfuscate(\$html, passphrase: 'my-unique-passphrase');</code></pre>
+echo obfuscate(\$html, passphrase: 'my-unique-but-stable-passphrase');</code></pre>
 
         <p>Each email or phone number in text nodes becomes:</p>
         <pre><code class="language-html">&lt;x-obfuscated value="base64..."&gt;&lt;/x-obfuscated&gt;</code></pre>

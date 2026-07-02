@@ -68,14 +68,14 @@ obfuscate($doc, passphrase: 'my unique passphrase')->apply();
 
 ## Rendering the client script manually
 
-By default, the client `<script>` is auto-injected into the document. If you need it in a specific location (e.g. in the `<head>`), use `renderClientScript()` to get it as a string and echo it yourself:
+By default, the client `<script>` is auto-injected into the document. If you need it in a specific location (e.g. in the `<head>`), use `clientScript()` and echo it yourself:
 
 ```php
-use Hirasso\HTMLObfuscator\HTMLObfuscator;
 use function Hirasso\HTMLObfuscator\obfuscate;
+use function Hirasso\HTMLObfuscator\clientScript;
 
 // 1. Render the script in your <head>
-echo HTMLObfuscator::renderClientScript(passphrase: 'my unique passphrase');
+echo clientScript(passphrase: 'my unique passphrase');
 
 // 2. Obfuscate your HTML — script injection is skipped because it was already rendered
 echo obfuscate($html, 'my unique passphrase');

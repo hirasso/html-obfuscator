@@ -64,6 +64,15 @@ final class HTMLObfuscator
     }
 
     /**
+     * Create an instance for rendering the client script only
+     */
+    public static function createForClientScript(string $passphrase): self
+    {
+        ObfuscatorConfig::$hasInjectedClientScript = false;
+        return self::createEmpty($passphrase);
+    }
+
+    /**
      * Should emails be obfuscated?
      */
     public function emails(bool $enabled = true): self
@@ -285,22 +294,6 @@ final class HTMLObfuscator
         $script->setAttribute('data-tagname', ObfuscatorConfig::getTagName());
 
         ($this->document->body ?? $this->document)->append($script);
-    }
-
-    /**
-     * Explicitly Render the client script as a string (for example in the head of your site)
-     */
-    public static function renderClientScript(
-        string $passphrase,
-        ?string $tagName = null,
-        bool $debug = false
-    ): string {
-        ObfuscatorConfig::$hasInjectedClientScript = false;
-
-        return self::createEmpty($passphrase)
-            ->withTagName($tagName ?? ObfuscatorConfig::getTagName())
-            ->debug($debug)
-            ->render();
     }
 
     /**
