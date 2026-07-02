@@ -113,6 +113,25 @@ echo obfuscate($html, key: 'unique but stable key')
 
 The pattern must be a valid PCRE regex with delimiters. Each call to `->addRegex()` appends one pattern; you can chain as many as you need. An `\InvalidArgumentException` is thrown for invalid patterns.
 
+## `<obfuscate-text>`
+
+Wrap any HTML in an `<obfuscate-text>` element to obfuscate all of its text content — no pattern matching needed. This is a simpler alternative to `->addRegex()` when you control the markup:
+
+```html
+<obfuscate-text><span>verylongemailaddress@</span>example.com</obfuscate-text>
+```
+
+Every text node inside is obfuscated wholesale:
+
+```html
+<obfuscate-text style="display:contents">
+  <span><ob-fus-ca-ted value="..."></ob-fus-ca-ted></span>
+  <ob-fus-ca-ted value="..."></ob-fus-ca-ted>
+</obfuscate-text>
+```
+
+The element itself renders transparently (`display:contents`) and requires no JavaScript of its own — the inner `<ob-fus-ca-ted>` elements handle deobfuscation as usual. Content inside `<pre>`, `<code>`, `<script>`, and other excluded elements is left untouched even when nested inside `<obfuscate-text>`.
+
 ## With a `HTMLDocument`
 
 When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
