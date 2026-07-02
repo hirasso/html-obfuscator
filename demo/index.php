@@ -95,7 +95,7 @@ $html = <<<HTML
 echo obfuscate(\$html, key: 'my-unique-but-stable-key');</code></pre>
 
         <p>Each email or phone number in text nodes becomes:</p>
-        <pre><code class="language-html">&lt;x-obfuscated value="base64..."&gt;&lt;/x-obfuscated&gt;</code></pre>
+        <pre><code class="language-html">&lt;ob-fus-ca-ted value="base64..."&gt;&lt;/ob-fus-ca-ted&gt;</code></pre>
         <p>
             In the browser, a Web Component registered under that tag name decodes the value on
             <code>connectedCallback</code> and renders it into a closed shadow root, invisible to headless crawlers
@@ -103,8 +103,8 @@ echo obfuscate(\$html, key: 'my-unique-but-stable-key');</code></pre>
             After the first interaction, it replaces itself with the decoded content in the live DOM.
             The deobfuscation script is injected automatically and removes itself from the DOM after execution.
         </p>
-        <p>Each <code>a[href^="mailto:"]</code> or <code>a[href^="tel:"]</code> gets a <code>x-obfuscated[attr="href"]</code> injected:</p>
-        <pre><code class="language-html">&lt;x-obfuscated value="base64..." attr="href"&gt;&lt;/x-obfuscated&gt;</code></pre>
+        <p>Each <code>a[href^="mailto:"]</code> or <code>a[href^="tel:"]</code> gets a <code>ob-fus-ca-ted[attr="href"]</code> injected:</p>
+        <pre><code class="language-html">&lt;ob-fus-ca-ted value="base64..." attr="href"&gt;&lt;/ob-fus-ca-ted&gt;</code></pre>
         <p>
             In the browser, the Web Component replaces it's parent element's <code>href</code> with the decoded
             value on <code>connectedCallback</code> and removes itself afterwards.

@@ -37,7 +37,7 @@
 ### How it works
 - Brief prose
 - PHP snippet showing `obfuscate($html)`
-- Resulting `<x-obfuscated>` HTML output
+- Resulting `<ob-fus-ca-ted>` HTML output
 
 ## Implementation notes
 - Pre-generate raw obfuscated contact block with `->injectClientScript(false)` for the details display

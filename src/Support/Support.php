@@ -54,11 +54,15 @@ final class Support
     }
 
     /** @return list<\Dom\Text> */
-    public static function getTextNodes(HTMLDocument $doc): array
+    public static function getTextNodes(HTMLDocument $doc, ?Element $context = null): array
     {
+        $query = $context
+            ? './/text()[normalize-space() != ""]'
+            : '//text()[normalize-space() != ""]';
+
         /** @var list<\Dom\Text> */
         return array_values(array_filter(
-            [...new XPath($doc)->query('//text()[normalize-space() != ""]')],
+            [...new XPath($doc)->query($query, $context)],
             fn ($node) => !$node->parentElement?->closest(
                 'head, script, style, svg, noscript, title, textarea, select, iframe, canvas, pre, code'
             )
