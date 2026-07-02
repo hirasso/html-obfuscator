@@ -144,10 +144,10 @@ test('addRegex() throws on invalid pattern', function () {
 
 test('renders the client script', function () {
     $debug_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME)->debug(true);
-    expect($debug_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
+    expect($debug_result)->toContain('<script data-key="456fc1f3d9b7477593f65c619f73b46c6ec5b6dfa92b3fc3397e4216e4f4bc42" data-tagname="tests-obfuscated">');
     expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
 
     $minified_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME);
-    expect($minified_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
+    expect($minified_result)->toContain('<script data-key="456fc1f3d9b7477593f65c619f73b46c6ec5b6dfa92b3fc3397e4216e4f4bc42" data-tagname="tests-obfuscated">');
     expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
 });

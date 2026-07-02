@@ -39,7 +39,7 @@ final class HTMLObfuscator
         private bool $isPartial = false,
     ) {
         ObfuscatorConfig::setKey($key);
-        $this->key = md5($key);
+        $this->key = hash('sha256', self::class . '-' . $key);
     }
 
     /**
