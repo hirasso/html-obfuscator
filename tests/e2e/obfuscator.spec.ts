@@ -41,3 +41,24 @@ test("mailto href is revealed after interaction", async ({ page }) => {
   await page.mouse.move(100, 100);
   await expect(page.locator('a[href="mailto:mail@example.com"]')).toBeVisible();
 });
+
+test("obfuscated elements have aria-label", async ({ page }) => {
+  await page.goto("/");
+  const elements = page.locator("ob-fus-ca-ted");
+  const count = await elements.count();
+  expect(count).toBeGreaterThan(0);
+  for (let i = 0; i < count; i++) {
+    await expect(elements.nth(i)).toHaveAttribute("aria-label", "Interact with the page to reveal");
+  }
+});
+
+test("obfuscated elements contain noscript with fallback text", async ({ page }) => {
+  await page.goto("/");
+  const noscripts = page.locator("ob-fus-ca-ted noscript");
+  const count = await noscripts.count();
+  expect(count).toBeGreaterThan(0);
+  for (let i = 0; i < count; i++) {
+    const text = await noscripts.nth(i).innerHTML();
+    expect(text.trim()).toBe("Please activate JavaScript");
+  }
+});

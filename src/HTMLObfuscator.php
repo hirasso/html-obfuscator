@@ -22,6 +22,9 @@ final class HTMLObfuscator
     private const string PATTERN_EMAIL = '/(?:mailto:)?[^\s@]+@[^\s@]+\.[^\s@]{2,}/';
     private const string PATTERN_PHONE = '/(?:tel:)?[\+\d][\d \-\(\)\.]{6,20}(?<!\s)/';
 
+    private ?string $ariaLabel = 'Interact with the page to reveal';
+    private ?string $noscriptText = 'Please activate JavaScript';
+
     private string $key;
 
     private bool $debug = false;
@@ -119,6 +122,24 @@ final class HTMLObfuscator
     public function withTagName(string $tagName): self
     {
         ObfuscatorConfig::setTagName($tagName);
+        return $this;
+    }
+
+    /**
+     * Customize or disable the aria-label on obfuscated elements
+     */
+    public function withAriaLabel(?string $text = null): self
+    {
+        $this->ariaLabel = $text;
+        return $this;
+    }
+
+    /**
+     * Customize or disable the <noscript> fallback inside obfuscated elements
+     */
+    public function withNoscriptText(?string $text = null): self
+    {
+        $this->noscriptText = $text;
         return $this;
     }
 
@@ -256,6 +277,16 @@ final class HTMLObfuscator
 
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('value', $value->encoded);
+
+        if ($this->ariaLabel) {
+            $el->setAttribute('aria-label', $this->ariaLabel);
+        }
+
+        if ($this->noscriptText) {
+            $noscript = $this->document->createElement('noscript');
+            $noscript->textContent = $this->noscriptText;
+            $el->append($noscript);
+        }
 
         return $el;
     }
