@@ -13,7 +13,7 @@ $contactHtml = <<<HTML
 HTML;
 
 $rawObfuscated = (string) obfuscate($contactHtml, passphrase: 'demo')
-    ->injectFrontendScript(false);
+    ->injectClientScript(false);
 
 $rawObfuscated = htmlspecialchars($rawObfuscated);
 

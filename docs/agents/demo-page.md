@@ -40,5 +40,5 @@
 - Resulting `<x-obfuscated>` HTML output
 
 ## Implementation notes
-- Pre-generate raw obfuscated contact block with `->injectFrontendScript(false)` for the details display
+- Pre-generate raw obfuscated contact block with `->injectClientScript(false)` for the details display
 - Reset `HTMLObfuscator::$hasInjectedFrontendScript = false` before the full-page obfuscation call

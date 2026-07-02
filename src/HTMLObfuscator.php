@@ -18,17 +18,18 @@ use InvalidArgumentException;
  */
 final class HTMLObfuscator
 {
-    public const string DEFAULT_TAG_NAME = 'x-obfuscated';
-
-    private string $tagName = self::DEFAULT_TAG_NAME;
+    public const string DEFAULT_TAG_NAME = 'ob-fus-ca-ted';
 
     private string $key;
+    private static ?string $passphrase = null;
+    private static string $tagName = self::DEFAULT_TAG_NAME;
+
     private bool $debug = false;
 
     private bool $emails = true;
     private bool $phoneNumbers = true;
 
-    private bool $injectFrontendScript = true;
+    private bool $injectClientScript = true;
 
     /** @internal */
     public static bool $hasInjectedFrontendScript = false;
@@ -36,8 +37,13 @@ final class HTMLObfuscator
     private function __construct(
         private HTMLDocument $document,
         string $passphrase,
-        private bool $isPartial,
+        private bool $isPartial = false,
     ) {
+        if (self::$passphrase && $passphrase !== self::$passphrase) {
+            throw new InvalidArgumentException('The passphrase needs to be globally stable');
+        }
+        self::$passphrase = $passphrase;
+
         $this->key = md5($passphrase);
     }
 
@@ -57,6 +63,14 @@ final class HTMLObfuscator
         $isPartial = !str_contains($source, '</body>');
 
         return new self(Support::createDocument($source), passphrase: $passphrase, isPartial: $isPartial);
+    }
+
+    /**
+     * Create an empty instance
+     */
+    public static function createEmpty(string $passphrase): self
+    {
+        return new self(HTMLDocument::createEmpty(), $passphrase);
     }
 
     /**
@@ -81,29 +95,36 @@ final class HTMLObfuscator
      * Customize the tag name of the obfuscated element
      * Must contain at least one "-", as defined by the Spec
      */
-    public function withTagName(string $tagName): self
+    public function withTagName(string $tagName, bool $force = false): self
     {
+        $tagName = trim($tagName);
+
         if (!str_contains($tagName, '-')) {
             throw new InvalidArgumentException('The tag name needs to contain at least one dash');
         }
 
-        $this->tagName = trim($tagName);
+        if (!$force && self::$tagName !== self::DEFAULT_TAG_NAME && $tagName !== self::$tagName) {
+            throw new InvalidArgumentException('The tag name needs to be globally stable');
+        }
+
+        self::$tagName = $tagName;
+
         return $this;
     }
 
     /**
      * Should the deobfuscation script be injected or not?
      */
-    public function injectFrontendScript(bool $enabled = true): self
+    public function injectClientScript(bool $enabled = true): self
     {
-        $this->injectFrontendScript = $enabled;
+        $this->injectClientScript = $enabled;
         return $this;
     }
 
     /**
      * Activate debug mode. Currently, this has only one effect:
      *
-     *  - The deobfuscation JavaScript will be injected un-minified
+     *  - The client script will be injected un-minified and with a logger
      */
     public function debug(bool $enabled = true): self
     {
@@ -116,7 +137,8 @@ final class HTMLObfuscator
      */
     public function apply(): self
     {
-        $this->maybeInjectFrontendScript();
+
+        $this->maybeInjectClientScript();
 
         $this->obfuscateLinks();
         $this->obfuscateTextNodes();
@@ -208,7 +230,7 @@ final class HTMLObfuscator
         ObfuscatedValue $value,
     ): Element {
 
-        $el = $this->document->createElement($this->tagName);
+        $el = $this->document->createElement(self::$tagName);
         $el->setAttribute('value', $value->encoded);
 
         return $el;
@@ -266,13 +288,9 @@ final class HTMLObfuscator
      * Inject the script that de-obfuscates obfuscated emails in the frontend.
      * This intentionally runs only ONCE per PHP process, since we only need it once
      */
-    private function maybeInjectFrontendScript(): void
+    private function maybeInjectClientScript(): void
     {
-        if (!$this->document->body) {
-            return;
-        }
-
-        if (self::$hasInjectedFrontendScript || !$this->injectFrontendScript) {
+        if (self::$hasInjectedFrontendScript || !$this->injectClientScript) {
             return;
         }
 
@@ -280,21 +298,30 @@ final class HTMLObfuscator
 
         /** the script tag */
         $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
-        $wrapper = $this->document->createElement('html-obfuscator');
-        $wrapper->innerHTML = <<<HTML
-            <template shadowrootmode="closed">
-                <script data-tagname="$this->tagName" data-key="$this->key">
-                    $js
-                </script>
-            </template>
-        HTML;
+
         $script = $this->document->createElement('script');
-
         $script->textContent = $js;
-        $script->setAttribute('data-tagname', $this->tagName);
-        $script->setAttribute('data-key', $this->key);
-        $this->document->body->append($script);
 
+        $script->setAttribute('data-key', $this->key);
+        $script->setAttribute('data-tagname', self::$tagName);
+
+        ($this->document->body ?? $this->document)->append($script);
+    }
+
+    /**
+     * Explicitly Render the client script as a string (for example in the head of your site)
+     */
+    public static function renderClientScript(
+        string $passphrase,
+        string $tagName,
+        bool $debug = false
+    ): string {
+        self::$hasInjectedFrontendScript = false;
+
+        return self::createEmpty($passphrase)
+            ->withTagName($tagName)
+            ->debug($debug)
+            ->render();
     }
 
     /**
@@ -305,6 +332,6 @@ final class HTMLObfuscator
         $root = dirname(__DIR__);
         $path = ltrim($path, "/");
         $resource = file_get_contents("{$root}/resources/dist/$path") ?: '';
-        return str_replace(self::DEFAULT_TAG_NAME, $this->tagName, $resource);
+        return str_replace(self::DEFAULT_TAG_NAME, self::$tagName, $resource);
     }
 }
