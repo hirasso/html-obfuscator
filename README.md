@@ -90,4 +90,16 @@ echo clientScript(passphrase: 'unique but stable passphrase');
 echo obfuscate($html, 'unique but stable passphrase');
 ```
 
+## Custom patterns with `->addRegex()`
+
+Use `->addRegex()` to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specificly:
+
+```php
+echo obfuscate($html, passphrase: 'unique but stable passphrase')
+    ->addRegex('/[^\s@]+@/') // obfuscates the <span> text node ("verylongemailaddress@")
+    ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscates the domain part ("example.com")
+```
+
+The pattern must be a valid PCRE regex with delimiters. Each call to `->addRegex()` appends one pattern; you can chain as many as you need. An `\InvalidArgumentException` is thrown for invalid patterns.
+
 &rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.

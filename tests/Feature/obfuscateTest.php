@@ -117,9 +117,14 @@ test('obfuscates emails and phone numbers within the same text node', function (
 });
 
 test('addRegex() obfuscates matching text nodes', function () {
+
     $result = (string) obfuscate('<span>verylongemail@</span>example.com')
-        ->addRegex('/[^\s@]+@/');
-    expect($result)->toContain('<tests-obfuscated');
+        ->addRegex('/[^\s@]+@/') // obfuscates the <span> text node ("verylongemailaddress@")
+        ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscates the domain part ("example.com")
+    ;
+
+    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect($result)->not->toContain('example.com');
     expect($result)->not->toContain('verylongemail@');
 });
 
