@@ -77,7 +77,7 @@ test('Invalid tel: links are not obfuscated', function () {
     expect($result)->not->toContain('tests-obfuscated');
 });
 
-test('Allows to customize the custom element\'s tag name', function () {
+test("Allows to customize the custom element's tag name", function () {
     $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
         ->withTagName('reveal-me')
         ->injectClientScript(false)
@@ -114,6 +114,32 @@ test('obfuscates emails and phone numbers within the same text node', function (
     expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
     expect($result)->not->toContain('mail@example.com');
     expect($result)->not->toContain('+49 12 345 67');
+});
+
+test('addRegex() obfuscates matching text nodes', function () {
+
+    $result = (string) obfuscate('<span>verylongemail@</span>example.com')
+        ->addRegex('/[^\s@]+@/') // obfuscates the <span> text node ("verylongemailaddress@")
+        ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscates the domain part ("example.com")
+    ;
+
+    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect($result)->not->toContain('example.com');
+    expect($result)->not->toContain('verylongemail@');
+});
+
+test('addRegex() stacks multiple patterns', function () {
+    $result = (string) obfuscate('foo-123 and bar-456')
+        ->addRegex('/foo-\d+/')
+        ->addRegex('/bar-\d+/');
+    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect($result)->not->toContain('foo-123');
+    expect($result)->not->toContain('bar-456');
+});
+
+test('addRegex() throws on invalid pattern', function () {
+    expect(fn () => obfuscate('hello')->addRegex('not-a-valid-regex['))
+        ->toThrow(InvalidArgumentException::class);
 });
 
 test('renders the client script', function () {

@@ -7,7 +7,6 @@ namespace Hirasso\HTMLObfuscator;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
-use Hirasso\HTMLObfuscator\Enum\Regex;
 use Hirasso\HTMLObfuscator\Support\Support;
 
 /**
@@ -19,12 +18,18 @@ final class HTMLObfuscator
 {
     public const string DEFAULT_TAG_NAME = 'ob-fus-ca-ted';
 
+    private const string PATTERN_EMAIL = '/(?:mailto:)?[^\s@]+@[^\s@]+\.[^\s@]{2,}/';
+    private const string PATTERN_PHONE = '/(?:tel:)?[\+\d][\d \-\(\)\.]{6,20}(?<!\s)/';
+
     private string $key;
 
     private bool $debug = false;
 
     private bool $emails = true;
     private bool $phoneNumbers = true;
+
+    /** @var list<string> */
+    private array $customPatterns = [];
 
     private bool $injectClientScript = true;
 
@@ -78,6 +83,22 @@ final class HTMLObfuscator
     public function emails(bool $enabled = true): self
     {
         $this->emails = $enabled;
+        return $this;
+    }
+
+    /**
+     * Add a custom PCRE regex pattern (with delimiters) to obfuscate matching text nodes
+     */
+    public function addRegex(string $pattern): self
+    {
+        set_error_handler(fn () => true);
+        $valid = preg_match($pattern, '') !== false;
+        restore_error_handler();
+
+        if (!$valid) {
+            throw new \InvalidArgumentException("Invalid regex pattern: {$pattern}");
+        }
+        $this->customPatterns[] = $pattern;
         return $this;
     }
 
@@ -192,12 +213,12 @@ final class HTMLObfuscator
         }
 
         /** apply only the first regex that matches */
-        $regex = Support::first(
-            Regex::get($this->emails, $this->phoneNumbers),
-            fn ($r) => !!preg_match('/' . $r->value . '$/', $value)
+        $pattern = \array_find(
+            $this->builtinPatterns(),
+            fn ($p) => !!preg_match($p, $value)
         );
 
-        if (!$regex) {
+        if (!$pattern) {
             return;
         }
 
@@ -224,15 +245,29 @@ final class HTMLObfuscator
         return $el;
     }
 
+    /** @return list<string> */
+    private function builtinPatterns(): array
+    {
+        $patterns = [];
+        if ($this->emails) {
+            $patterns[] = self::PATTERN_EMAIL;
+        }
+        if ($this->phoneNumbers) {
+            $patterns[] = self::PATTERN_PHONE;
+        }
+        return $patterns;
+    }
+
     /**
      * Obfuscate all text nodes
      */
     private function obfuscateTextNodes(): void
     {
-        foreach (Regex::get($this->emails, $this->phoneNumbers) as $regex) {
-            /** parse again for each regex */
+        $patterns = [...$this->builtinPatterns(), ...$this->customPatterns];
+
+        foreach ($patterns as $pattern) {
             foreach (Support::getTextNodes($this->document) as $node) {
-                $this->obfuscateTextNode($node, $regex);
+                $this->obfuscateTextNode($node, $pattern);
             }
         }
     }
@@ -240,13 +275,13 @@ final class HTMLObfuscator
     /**
      * Obfuscate a text node
      */
-    private function obfuscateTextNode(Text $node, Regex $regex): void
+    private function obfuscateTextNode(Text $node, string $pattern): void
     {
         $value = $node->data;
 
         /** obfuscate */
         $value = preg_replace_callback(
-            "/{$regex->value}/",
+            $pattern,
             function ($matches) {
                 $obfuscated = new ObfuscatedValue($matches[0], $this->key);
                 $el = $this->createObfuscatedElement($obfuscated);

@@ -94,19 +94,4 @@ final class Support
         return $doc->saveHTML();
     }
 
-    /**
-     * @template T
-     * @param array<T> $array
-     * @param callable(T): bool $predicate
-     * @return T|null
-     */
-    public static function first(array $array, callable $predicate): mixed
-    {
-        foreach ($array as $item) {
-            if ($predicate($item)) {
-                return $item;
-            }
-        }
-        return null;
-    }
 }
