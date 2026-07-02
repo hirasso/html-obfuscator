@@ -77,7 +77,7 @@ test('Invalid tel: links are not obfuscated', function () {
     expect($result)->not->toContain('tests-obfuscated');
 });
 
-test('Allows to customize the custom element\'s tag name', function () {
+test("Allows to customize the custom element's tag name", function () {
     $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
         ->withTagName('reveal-me')
         ->injectClientScript(false)

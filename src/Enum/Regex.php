@@ -6,8 +6,8 @@ namespace Hirasso\HTMLObfuscator\Enum;
 
 enum Regex: string
 {
-    case Email = '[^\s@]+@[^\s@]+\.[^\s@]{2,}';
-    case PhoneNumber = '[\+\d][\d \-\(\)\.]{6,20}(?<!\s)';
+    case Email = '/(?:mailto:)?[^\s@]+@[^\s@]+\.[^\s@]{2,}/';
+    case PhoneNumber = '/(?:tel:)?[\+\d][\d \-\(\)\.]{6,20}(?<!\s)/';
 
     /**
      * Get enabled Regexes

@@ -194,7 +194,7 @@ final class HTMLObfuscator
         /** apply only the first regex that matches */
         $regex = Support::first(
             Regex::get($this->emails, $this->phoneNumbers),
-            fn ($r) => !!preg_match('/' . $r->value . '$/', $value)
+            fn ($r) => !!preg_match($r->value, $value)
         );
 
         if (!$regex) {
@@ -246,7 +246,7 @@ final class HTMLObfuscator
 
         /** obfuscate */
         $value = preg_replace_callback(
-            "/{$regex->value}/",
+            $regex->value,
             function ($matches) {
                 $obfuscated = new ObfuscatedValue($matches[0], $this->key);
                 $el = $this->createObfuscatedElement($obfuscated);
