@@ -116,6 +116,27 @@ test('obfuscates emails and phone numbers within the same text node', function (
     expect($result)->not->toContain('+49 12 345 67');
 });
 
+test('addRegex() obfuscates matching text nodes', function () {
+    $result = (string) obfuscate('<span>verylongemail@</span>example.com')
+        ->addRegex('/[^\s@]+@/');
+    expect($result)->toContain('<tests-obfuscated');
+    expect($result)->not->toContain('verylongemail@');
+});
+
+test('addRegex() stacks multiple patterns', function () {
+    $result = (string) obfuscate('foo-123 and bar-456')
+        ->addRegex('/foo-\d+/')
+        ->addRegex('/bar-\d+/');
+    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect($result)->not->toContain('foo-123');
+    expect($result)->not->toContain('bar-456');
+});
+
+test('addRegex() throws on invalid pattern', function () {
+    expect(fn () => obfuscate('hello')->addRegex('not-a-valid-regex['))
+        ->toThrow(InvalidArgumentException::class);
+});
+
 test('renders the client script', function () {
     $debug_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME)->debug(true);
     expect($debug_result)->toContain('<script data-key="098f6bcd4621d373cade4e832627b4f6" data-tagname="tests-obfuscated">');
