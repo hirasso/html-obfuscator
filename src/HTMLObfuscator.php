@@ -213,7 +213,7 @@ final class HTMLObfuscator
         }
 
         /** apply only the first regex that matches */
-        $pattern = Support::first(
+        $pattern = \array_find(
             $this->builtinPatterns(),
             fn ($p) => !!preg_match($p, $value)
         );
