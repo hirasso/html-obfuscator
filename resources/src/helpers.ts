@@ -21,7 +21,7 @@ export function createLogger() {
     warn: (...args: any[]) => console.warn(`%c${prefix}`, style, ...args),
     error: (...args: any[]) => console.error(`%c${prefix}`, style, ...args),
   };
-};
+}
 
 /**
  * Prefix a string with our prefix
@@ -56,10 +56,12 @@ export const detectInteraction = (() => {
 
   return <T extends HTMLElement | Document | Window>(
     target: T,
-    events: (keyof DocumentEventMap)[] | undefined = undefined,
+    events: (keyof DocumentEventMap)[] = [
+      "pointermove",
+      "pointerdown",
+      "keydown",
+    ],
   ): Promise<T> => {
-    events ??= ["pointermove", "pointerdown", "keydown"];
-
     if (hasInteracted) return Promise.resolve(target);
 
     if (!promises.has(target)) {

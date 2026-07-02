@@ -44,12 +44,11 @@ function detectGlobalInteraction() {
 const detectInteraction = (() => {
 	let hasInteracted = false;
 	const promises = /* @__PURE__ */ new Map();
-	return (target, events = void 0) => {
-		events ??= [
-			"pointermove",
-			"pointerdown",
-			"keydown"
-		];
+	return (target, events = [
+		"pointermove",
+		"pointerdown",
+		"keydown"
+	]) => {
 		if (hasInteracted) return Promise.resolve(target);
 		if (!promises.has(target)) promises.set(target, new Promise((resolve) => {
 			const abortCtrl = new AbortController();
