@@ -51,28 +51,36 @@ echo obfuscate($html, passphrase: /** TODO */);
 echo obfuscate($html, passphrase: $config->userAuthSalt);
 ```
 
-## Keep Example
+## ->emails(bool)
+
+Keep emails unobfuscated
 
 ```php
-use function Hirasso\HTMLObfuscator\obfuscate;
-
-echo obfuscate($html, passphrase: 'unique but stable passphrase')
-    ->phoneNumbers(false)
-    ->withTagName('reveal-me')
-    ->debug(true);
+echo obfuscate($html, passphrase: 'unique but stable passphrase')->emails(false);
 ```
 
-## With a `HTMLDocument`
+## ->phoneNumbers(bool)
 
-When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
+Keep phone numbers unobfuscated
 
 ```php
-use Dom\HTMLDocument;
-use function Hirasso\HTMLObfuscator\obfuscate;
+echo obfuscate($html, passphrase: 'unique but stable passphrase')->phoneNumbers(false);
+```
 
-$doc = HTMLDocument::createFromString($html);
-obfuscate($doc, passphrase: 'unique but stable passphrase')->apply();
-// $doc is now obfuscated in place
+## `->debug(bool)`
+
+Inject the client script unminified and with logging:
+
+```php
+echo obfuscate($html, passphrase: 'unique but stable passphrase')->debug(true);
+```
+
+## `->withTagName(string)`
+
+Customize the tag name of the custom element
+
+```php
+echo obfuscate($html, passphrase: 'unique but stable passphrase')->withTagName('reveal-me');
 ```
 
 ## Rendering the client script manually
@@ -90,16 +98,29 @@ echo clientScript(passphrase: 'unique but stable passphrase');
 echo obfuscate($html, 'unique but stable passphrase');
 ```
 
-## Custom patterns with `->addRegex()`
+## `->addRegex()`
 
-Use `->addRegex()` to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specificly:
+Add custom patterns to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specificly:
 
 ```php
 echo obfuscate($html, passphrase: 'unique but stable passphrase')
-    ->addRegex('/[^\s@]+@/') // obfuscates the <span> text node ("verylongemailaddress@")
-    ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscates the domain part ("example.com")
+    ->addRegex('/[^\s@]+@/') // obfuscate the <span> text node ("verylongemailaddress@")
+    ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscate the domain part ("example.com")
 ```
 
 The pattern must be a valid PCRE regex with delimiters. Each call to `->addRegex()` appends one pattern; you can chain as many as you need. An `\InvalidArgumentException` is thrown for invalid patterns.
+
+## With a `HTMLDocument`
+
+When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
+
+```php
+use Dom\HTMLDocument;
+use function Hirasso\HTMLObfuscator\obfuscate;
+
+$doc = HTMLDocument::createFromString($html);
+obfuscate($doc, passphrase: 'unique but stable passphrase')->apply();
+// $doc is now obfuscated in place
+```
 
 &rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.
