@@ -16,7 +16,7 @@ On the server, PHP finds emails and phone numbers in the HTML, XOR-encodes them 
 
 ```html
 <ob-fus-ca-ted value="..." aria-label="Interact with the page to reveal">
-  <noscript>Interact with the page to reveal</noscript>
+  <noscript>Please activate JavaScript</noscript>
 </ob-fus-ca-ted>
 ```
 
