@@ -27,9 +27,11 @@
   },
   "require-dev": {
     "laravel/pint": "^1.20",
+    "league/commonmark": "^2.8",
     "pestphp/pest": "^3.7",
     "pestphp/pest-plugin-watch": "^3.0",
     "phpstan/phpstan": "^2.1",
+    "spatie/shiki-php": "^2.4",
     "spatie/typescript-transformer": "^3.3",
     "symfony/console": "^8.1",
     "symfony/var-dumper": ">=6.4"
@@ -54,8 +56,13 @@
       "pkill -f 'php -S localhost:8766' || true",
       "php -S localhost:8766 -t tests/e2e/fixtures/"
     ],
-    "build": "pnpm build",
+    "build": [
+      "pnpm build",
+      "@generate-types",
+      "@generate-readme"
+    ],
     "generate-types": "bin/console typescript:transform",
+    "generate-readme": "bin/console readme:generate",
     "post-install-cmd": [
       "[ -n \"$CI\" ] || pnpm install",
       "ln -s AGENTS.md CLAUDE.md || exit 0"
