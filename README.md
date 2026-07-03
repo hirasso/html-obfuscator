@@ -6,28 +6,35 @@
 
 **Make crawlers work for it. Obfuscates emails, phone numbers, and other sensitive contact data with PHP and modern browser features.**
 
-## Why
+## Motifaction
 
-You might think that obfuscation won't work against spam bots. [This article](https://spencermortensen.com/articles/email-obfuscation/) by Spencer Mortensen documents that even moderate obfuscation dramatically reduces harvesting. Most bots scan raw HTML and don't simulate user interaction.
+Contrary to popular belief, [this article by Spencer Mortensen](https://spencermortensen.com/articles/email-obfuscation/) shows that even moderate obfuscation dramatically reduces email harvesting by spam bots. Most bots simply scan raw HTML and don't simulate user interaction.
 
 ## How it works
 
-On the server, PHP finds emails and phone numbers in the HTML, XOR-encodes them with a hashed key, base64-encodes the result, and replaces the original text with a custom HTML element:
+On the server, PHP finds emails and phone numbers in the HTML (plain text or `href` attributes), XOR-encodes them with a hashed key, base64-encodes the result, and replaces the original with a custom HTML element:
 
 ```html
+<!-- text nodes: -->
 <ob-fus-ca-ted value="..." aria-label="Interact with the page to reveal">
   <noscript>Please activate JavaScript</noscript>
 </ob-fus-ca-ted>
+
+<!-- links: -->
+<a href>
+  <ob-fus-ca-ted attr="href" value="..." style="display: none;"></ob-fus-ca-ted>
+<a/>
 ```
 
-In the browser, a Web Component registered under that tag name picks up each element on `connectedCallback`, reverses the XOR encoding and renders the result in a **closed** `shadowRoot` that cannot be read by crawlers. The content gets "unwrapped" into the light DOM only after interaction with the page was detected.
+In the browser, the custom element picks up each instance on `connectedCallback`, reverses the XOR encoding and renders the result in a **closed** `shadowRoot` that crawlers cannot read. The content is "unwrapped" into the light DOM only after interaction with the page has been detected.
 
 ## Features
 
-- Fluent [API](#api)
-- 
+- Works without any configuration
+- Can be easily customized using a fluent [API](#api)
 - Fully compatible with HTML5
-- Extensively tested
+- Doesn't interfere with Accessibility
+- Extensively tested with [unit](tests/Unit), [integration](tests/Integration) and [e2e](tests/e2e) tests
 
 ## Installation
 
@@ -38,7 +45,7 @@ composer require hirasso/html-obfuscator
 
 ## Minimal Example
 
-Obfuscate emails and phone numbers in `$html` and automatically injects the client script required for de-obfuscation of the resulting `<ob-fus-ca-ted>` custom elements:
+Obfuscate emails and phone numbers in `$html` and automatically inject the client script required revealing the resulting `<ob-fus-ca-ted>` custom elements:
 
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
@@ -50,14 +57,14 @@ echo obfuscate($html, key: config('app.key'));
 /** or in WordPress: */
 echo obfuscate($html, key: wp_salt());
 /** or in Kirby: */
-echo obfuscate($html, key: /** TODO */);
+echo obfuscate($html, key: kirby()->option('content.salt', 'fallbackValue'));
 /** or in ProcessWire: */
 echo obfuscate($html, key: $config->userAuthSalt);
 ```
 
 ## Rendering the client script manually
 
-By default, the client `<script>` is auto-injected into the document. If you need it in a specific location (e.g. in the `<head>`), use `clientScript()` and echo it yourself:
+By default, the client `<script>` is auto-injected into the document. If you want more control (e.g. want the script in the `<head>`), use `clientScript()` and echo it yourself:
 
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
