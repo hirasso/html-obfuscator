@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator\Commands;
 
-use Parsedown;
-use Spatie\ShikiPhp\Shiki;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\MarkdownConverter;
+use Spatie\CommonMarkShikiHighlighter\HighlightCodeExtension;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,21 +40,12 @@ class GenerateReadmeCommand extends Command
         // Render > [!NOTE] as a styled blockquote
         $markdown = preg_replace('/^> \[!NOTE\]$/m', '> **Note:**', $markdown) ?? $markdown;
 
-        $parsedown = new class () extends Parsedown {
-            /**
-             * @param array<string, mixed> $Block
-             * @return array<string, string>
-             */
-            protected function blockFencedCodeComplete($Block): array
-            {
-                $language = str_replace('language-', '', $Block['element']['element']['attributes']['class'] ?? 'text');
-                $code = $Block['element']['element']['text'] ?? '';
-                return ['markup' => Shiki::highlight(rtrim($code), $language, 'nord')];
-            }
-        };
+        $environment = new Environment();
+        $environment->addExtension(new CommonMarkCoreExtension());
+        $environment->addExtension(new HighlightCodeExtension('nord'));
 
-        // Parsedown has known undefined-key warnings on PHP 8 — suppress at call site
-        $html = @$parsedown->text($markdown);
+        $converter = new MarkdownConverter($environment);
+        $html = $converter->convert($markdown)->getContent();
 
         // Rewrite relative hrefs to absolute GitHub URLs
         $repoUrl = 'https://github.com/hirasso/html-obfuscator/tree/main';
