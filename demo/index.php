@@ -33,16 +33,20 @@ $currentYear = date('Y');
   <main class="container-fluid">
 
     <header>
-
-        <h1>HTML Obfuscator</h1>
-        <p><strong>Tl;dr</strong>: Make crawlers earn it. Obfuscates emails, phone numbers, and other sensitive data with PHP and modern browser features.<br></p>
-        <p><a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></p>
-
+        <hgroup>
+            <p><a href="https://github.com/hirasso/html-obfuscator" role="button" class="pill outline">hirasso/html-obfuscator</a></p>
+            <h1>HTML Obfuscator</h1>
+            <p><strong>Tl;dr</strong>: Make crawlers earn it. Obfuscates emails, phone numbers, and other sensitive data with PHP and modern browser features.<br></p>
+        </hgroup>
     </header>
 
     <section>
-      <h2>Demo</h2>
-      <p class="hint">Inspect one of the two links in the following paragraph, reload the page and then move your mouse or press any key to see the effect.</p>
+        <h2>Demo</h2>
+        <p class="hint">
+            <strong>There is NO visual difference between obfuscated and fully revealed state.</strong>
+            To see the effect, you must inspect on of the two links in the following paragraph,
+            reload the page and then move your mouse or press any key.
+        </p>
         <?= $contactHtml ?>
     </section>
 
@@ -56,6 +60,7 @@ $currentYear = date('Y');
   </main>
   <footer class="container-fluid">
     <small>
+        Browse the source on <a href="https://github.com/hirasso/html-obfuscator">GitHub</a>.
         Motivated by <a href="https://spencermortensen.com/articles/email-obfuscation/">this article</a> by Spencer Mortensen.
         Demo page built using <a href="https://picocss.com/">Pico CSS</a>.
         © <?= $currentYear ?> by <a href="https://github.com/hirasso">Rasso Hilber</a> 👋
