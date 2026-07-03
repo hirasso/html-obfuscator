@@ -15,18 +15,27 @@ Contrary to popular belief, [this article by Spencer Mortensen](https://spencerm
 On the server, PHP searches emails and phone numbers in the HTML (plain text or `href` attributes) using `regex`, XOR-encodes them with a hashed key, base64-encodes the result, removes the original and injects a [custom element](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements) in its place.
 
 ```html
-<!-- text nodes: -->
+<!--
+  text nodes:
+  replace with obfuscated element and instructions how to reveal
+-->
 <ob-fus-ca-ted value="..." aria-label="Interact with the page to reveal">
   <noscript>Please activate JavaScript</noscript>
 </ob-fus-ca-ted>
 
-<!-- links: -->
+<!--
+  href attributes:
+  remove everything except the scheme, inject obfuscated element with [attr="href"]
+-->
 <a href="mailto:">
   <ob-fus-ca-ted attr="href" value="..." style="display: none;"></ob-fus-ca-ted>
 </a>
 ```
 
 In the browser, the custom element picks up each instance on `connectedCallback`, reverses the XOR encoding and renders the result in a **closed** `shadowRoot` that crawlers cannot read. The content is "unwrapped" into the light DOM only after interaction with the page has been detected.
+
+> [!NOTE]
+> The scheme in obfuscated `href` attributes is preserved to prevent [FOUC](https://en.wikipedia.org/wiki/Flash_of_unstyled_content) if links are styled using `a[href^="mailto:"]` or `a[href^="tel:"]`
 
 ### What can JS-_disabled_ crawlers see?
 
@@ -59,7 +68,8 @@ composer require hirasso/html-obfuscator
 
 Obfuscate emails and phone numbers in `$html` and automatically inject the client script required revealing the resulting `<ob-fus-ca-ted>` custom elements:
 
-> [!NOTE] The key is used to XOR-encode obfuscated values. It must be stable (changing it breaks any cached HTML) and secret (it's what prevents bots from reversing the encoding). The framework-specific examples below show idiomatic sources for it.
+> [!NOTE]
+> The key is used to XOR-encode obfuscated values. It must be stable (changing it breaks any cached HTML) and secret (it's what prevents bots from reversing the encoding). The framework-specific examples below show idiomatic sources for it.
 
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
