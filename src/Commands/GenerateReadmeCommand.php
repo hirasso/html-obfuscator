@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator\Commands;
 
-use League\CommonMark\Environment\Environment;
-use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
-use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
-use League\CommonMark\MarkdownConverter;
-use League\CommonMark\Node\Node;
-use League\CommonMark\Renderer\ChildNodeRendererInterface;
-use League\CommonMark\Renderer\NodeRendererInterface;
+use Parsedown;
 use Spatie\ShikiPhp\Shiki;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,14 +17,14 @@ class GenerateReadmeCommand extends Command
 {
     protected function configure(): void
     {
-        $this->setDescription('Generate demo/readme.php from README.md');
+        $this->setDescription('Generate demo/readme.html from README.md');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $root = dirname(__DIR__, 2);
         $readmePath = "{$root}/README.md";
-        $outputPath = "{$root}/demo/readme.php";
+        $outputPath = "{$root}/demo/readme.html";
 
         $markdown = file_get_contents($readmePath);
         if ($markdown === false) {
@@ -44,19 +38,21 @@ class GenerateReadmeCommand extends Command
         // Render > [!NOTE] as a styled blockquote
         $markdown = preg_replace('/^> \[!NOTE\]$/m', '> **Note:**', $markdown) ?? $markdown;
 
-        $environment = new Environment();
-        $environment->addExtension(new CommonMarkCoreExtension());
-        $environment->addRenderer(FencedCode::class, new class () implements NodeRendererInterface {
-            public function render(Node $node, ChildNodeRendererInterface $childRenderer): string
+        $parsedown = new class () extends Parsedown {
+            /**
+             * @param array<string, mixed> $Block
+             * @return array<string, string>
+             */
+            protected function blockFencedCodeComplete($Block): array
             {
-                assert($node instanceof FencedCode);
-                $language = $node->getInfoWords()[0] ?? 'text';
-                return Shiki::highlight(rtrim($node->getLiteral()), $language, 'nord');
+                $language = str_replace('language-', '', $Block['element']['element']['attributes']['class'] ?? 'text');
+                $code = $Block['element']['element']['text'] ?? '';
+                return ['markup' => Shiki::highlight(rtrim($code), $language, 'nord')];
             }
-        });
+        };
 
-        $converter = new MarkdownConverter($environment);
-        $html = $converter->convert($markdown)->getContent();
+        // Parsedown has known undefined-key warnings on PHP 8 — suppress at call site
+        $html = @$parsedown->text($markdown);
 
         // Rewrite relative hrefs to absolute GitHub URLs
         $repoUrl = 'https://github.com/hirasso/html-obfuscator/tree/main';

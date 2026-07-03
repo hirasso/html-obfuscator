@@ -26,8 +26,8 @@
     "php": ">=8.4"
   },
   "require-dev": {
+    "erusev/parsedown": "^1.8",
     "laravel/pint": "^1.20",
-    "league/commonmark": "^2.8",
     "pestphp/pest": "^3.7",
     "pestphp/pest-plugin-watch": "^3.0",
     "phpstan/phpstan": "^2.1",

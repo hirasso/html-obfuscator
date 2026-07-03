@@ -49,7 +49,7 @@ $currentYear = date('Y');
 
     <!-- README.md:start -->
 
-    <?php include('readme.php') ?>
+    <?php include('./readme.html') ?>
 
     <!-- README.md:end -->
 
