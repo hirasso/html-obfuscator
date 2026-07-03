@@ -66,7 +66,7 @@ composer require hirasso/html-obfuscator
 
 ## Minimal Example
 
-Obfuscate emails and phone numbers in `$html` and automatically inject the client script required revealing the resulting `<ob-fus-ca-ted>` custom elements:
+Obfuscate emails and phone numbers in `$html` and automatically inject the client script that reveals `<ob-fus-ca-ted>` custom elements in the frontend:
 
 > [!NOTE]
 > The key is used to XOR-encode obfuscated values. The framework-specific examples below show idiomatic sources for it.
