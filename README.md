@@ -80,8 +80,6 @@ echo obfuscate($html, key: 'unique but stable key');
 echo obfuscate($html, key: config('app.key'));
 /** or in WordPress: */
 echo obfuscate($html, key: wp_salt());
-/** or in Kirby: */
-echo obfuscate($html, key: kirby()->option('content.salt', 'fallbackValue'));
 /** or in ProcessWire: */
 echo obfuscate($html, key: $config->userAuthSalt);
 ```
