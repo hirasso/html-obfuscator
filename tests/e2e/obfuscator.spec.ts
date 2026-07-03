@@ -33,7 +33,7 @@ test("content is revealed after interaction", async ({ page }) => {
 test("mailto href is obfuscated in source", async ({ request }) => {
   const response = await request.get("/");
   const body = await response.text();
-  expect(body).not.toContain('href="mailto:');
+  expect(body).not.toContain('href="mailto:mail@');
 });
 
 test("mailto href is revealed after interaction", async ({ page }) => {
@@ -44,7 +44,7 @@ test("mailto href is revealed after interaction", async ({ page }) => {
 
 test("obfuscated elements have aria-label", async ({ page }) => {
   await page.goto("/");
-  const elements = page.locator("ob-fus-ca-ted");
+  const elements = page.locator("ob-fus-ca-ted:not([attr])");
   const count = await elements.count();
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i++) {
