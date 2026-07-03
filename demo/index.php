@@ -62,10 +62,10 @@ $html = <<<HTML
         </details>
 
         <details>
-            <summary>What can JS crawlers see before interaction?</summary>
+            <summary>What can JS crawlers see?</summary>
             <p>
-                Not much more. The Web Component does decode the value on <code>connectedCallback</code>,
-                but renders it into a <strong>closed</strong> shadow root — <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#closed">inaccessible from outside JavaScript</a>.
+                Not much more, if they don't interact with the page. The custom element does decode the value on <code>connectedCallback</code>,
+                but renders it into a <strong>closed</strong> shadow root that <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#closed">cannot be accessed from JavaScript</a>.
                 The <code>href</code> attribute also stays empty until interaction
                 (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
             </p>

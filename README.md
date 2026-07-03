@@ -6,13 +6,13 @@
 
 **Make crawlers work for it. Obfuscates emails, phone numbers, and other sensitive contact data with PHP and modern browser features.**
 
-## Motifaction
+## Motivation
 
 Contrary to popular belief, [this article by Spencer Mortensen](https://spencermortensen.com/articles/email-obfuscation/) shows that even moderate obfuscation dramatically reduces email harvesting by spam bots. Most bots simply scan raw HTML and don't simulate user interaction.
 
 ## How it works
 
-On the server, PHP finds emails and phone numbers in the HTML (plain text or `href` attributes), XOR-encodes them with a hashed key, base64-encodes the result, and replaces the original with a custom HTML element:
+On the server, PHP searches emails and phone numbers in the HTML (plain text or `href` attributes) using `regex`, XOR-encodes them with a hashed key, base64-encodes the result, removes the original and injects a [custom element](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements) in its place.
 
 ```html
 <!-- text nodes: -->
@@ -21,12 +21,24 @@ On the server, PHP finds emails and phone numbers in the HTML (plain text or `hr
 </ob-fus-ca-ted>
 
 <!-- links: -->
-<a href>
+<a href="mailto:">
   <ob-fus-ca-ted attr="href" value="..." style="display: none;"></ob-fus-ca-ted>
-<a/>
+</a>
 ```
 
 In the browser, the custom element picks up each instance on `connectedCallback`, reverses the XOR encoding and renders the result in a **closed** `shadowRoot` that crawlers cannot read. The content is "unwrapped" into the light DOM only after interaction with the page has been detected.
+
+### What can JS-_disabled_ crawlers see?
+
+Instead of the original values, there are now obfuscated custom elements. One for each obfuscated `href` attribute, one for each plaintext value.
+
+### What can JS-_enabled_ crawlers see?
+
+Not much more, before interaction (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
+
+Custom elements representing a text node _do_ decode the value immediately on <code>connectedCallback</code>, but render it into a <strong>closed</strong> shadow root that is completely visible to humans but **<a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#closed">cannot be accessed from JavaScript</a>**.
+
+<code>href</code> attributes of obfuscated links also stay empty until interaction.
 
 ## Features
 
@@ -47,6 +59,8 @@ composer require hirasso/html-obfuscator
 
 Obfuscate emails and phone numbers in `$html` and automatically inject the client script required revealing the resulting `<ob-fus-ca-ted>` custom elements:
 
+> [!NOTE] The key is used to XOR-encode obfuscated values. It must be stable (changing it breaks any cached HTML) and secret (it's what prevents bots from reversing the encoding). The framework-specific examples below show idiomatic sources for it.
+
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
 
@@ -62,7 +76,7 @@ echo obfuscate($html, key: kirby()->option('content.salt', 'fallbackValue'));
 echo obfuscate($html, key: $config->userAuthSalt);
 ```
 
-## Rendering the client script manually
+## Manually load the client script
 
 By default, the client `<script>` is auto-injected into the document. If you want more control (e.g. want the script in the `<head>`), use `clientScript()` and echo it yourself:
 
@@ -170,7 +184,7 @@ use Dom\HTMLDocument;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 $doc = HTMLDocument::createFromString($html);
-obfuscate($doc, key: 'unique but stable key')->apply();
+obfuscate($doc, key: 'unique but stable key')->saveDocument();
 // $doc is now obfuscated in place
 ```
 

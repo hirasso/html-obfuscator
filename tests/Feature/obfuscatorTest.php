@@ -1,5 +1,6 @@
 <?php
 
+use Dom\HTMLElement;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 
@@ -94,14 +95,10 @@ test("Allows to customize the custom element's tag name", function () {
     $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
         ->withTagName('reveal-me')
         ->injectClientScript(false)
-        ->saveHTML();
+        ->saveDocument()
+        ->querySelector('reveal-me');
 
-    expectObfuscatedElement($result, 'reveal-me');
-});
-
-test('Exposes ->apply() as public method', function () {
-    $obfuscate = obfuscate('mail@example.com');
-    expect($obfuscate)->toBeInstanceOf(HTMLObfuscator::class);
+    expect($result)->toBeInstanceOf(HTMLElement::class);
 });
 
 test('withTagName() throws if the element name is malformed', function () {
