@@ -85,7 +85,7 @@ Obfuscate emails and phone numbers in `$html` and automatically inject the clien
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 /** vanilla: */
-echo obfuscate($html, key: 'unique but stable key');
+echo obfuscate($html, key: 'unique key');
 /** or in Laravel: */
 echo obfuscate($html, key: config('app.key'));
 /** or in WordPress: */
@@ -103,10 +103,10 @@ use function Hirasso\HTMLObfuscator\obfuscate;
 use function Hirasso\HTMLObfuscator\clientScript;
 
 // 1. Render the script in your <head>
-echo clientScript(key: 'unique but stable key');
+echo clientScript(key: 'unique key');
 
 // 2. Obfuscate your HTML — script injection is skipped because it was already rendered
-echo obfuscate($html, key: 'unique but stable key');
+echo obfuscate($html, key: 'unique key');
 ```
 
 ## API
@@ -116,7 +116,7 @@ echo obfuscate($html, key: 'unique but stable key');
 Keep emails unobfuscated
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')->emails(false);
+echo obfuscate($html, key: 'unique key')->emails(false);
 ```
 
 ### `->phoneNumbers(bool)`
@@ -124,7 +124,7 @@ echo obfuscate($html, key: 'unique but stable key')->emails(false);
 Keep phone numbers unobfuscated
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')->phoneNumbers(false);
+echo obfuscate($html, key: 'unique key')->phoneNumbers(false);
 ```
 
 ### `->debug(bool)`
@@ -132,7 +132,7 @@ echo obfuscate($html, key: 'unique but stable key')->phoneNumbers(false);
 Inject the client script unminified and with logging
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')->debug(true);
+echo obfuscate($html, key: 'unique key')->debug(true);
 ```
 
 ### `->withAriaLabel(?string)`
@@ -140,8 +140,8 @@ echo obfuscate($html, key: 'unique but stable key')->debug(true);
 Customize or disable the `aria-label` on each obfuscated element. Pass `null` to omit it entirely:
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')->withAriaLabel('Hidden contact info');
-echo obfuscate($html, key: 'unique but stable key')->withAriaLabel(null); // disable
+echo obfuscate($html, key: 'unique key')->withAriaLabel('Hidden contact info');
+echo obfuscate($html, key: 'unique key')->withAriaLabel(null); // disable
 ```
 
 ### `->withNoscriptText(?string)`
@@ -149,8 +149,8 @@ echo obfuscate($html, key: 'unique but stable key')->withAriaLabel(null); // dis
 Customize or disable the `<noscript>` fallback inside each obfuscated element. Pass `null` to omit it:
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')->withNoscriptText('Please activate JavaScript');
-echo obfuscate($html, key: 'unique but stable key')->withNoscriptText(null); // disable
+echo obfuscate($html, key: 'unique key')->withNoscriptText('Please activate JavaScript');
+echo obfuscate($html, key: 'unique key')->withNoscriptText(null); // disable
 ```
 
 ### `->withTagName(string)`
@@ -158,7 +158,7 @@ echo obfuscate($html, key: 'unique but stable key')->withNoscriptText(null); // 
 Customize the tag name of the custom element
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')->withTagName('reveal-me');
+echo obfuscate($html, key: 'unique key')->withTagName('reveal-me');
 ```
 
 ### `->addRegex(string)`
@@ -166,7 +166,7 @@ echo obfuscate($html, key: 'unique but stable key')->withTagName('reveal-me');
 Add custom patterns to obfuscate text that the built-in patterns can't reach. A common case is an email address split across HTML elements to allow for a line break — the built-in email regex matches a single text node, so `<span>verylongemailaddress@</span>example.com` would slip through. You can target this specifically:
 
 ```php
-echo obfuscate($html, key: 'unique but stable key')
+echo obfuscate($html, key: 'unique key')
     ->addRegex('/[^\s@]+@/') // obfuscate the <span> text node ("verylongemailaddress@")
     ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscate the domain part ("example.com")
 ;
@@ -202,7 +202,7 @@ use Dom\HTMLDocument;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 $doc = HTMLDocument::createFromString($html);
-obfuscate($doc, key: 'unique but stable key')->saveDocument();
+obfuscate($doc, key: 'unique key')->saveDocument();
 // $doc is now obfuscated in place
 ```
 

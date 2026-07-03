@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator;
 
-final readonly class ObfuscatedValue
+use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
+
+final readonly class XORValue implements ObfuscatedValue
 {
     public string $encoded;
 
@@ -15,9 +17,11 @@ final readonly class ObfuscatedValue
         $this->encoded = $this->encode($original, $key);
     }
 
-    /**
-     * Encode a string, using a key
-     */
+    public function getAttribute(): string
+    {
+        return "{$this->encoded}:xor:{$this->key}";
+    }
+
     private function encode(string $value, string $key): string
     {
         $out = '';

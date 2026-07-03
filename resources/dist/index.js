@@ -69,7 +69,10 @@ const detectInteraction = (() => {
 const decode = (() => {
 	const cache = /* @__PURE__ */ new Map();
 	return (el, logger) => {
-		const encoded = atob(el.getAttribute("value") ?? "");
+		const raw = el.getAttribute("value");
+		if (!raw) return;
+		const [value, key] = raw.split(":xor:");
+		const encoded = atob(value);
 		if (!encoded) return;
 		if (cache.has(encoded)) {
 			logger?.log(`Cache hit for ${encoded}`);

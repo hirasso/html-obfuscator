@@ -96,7 +96,11 @@ export const decode = (() => {
   const cache = new Map<string, string>();
 
   return (el: ObfuscatedElement, logger?: Logger): string | undefined => {
-    const encoded = atob(el.getAttribute("value") ?? "");
+    const raw = el.getAttribute("value");
+    if (!raw) return;
+
+    const [value, key] = raw.split(':xor:');
+    const encoded = atob(value);
 
     if (!encoded) {
       return undefined;

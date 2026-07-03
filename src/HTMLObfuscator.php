@@ -7,6 +7,7 @@ namespace Hirasso\HTMLObfuscator;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
+use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
 use Hirasso\HTMLObfuscator\Support\Support;
 
 /**
@@ -220,7 +221,7 @@ final class HTMLObfuscator
         foreach ($this->document->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
             $el->removeAttribute(self::OBFUSCATE_TEXT_ATTR);
             foreach (Support::getTextNodes($this->document, $el) as $node) {
-                $obfuscated = new ObfuscatedValue($node->data, $this->key);
+                $obfuscated = new XORValue($node->data, $this->key);
                 $node->replaceWith($this->createObfuscatedTextElement($obfuscated));
             }
         }
@@ -259,7 +260,7 @@ final class HTMLObfuscator
             return;
         }
 
-        $obfuscatedValue = new ObfuscatedValue($value, $this->key);
+        $obfuscatedValue = new XORValue($value, $this->key);
         $obfuscated = $this->createObfuscatedAttributeElement($obfuscatedValue, $attibuteName);
 
         $el->prepend($obfuscated);
@@ -275,7 +276,7 @@ final class HTMLObfuscator
     private function createObfuscatedTextElement(ObfuscatedValue $value): Element
     {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
-        $el->setAttribute('value', $value->encoded);
+        $el->setAttribute('value', $value->getAttribute());
 
         if ($this->ariaLabel) {
             $el->setAttribute('aria-label', $this->ariaLabel);
@@ -297,7 +298,8 @@ final class HTMLObfuscator
     {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('attr', $attribute);
-        $el->setAttribute('value', $value->encoded);
+        // $el->setAttribute('value', $value->encoded);
+        $el->setAttribute('value', $value->getAttribute());
         $el->setAttribute('style', 'display:none');
 
         return $el;
@@ -341,7 +343,7 @@ final class HTMLObfuscator
         $value = preg_replace_callback(
             $pattern,
             function ($matches) {
-                $obfuscated = new ObfuscatedValue($matches[0], $this->key);
+                $obfuscated = new XORValue($matches[0], $this->key);
                 $el = $this->createObfuscatedTextElement($obfuscated);
 
                 return Support::outerHTML($el);
