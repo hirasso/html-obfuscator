@@ -14,28 +14,37 @@ Contrary to popular belief, [this article by Spencer Mortensen](https://spencerm
 
 On the server, PHP searches emails and phone numbers in the HTML (plain text or `href` attributes) using `regex`, XOR-encodes them with a hashed key, base64-encodes the result, removes the original and injects a [custom element](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements) in its place.
 
-```html
-<!--
-  text nodes:
-  replace with obfuscated element and instructions how to reveal
--->
-<ob-fus-ca-ted value="..." aria-label="Interact with the page to reveal">
-  <noscript>Please activate JavaScript</noscript>
-</ob-fus-ca-ted>
+### Text nodes
 
-<!--
-  href attributes:
-  remove everything except the scheme, inject obfuscated element with [attr="href"]
--->
+Matching parts get replaced with an obfuscated element and instructions how to reveal it:
+
+```html
+<!-- before: -->
+<p>Call us at +49 176 123 45 678.</p>
+
+<!-- after: -->
+<p>Call us at  <ob-fus-ca-ted value="..." aria-label="Interact with the page to reveal"><noscript>Please activate JavaScript</noscript></ob-fus-ca-ted>.</p>
+```
+
+### Links with matching `href` attribute
+
+Everything but the scheme is stripped from the `href` attribute. The link gets a hidden obfuscated element with `[attr="href"]` injected as a child:
+
+```html
+<!-- before: -->
+<a href="mailto:mail@example.com">
+  Write us an email
+</a>
+
+<!-- after: -->
 <a href="mailto:">
   <ob-fus-ca-ted attr="href" value="..." style="display: none;"></ob-fus-ca-ted>
+  Write us an email
 </a>
 ```
 
-In the browser, the custom element picks up each instance on `connectedCallback`, reverses the XOR encoding and renders the result in a **closed** `shadowRoot` that crawlers cannot read. The content is "unwrapped" into the light DOM only after interaction with the page has been detected.
-
 > [!NOTE]
-> The scheme in obfuscated `href` attributes is preserved to prevent [FOUC](https://en.wikipedia.org/wiki/Flash_of_unstyled_content) if links are styled using `a[href^="mailto:"]` or `a[href^="tel:"]`
+> The scheme in obfuscated `href` attributes is preserved to prevent a [FOUC](https://en.wikipedia.org/wiki/Flash_of_unstyled_content) if links are styled using `a[href^="mailto:"]` or `a[href^="tel:"]`
 
 ### What can JS-_disabled_ crawlers see?
 
@@ -45,7 +54,7 @@ Instead of the original values, there are now obfuscated custom elements. One fo
 
 Not much more, before interaction (<code>pointermove</code>, <code>pointerdown</code>, or <code>keydown</code>) was detected.
 
-Custom elements representing a text node _do_ decode the value immediately on <code>connectedCallback</code>, but render it into a <strong>closed</strong> shadow root that is completely visible to humans but **<a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#closed">cannot be accessed from JavaScript</a>**.
+Custom elements representing a text node _do_ decode the value immediately on <code>connectedCallback</code>, but render it into a <strong>closed</strong> shadow root that is completely visible to humans but **[cannot be accessed from JavaScript](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#closed)**.
 
 <code>href</code> attributes of obfuscated links also stay empty until interaction.
 
