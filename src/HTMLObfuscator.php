@@ -17,7 +17,7 @@ use Hirasso\HTMLObfuscator\Support\Support;
 final class HTMLObfuscator
 {
     public const string DEFAULT_TAG_NAME = 'ob-fus-ca-ted';
-    public const string OBFUSCATE_TEXT_TAG = 'obfuscate-text';
+    public const string OBFUSCATE_TEXT_ATTR = 'obfuscate-text';
 
     private const string PATTERN_EMAIL = '/(?:mailto:)?[^\s@]+@[^\s@]+\.[^\s@]{2,}/';
     private const string PATTERN_PHONE = '/(?:tel:)?[\+\d][\d \-\(\)\.]{6,20}(?<!\s)/';
@@ -213,12 +213,12 @@ final class HTMLObfuscator
     }
 
     /**
-     * Obfuscate all text nodes inside <obfuscate-text> elements wholesale
+     * Obfuscate all text nodes inside [obfuscate-text] elements wholesale
      */
     private function processObfuscateTextElements(): void
     {
-        foreach ($this->document->querySelectorAll(self::OBFUSCATE_TEXT_TAG) as $el) {
-            $el->setAttribute('style', 'display:contents');
+        foreach ($this->document->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
+            $el->removeAttribute(self::OBFUSCATE_TEXT_ATTR);
             foreach (Support::getTextNodes($this->document, $el) as $node) {
                 $obfuscated = new ObfuscatedValue($node->data, $this->key);
                 $node->replaceWith($this->createObfuscatedTextElement($obfuscated));

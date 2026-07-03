@@ -6,7 +6,7 @@ use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 
 use function Hirasso\HTMLObfuscator\clientScript;
 
-const OBFUSCATE_TEXT_TAG = HTMLObfuscator::OBFUSCATE_TEXT_TAG;
+const OBFUSCATE_TEXT_ATTR = HTMLObfuscator::OBFUSCATE_TEXT_ATTR;
 
 afterEach(fn () => ObfuscatorConfig::reset());
 
@@ -152,31 +152,31 @@ test('addRegex() throws on invalid pattern', function () {
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('<obfuscate-text> obfuscates all text nodes inside', function () {
-    $result = (string) obfuscate('<obfuscate-text><span>foobar@</span>example.com</obfuscate-text>');
+test('[obfuscate-text] obfuscates all text nodes inside', function () {
+    $result = (string) obfuscate('<div obfuscate-text><span>foobar@</span>example.com</div>');
     expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(2);
     expect($result)->not->toContain('foobar@');
     expect($result)->not->toContain('example.com');
 });
 
-test('<obfuscate-text> sets style="display:contents" on the element', function () {
-    $result = (string) obfuscate('<obfuscate-text>hello</obfuscate-text>');
-    expect($result)->toContain('<' . OBFUSCATE_TEXT_TAG . ' style="display:contents">');
+test('[obfuscate-text] removes the attribute from the element', function () {
+    $result = (string) obfuscate('<div obfuscate-text>hello</div>');
+    expect($result)->not->toContain('obfuscate-text');
 });
 
-test('<obfuscate-text> honors the exclusion list', function () {
-    $result = (string) obfuscate('<obfuscate-text><pre>dont obfuscate me</pre>visible text</obfuscate-text>');
+test('[obfuscate-text] honors the exclusion list', function () {
+    $result = (string) obfuscate('<div obfuscate-text><pre>dont obfuscate me</pre>visible text</div>');
     expect($result)->toContain('dont obfuscate me');
     expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(1);
 });
 
-test('<obfuscate-text> does not double-obfuscate with the pattern-matching pass', function () {
-    $result = (string) obfuscate('<obfuscate-text>mail@example.com</obfuscate-text>');
+test('[obfuscate-text] does not double-obfuscate with the pattern-matching pass', function () {
+    $result = (string) obfuscate('<div obfuscate-text>mail@example.com</div>');
     expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(1);
 });
 
-test('<obfuscate-text> skips whitespace-only text nodes', function () {
-    $result = (string) obfuscate("<obfuscate-text>\n  <span>hello</span>\n</obfuscate-text>");
+test('[obfuscate-text] skips whitespace-only text nodes', function () {
+    $result = (string) obfuscate("<div obfuscate-text>\n  <span>hello</span>\n</div>");
     expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(1);
 });
 
