@@ -17,6 +17,17 @@ test('Obfuscates emails in links', function () {
     );
 });
 
+test('Keeps the scheme in the href for consistent styling', function () {
+    $doc = obfuscate(<<<HTML
+        <a href="mailto:mail@example.com">email</a><a href="tel:+49 12 345 67">tel</a>
+        HTML)
+        ->saveDocument();
+    $links = $doc->querySelectorAll('a');
+
+    expect($links->item(0)?->getAttribute('href'))->toBe("mailto:");
+    expect($links->item(1)?->getAttribute('href'))->toBe("tel:");
+});
+
 test('Obfuscates emails in plaintext', function () {
     expectObfuscatedElement((string) obfuscate('mail@example.com'));
 });
@@ -83,7 +94,7 @@ test("Allows to customize the custom element's tag name", function () {
     $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
         ->withTagName('reveal-me')
         ->injectClientScript(false)
-        ->render();
+        ->saveHTML();
 
     expectObfuscatedElement($result, 'reveal-me');
 });
@@ -106,9 +117,9 @@ test('Returns a the full document when receiving at least a <body> element', fun
     expect((string) obfuscate('<body>foobar</body>'))->toContain('<html><head></head><body>foobar');
 });
 
-test('getDocument() returns the underlying HTMLDocument', function () {
+test('saveDocument() returns the underlying HTMLDocument', function () {
     $obfuscator = obfuscate('mail@example.com');
-    expect($obfuscator->getDocument())->toBeInstanceOf(\Dom\HTMLDocument::class);
+    expect($obfuscator->saveDocument())->toBeInstanceOf(\Dom\HTMLDocument::class);
 });
 
 test('obfuscates emails and phone numbers within the same text node', function () {

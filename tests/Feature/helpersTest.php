@@ -14,5 +14,5 @@ test('Named constructors return an HTMLObfuscator instance', function () {
 
 test('obfuscate(HTMLDocument) mutates the passed HTMLDocument directly', function () {
     $doc = HTMLDocument::createEmpty();
-    expect(obfuscate($doc, 'test')->getDocument())->toBe($doc);
+    expect(obfuscate($doc, 'test')->saveDocument())->toBe($doc);
 });

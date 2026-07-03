@@ -178,17 +178,18 @@ final class HTMLObfuscator
     }
 
     /**
-     * Get the document we are working on
+     * Apply changes and get the document
      */
-    public function getDocument(): HTMLDocument
+    public function saveDocument(): HTMLDocument
     {
+        $this->apply();
         return $this->document;
     }
 
     /**
      * Apply obfuscation and return the result as a string
      */
-    public function render(): string
+    public function saveHTML(): string
     {
         $this->apply();
 
@@ -208,7 +209,7 @@ final class HTMLObfuscator
      */
     public function __toString(): string
     {
-        return $this->render();
+        return $this->saveHTML();
     }
 
     /**
@@ -220,7 +221,7 @@ final class HTMLObfuscator
             $el->setAttribute('style', 'display:contents');
             foreach (Support::getTextNodes($this->document, $el) as $node) {
                 $obfuscated = new ObfuscatedValue($node->data, $this->key);
-                $node->replaceWith($this->createObfuscatedElement($obfuscated));
+                $node->replaceWith($this->createObfuscatedTextElement($obfuscated));
             }
         }
     }
@@ -259,22 +260,20 @@ final class HTMLObfuscator
         }
 
         $obfuscatedValue = new ObfuscatedValue($value, $this->key);
-        $obfuscated = $this->createObfuscatedElement($obfuscatedValue);
-        $obfuscated->setAttribute('attr', $attibuteName);
-        $obfuscated->setAttribute('style', 'display:none');
+        $obfuscated = $this->createObfuscatedAttributeElement($obfuscatedValue, $attibuteName);
 
         $el->prepend($obfuscated);
-        /** clear the original attribute value */
-        $el->setAttribute($attibuteName, '');
+
+        /** Keep only the scheme from the original attribute value */
+        $colon = strpos($value, ':');
+        $el->setAttribute($attibuteName, $colon !== false ? substr($value, 0, $colon + 1) : '');
     }
 
     /**
-     * Create an obfuscated element
+     * Create an obfuscated element for a text node
      */
-    private function createObfuscatedElement(
-        ObfuscatedValue $value,
-    ): Element {
-
+    private function createObfuscatedTextElement(ObfuscatedValue $value): Element
+    {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('value', $value->encoded);
 
@@ -287,6 +286,19 @@ final class HTMLObfuscator
             $noscript->textContent = $this->noscriptText;
             $el->append($noscript);
         }
+
+        return $el;
+    }
+
+    /**
+     * Create an obfuscated element targeting a parent's attribute
+     */
+    private function createObfuscatedAttributeElement(ObfuscatedValue $value, string $attribute): Element
+    {
+        $el = $this->document->createElement(ObfuscatorConfig::getTagName());
+        $el->setAttribute('attr', $attribute);
+        $el->setAttribute('value', $value->encoded);
+        $el->setAttribute('style', 'display:none');
 
         return $el;
     }
@@ -330,7 +342,8 @@ final class HTMLObfuscator
             $pattern,
             function ($matches) {
                 $obfuscated = new ObfuscatedValue($matches[0], $this->key);
-                $el = $this->createObfuscatedElement($obfuscated);
+                $el = $this->createObfuscatedTextElement($obfuscated);
+
                 return Support::outerHTML($el);
             },
             $value
