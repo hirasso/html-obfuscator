@@ -23,3 +23,6 @@ TODO.md
 
 # Playwright
 tests/e2e/results
+
+# Generated
+demo/readme.html
