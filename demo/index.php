@@ -43,7 +43,7 @@ $html = <<<HTML
     <header>
 
         <h1>HTML Obfuscator</h1>
-        <p><strong>Tl;dr</strong>: Require work from crawlers before revealing contact information, by obfuscating email addresses and phone numbers using PHP and modern web features. <br></p>
+        <p><strong>Tl;dr</strong>: Make crawlers earn it. Obfuscates emails, phone numbers, and other sensitive data with PHP and modern browser features.<br></p>
         <p><a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></p>
 
     </header>
@@ -74,20 +74,18 @@ $html = <<<HTML
     </section>
 
     <section>
-        <h2>Does this even make sense?</h2>
+        <h2>Motivation</h2>
         <p>
-            You might think spam bots are too clever for this.
-            <a href="https://spencermortensen.com/articles/email-obfuscation/">This article by Spencer Mortensen</a>
-            documents that even moderate obfuscation dramatically reduces harvesting. Most bots scan raw HTML
-            and don't simulate user interaction. My best guess is that it's just too expensive.
+            Contrary to popular belief, <a href="https://spencermortensen.com/articles/email-obfuscation/">This article by Spencer Mortensen</a>
+            shows that even moderate obfuscation dramatically reduces email harvesting by spam bots. Most bots simply scan raw HTML and don't simulate user interaction.
         </p>
     </section>
 
     <section>
         <h2>How it works</h2>
         <p>
-            On the server, PHP finds emails and phone numbers in your HTML, XOR-encodes them with a key
-            derived from a key, and replaces each match with a custom element:
+            On the server, PHP finds emails and phone numbers in your HTML, XOR-encodes them with a hashed key,
+            and replaces each match with a custom element:
         </p>
 
         <pre><code class="language-php">use function Hirasso\HTMLObfuscator\obfuscate;
@@ -106,7 +104,7 @@ echo obfuscate(\$html, key: 'my-unique-but-stable-key');</code></pre>
         <p>Each <code>a[href^="mailto:"]</code> or <code>a[href^="tel:"]</code> gets a <code>ob-fus-ca-ted[attr="href"]</code> injected:</p>
         <pre><code class="language-html">&lt;ob-fus-ca-ted value="base64..." attr="href"&gt;&lt;/ob-fus-ca-ted&gt;</code></pre>
         <p>
-            In the browser, the Web Component replaces it's parent element's <code>href</code> with the decoded
+            In the browser, the Web Component replaces its parent element's <code>href</code> with the decoded
             value on <code>connectedCallback</code> and removes itself afterwards.
         </p>
     </section>
