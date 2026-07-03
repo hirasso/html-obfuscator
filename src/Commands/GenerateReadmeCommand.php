@@ -6,6 +6,7 @@ namespace Hirasso\HTMLObfuscator\Commands;
 
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
 use League\CommonMark\MarkdownConverter;
 use Spatie\CommonMarkShikiHighlighter\HighlightCodeExtension;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -40,9 +41,19 @@ class GenerateReadmeCommand extends Command
         // Render > [!NOTE] as a styled blockquote
         $markdown = preg_replace('/^> \[!NOTE\]$/m', '> **Note:**', $markdown) ?? $markdown;
 
-        $environment = new Environment();
+        $environment = new Environment([
+            'heading_permalink' => [
+                'apply_id_to_heading' => true,
+                'id_prefix' => '',
+                'fragment_prefix' => '',
+                'symbol' => '#',
+                'insert' => 'after',
+                'html_class' => 'anchor',
+            ],
+        ]);
         $environment->addExtension(new CommonMarkCoreExtension());
-        $environment->addExtension(new HighlightCodeExtension('nord'));
+        $environment->addExtension(new HighlightCodeExtension('rose-pine-moon'));
+        $environment->addExtension(new HeadingPermalinkExtension());
 
         $converter = new MarkdownConverter($environment);
         $html = $converter->convert($markdown)->getContent();

@@ -61,7 +61,7 @@ Custom elements representing a text node _do_ decode the value immediately on <c
 ## Features
 
 - Works without any configuration
-- Works with dynamically loaded content (AJAX/fetch, [Swup](https://swup.js.org/), [barba.js](https://barba.js.org/), ...)
+- Works with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
 - Can be easily customized using a fluent [API](#api)
 - Fully compatible with HTML5
 - Doesn't interfere with Accessibility

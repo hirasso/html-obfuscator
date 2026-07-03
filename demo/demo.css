@@ -1,5 +1,34 @@
 :root {
   --pico-font-size: 18px;
+  --pico-border-radius: 0.75rem;
+  scroll-behavior: smooth;
+}
+
+:root:not([data-theme=dark]),
+[data-theme=light] {
+  --pico-primary: black;
+  --pico-primary-background: var(--pico-primary);
+  --pico-primary-border: var(--pico-primary);
+  --pico-primary-underline: var(--pico-primary);
+  --pico-primary-hover: oklch(54% 0.24 28);
+  --pico-primary-hover-background: oklch(54% 0.24 28);
+  --pico-primary-hover-border: oklch(54% 0.24 28);
+  --pico-primary-hover-underline: oklch(54% 0.24 28);
+  --pico-primary-focus: oklch(62% 0.24 28 / 50%);
+  --pico-primary-inverse: #fff;
+}
+
+[data-theme=dark] {
+  --pico-primary: oklch(72% 0.24 28);
+  --pico-primary-background: var(--pico-primary);
+  --pico-primary-border: var(--pico-primary);
+  --pico-primary-underline: oklch(72% 0.24 28 / 50%);
+  --pico-primary-hover: oklch(80% 0.22 28);
+  --pico-primary-hover-background: oklch(67% 0.24 28);
+  --pico-primary-hover-border: oklch(67% 0.24 28);
+  --pico-primary-hover-underline: oklch(80% 0.22 28);
+  --pico-primary-focus: oklch(72% 0.24 28 / 50%);
+  --pico-primary-inverse: #fff;
 }
 
 body {
@@ -9,7 +38,7 @@ body {
 }
 
 main > * + * {
-  margin-block-start: 3rem;
+  margin-block-start: 2em;
 }
 
 .hint {
@@ -40,7 +69,7 @@ a[href^="tel:"] {
     text-decoration: none;
   }
   &::before {
-    content: "Now everyone can";
+    content: "Now machines can as well";
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -51,6 +80,7 @@ a[href^="tel:"] {
     color: white;
     border-radius: 1em;
     padding: 0.25em 1em 0.3em;
+    pointer-events: none;
   }
   &::after {
     content: "";
@@ -61,6 +91,7 @@ a[href^="tel:"] {
     border: 6px solid transparent;
     border-top-color: black;
     border-bottom: none;
+    pointer-events: none;
   }
 }
 
@@ -79,4 +110,25 @@ summary {
 pre[class*="language-"] {
   font-size: 1rem;
   border-radius: 1rem;
+}
+
+:is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 2rem;
+  position: relative;
+
+  .anchor {
+    opacity: 0;
+    margin-inline-start: 0.4em;
+    text-decoration: none;
+    font-weight: normal;
+    transition: opacity 0.15s;
+  }
+
+  &:hover .anchor {
+    opacity: 0.4;
+  }
+
+  .anchor:hover {
+    opacity: 1 !important;
+  }
 }
