@@ -1,5 +1,7 @@
-import { decode, detectGlobalInteraction, Logger } from "./helpers.js";
+import { decode } from "./decode.js";
+import { detectGlobalInteraction, Logger } from "./helpers.js";
 
+/** a logger, if debug is true */
 let logger: Logger | undefined;
 
 /**

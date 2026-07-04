@@ -3,6 +3,9 @@ const tagName = document.currentScript?.getAttribute("data-tagname") ?? "";
 
 //#endregion
 //#region resources/src/helpers.ts
+/**
+* The prefix for the logger and dispatched events
+*/
 const prefix = "html-obfuscator";
 function createLogger() {
 	const style = [
@@ -62,23 +65,14 @@ const detectInteraction = (() => {
 		return promises.get(target);
 	};
 })();
-/** Decode a base64 blob where the first 16 bytes are the key and the rest is the XOR ciphertext */
-function decodeXOR(data) {
-	const decoded = atob(data);
-	if (!decoded) return void 0;
-	const key = decoded.slice(0, 16);
-	return [...decoded.slice(16)].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
-}
-/** Decode a base64-encoded reversed string */
-function decodeRev(data) {
-	const encoded = atob(data);
-	if (!encoded) return void 0;
-	return [...encoded].reverse().join("");
-}
+
+//#endregion
+//#region resources/src/decode.ts
 /** Map strategy names to their decoder functions */
 const decoders = {
 	xor: (data, _params) => decodeXOR(data),
-	rev: (data, _params) => decodeRev(data)
+	rev: (data, _params) => decodeRev(data),
+	rot47: (data, _params) => decodeROT47(data)
 };
 /**
 * Decode a value
@@ -105,9 +99,35 @@ const decode = (() => {
 		return decoded;
 	};
 })();
+/**
+* Decode a base64 blob where the first 16 bytes are
+* the key and the rest is the XOR ciphertext
+*/
+function decodeXOR(data) {
+	const decoded = atob(data);
+	if (!decoded) return void 0;
+	const key = decoded.slice(0, 16);
+	return [...decoded.slice(16)].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+}
+/** Decode a base64-encoded reversed string */
+function decodeRev(data) {
+	const encoded = atob(data);
+	if (!encoded) return void 0;
+	return [...encoded].reverse().join("");
+}
+/** Decode a base64-encoded ROT47 string */
+function decodeROT47(data) {
+	const decoded = atob(data);
+	if (!decoded) return void 0;
+	return [...decoded].map((c) => {
+		const n = c.charCodeAt(0);
+		return n >= 33 && n <= 126 ? String.fromCharCode(33 + (n - 33 + 47) % 94) : c;
+	}).join("");
+}
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
+/** a logger, if debug is true */
 let logger$1;
 /**
 * Render an obfuscated element that can reveal itself or a parent element's attribute
