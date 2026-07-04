@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Hirasso\HTMLObfuscator;
+namespace Hirasso\HTMLObfuscator\Strategies;
 
 use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 
@@ -11,11 +11,6 @@ final readonly class RevStrategy implements ObfuscationStrategy
     public function __construct(
         public string $original,
     ) {
-    }
-
-    public function getAttribute(): string
-    {
-        return 'rev:' . $this->obfuscate();
     }
 
     public function obfuscate(): string

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Hirasso\HTMLObfuscator;
+namespace Hirasso\HTMLObfuscator\Strategies;
 
 use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 
@@ -11,11 +11,6 @@ final readonly class XORStrategy implements ObfuscationStrategy
     public function __construct(
         private string $original,
     ) {
-    }
-
-    public function getAttribute(): string
-    {
-        return "xor:{$this->obfuscate()}";
     }
 
     public function obfuscate(): string
