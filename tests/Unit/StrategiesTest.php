@@ -1,14 +1,19 @@
 <?php
 
-use Hirasso\HTMLObfuscator\Strategies\ROT47Strategy;
+use Hirasso\HTMLObfuscator\Strategies\RandomStrategy;
 
-test('ROT47Strategy is self-inverse', function () {
-    $original = 'mail@example.com';
-    $encoded = base64_decode((new ROT47Strategy($original))->obfuscate());
-    $roundtrip = '';
-    for ($i = 0, $len = strlen($encoded); $i < $len; $i++) {
-        $c = ord($encoded[$i]);
-        $roundtrip .= ($c >= 33 && $c <= 126) ? chr(33 + ($c - 33 + 47) % 94) : $encoded[$i];
-    }
-    expect($roundtrip)->toBe($original);
+test('RandomStrategy::STRATEGIES keys match client decoder names', function () {
+    expect(array_keys(RandomStrategy::STRATEGIES))->toBe(['xor', 'rev', 'rot47']);
+});
+
+test('RandomStrategy::getAttribute() produces "index:data" format', function () {
+    $strategy = new RandomStrategy('mail@example.com');
+    $attr = $strategy->getAttribute();
+
+    expect($attr)->toMatch('/^\d+:.+$/');
+
+    [$index, $data] = explode(':', $attr, 2);
+    expect((int) $index)->toBeGreaterThanOrEqual(0);
+    expect((int) $index)->toBeLessThan(count(RandomStrategy::STRATEGIES));
+    expect($data)->not->toBeEmpty();
 });

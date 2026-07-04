@@ -1,12 +1,17 @@
 import type { ObfuscatedElement } from "./ObfuscatedElement.js";
 import type { Logger } from "./helpers.js";
+import { strategyOrder } from "./generated/strategies.js";
 
-/** Map strategy names to their decoder functions */
-const decoders = {
-  xor: (data: string, _params: string[]) => decodeXOR(data),
-  rev: (data: string, _params: string[]) => decodeRev(data),
-  rot47: (data: string, _params: string[]) => decodeROT47(data),
+type Decoder = (data: string) => string | undefined;
+
+const decoderMap: Record<string, Decoder> = {
+  xor: decodeXOR,
+  rev: decodeRev,
+  rot47: decodeROT47,
 };
+
+/** Ordered by index, matching RandomStrategy::STRATEGIES */
+const decoders: Decoder[] = strategyOrder.map((name) => decoderMap[name]);
 
 /**
  * Decode a value
@@ -18,13 +23,17 @@ export const decode = (() => {
     const raw = el.getAttribute("value");
     if (!raw) return;
 
-    const [strategy, data, ...params] = raw.split(":");
+    const colonIdx = raw.indexOf(":");
+    if (colonIdx === -1) return undefined;
 
-    if (!strategy || !data) return undefined;
+    const index = parseInt(raw.slice(0, colonIdx), 10);
+    const data = raw.slice(colonIdx + 1);
 
-    const decoder = decoders[strategy as keyof typeof decoders];
+    if (!data || isNaN(index)) return undefined;
+
+    const decoder = decoders[index];
     if (!decoder) {
-      logger?.warn(`Unknown strategy: ${strategy}`);
+      logger?.warn(`Unknown strategy index: ${index}`);
       return undefined;
     }
 
@@ -33,7 +42,7 @@ export const decode = (() => {
       return cache.get(raw);
     }
 
-    const decoded = decoder(data, params);
+    const decoded = decoder(data);
     if (!decoded) return undefined;
 
     cache.set(raw, decoded);
