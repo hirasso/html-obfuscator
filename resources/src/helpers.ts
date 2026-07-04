@@ -88,24 +88,32 @@ export const detectInteraction = (() => {
   };
 })();
 
-function decodeXOR(data: string, key: string): string | undefined {
-  const encoded = atob(data);
-  if (!encoded) return undefined;
-  return [...encoded]
+/** Decode a base64 blob where the first 16 bytes are the key and the rest is the XOR ciphertext */
+function decodeXOR(data: string): string | undefined {
+  const decoded = atob(data);
+  if (!decoded) return undefined;
+
+  const key = decoded.slice(0, 16);
+  const ciphertext = decoded.slice(16);
+
+  return [...ciphertext]
     .map((c, i) =>
       String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
     )
     .join("");
 }
 
+/** Decode a base64-encoded reversed string */
 function decodeRev(data: string): string | undefined {
   const encoded = atob(data);
   if (!encoded) return undefined;
+
   return [...encoded].reverse().join("");
 }
 
+/** Map strategy names to their decoder functions */
 const decoders = {
-  xor: (data: string, params: string[]) => decodeXOR(data, params[0] ?? ""),
+  xor: (data: string, _params: string[]) => decodeXOR(data),
   rev: (data: string, _params: string[]) => decodeRev(data),
 };
 

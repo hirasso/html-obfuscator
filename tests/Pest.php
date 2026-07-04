@@ -16,7 +16,6 @@ function dumpEnvironment(): void
 }
 dumpEnvironment();
 
-const TESTS_PASSPHRASE = 'test';
 const TESTS_TAG_NAME = 'tests-obfuscated';
 
 /**
@@ -29,7 +28,7 @@ const TESTS_TAG_NAME = 'tests-obfuscated';
  */
 function obfuscate(string $html): HTMLObfuscator
 {
-    return HTMLObfuscator::createFromString($html, TESTS_PASSPHRASE)
+    return HTMLObfuscator::createFromString($html)
         ->withTagName(TESTS_TAG_NAME)
         ->injectClientScript(false)
         ->debug(true);

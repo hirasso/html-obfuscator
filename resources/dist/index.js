@@ -1,6 +1,5 @@
 //#region resources/src/defs.ts
 const tagName = document.currentScript?.getAttribute("data-tagname") ?? "";
-const key = document.currentScript?.getAttribute("data-key") ?? "";
 
 //#endregion
 //#region resources/src/helpers.ts
@@ -63,18 +62,22 @@ const detectInteraction = (() => {
 		return promises.get(target);
 	};
 })();
-function decodeXOR(data, key) {
-	const encoded = atob(data);
-	if (!encoded) return void 0;
-	return [...encoded].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+/** Decode a base64 blob where the first 16 bytes are the key and the rest is the XOR ciphertext */
+function decodeXOR(data) {
+	const decoded = atob(data);
+	if (!decoded) return void 0;
+	const key = decoded.slice(0, 16);
+	return [...decoded.slice(16)].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
 }
+/** Decode a base64-encoded reversed string */
 function decodeRev(data) {
 	const encoded = atob(data);
 	if (!encoded) return void 0;
 	return [...encoded].reverse().join("");
 }
+/** Map strategy names to their decoder functions */
 const decoders = {
-	xor: (data, params) => decodeXOR(data, params[0] ?? ""),
+	xor: (data, _params) => decodeXOR(data),
 	rev: (data, _params) => decodeRev(data)
 };
 /**
@@ -154,17 +157,11 @@ var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 const logger = true ? createLogger() : void 0;
 (() => {
-	if (!key || !tagName) {
-		logger?.error("required properties are missing:", {
-			tagName,
-			key
-		});
+	if (!tagName) {
+		logger?.error("required properties are missing:", { tagName });
 		return;
 	}
-	logger?.log({
-		tagName,
-		key
-	});
+	logger?.log({ tagName });
 	detectGlobalInteraction().then(() => {
 		dispatch("reveal");
 		logger?.log("Interaction detected. Obfuscated content revealed.");
