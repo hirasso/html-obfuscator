@@ -1,4 +1,4 @@
-# For Agents
+# Agent skills
 
 This is a libary to obfuscate emails and phone numbers in HTML using modern web technology
 
@@ -20,8 +20,6 @@ This is a libary to obfuscate emails and phone numbers in HTML using modern web 
 - run `composer test`, `composer analyse` and `pnpm run test:e2e`
 - never edit files in `resources/dist` directly. Edit `resources/src` instead and run `pnpm run build` to generate the dist files.
 - If it makes sense for a change, suggest a changeset message and level (patch/minor/major) and write it into the `./.changeset` folder. Commit it together with the changes
-
-## Agent skills
 
 ### Domain docs
 
