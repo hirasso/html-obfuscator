@@ -13,20 +13,11 @@ use InvalidArgumentException;
  */
 final class ObfuscatorConfig
 {
-    private static ?string $key = null;
     private static string $tagName = HTMLObfuscator::DEFAULT_TAG_NAME;
     public static bool $hasInjectedClientScript = false;
 
     private function __construct()
     {
-    }
-
-    public static function setKey(string $value): void
-    {
-        if (self::$key !== null && $value !== self::$key) {
-            throw new InvalidArgumentException('The key needs to be globally stable');
-        }
-        self::$key = $value;
     }
 
     public static function getTagName(): string
@@ -51,7 +42,6 @@ final class ObfuscatorConfig
 
     public static function reset(): void
     {
-        self::$key = null;
         self::$tagName = HTMLObfuscator::DEFAULT_TAG_NAME;
         self::$hasInjectedClientScript = false;
     }

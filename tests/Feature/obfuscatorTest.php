@@ -43,7 +43,7 @@ test('Obfuscates phone numbers in plaintext', function () {
 
 test('debug(false) Injects the minified and mangled frontend script', function () {
     $result = (string) obfuscate('')->debug(false)->injectClientScript(true);
-    expect($result)->toContain('new CustomEvent(o(t),{bubbles:!0}))}');
+    expect($result)->toContain('new CustomEvent(n(t),{bubbles:!0})');
 });
 
 test('debug(false) injects the un-obfuscated frontend script', function () {
@@ -69,7 +69,7 @@ test('phoneNumbers(false) disables phone number obfuscation', function () {
 });
 
 test('obfuscate() outputs full HTML for non-partial input', function () {
-    $result = (string) HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>', 'test');
+    $result = (string) HTMLObfuscator::createFromString('<html><body><p>hello</p></body></html>');
     expect($result)->toContain('<html');
     expect($result)->toContain('<p>hello</p>');
 });
@@ -92,7 +92,7 @@ test('Invalid tel: links are not obfuscated', function () {
 });
 
 test("Allows to customize the custom element's tag name", function () {
-    $result = HTMLObfuscator::createFromString('mail@example.com', TESTS_PASSPHRASE)
+    $result = HTMLObfuscator::createFromString('mail@example.com')
         ->withTagName('reveal-me')
         ->injectClientScript(false)
         ->saveDocument()
@@ -181,11 +181,11 @@ test('[obfuscate-text] skips whitespace-only text nodes', function () {
 });
 
 test('renders the client script', function () {
-    $debug_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME)->debug(true);
-    expect($debug_result)->toContain('<script data-key="456fc1f3d9b7477593f65c619f73b46c6ec5b6dfa92b3fc3397e4216e4f4bc42" data-tagname="tests-obfuscated">');
+    $debug_result = (string) clientScript()->withTagName(TESTS_TAG_NAME)->debug(true);
+    expect($debug_result)->toContain('<script data-tagname="tests-obfuscated">');
     expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
 
-    $minified_result = (string) clientScript(TESTS_PASSPHRASE)->withTagName(TESTS_TAG_NAME);
-    expect($minified_result)->toContain('<script data-key="456fc1f3d9b7477593f65c619f73b46c6ec5b6dfa92b3fc3397e4216e4f4bc42" data-tagname="tests-obfuscated">');
+    $minified_result = (string) clientScript()->withTagName(TESTS_TAG_NAME);
+    expect($minified_result)->toContain('<script data-tagname="tests-obfuscated">');
     expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
 });

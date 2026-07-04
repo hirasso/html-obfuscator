@@ -26,8 +26,6 @@ final class HTMLObfuscator
     private ?string $ariaLabel = 'Interact with the page to reveal';
     private ?string $noscriptText = 'Please activate JavaScript';
 
-    private string $key;
-
     private bool $debug = false;
 
     private bool $emails = true;
@@ -40,46 +38,43 @@ final class HTMLObfuscator
 
     private function __construct(
         private HTMLDocument $document,
-        string $key,
         private bool $isPartial = false,
     ) {
-        ObfuscatorConfig::setKey($key);
-        $this->key = hash('sha256', self::class . '-' . $key);
     }
 
     /**
      * Create a new Obfuscator instance from a HTMLDocument (by reference)
      */
-    public static function createFromDocument(HTMLDocument $document, string $key): self
+    public static function createFromDocument(HTMLDocument $document): self
     {
-        return new self($document, key: $key, isPartial: false);
+        return new self($document, isPartial: false);
     }
 
     /**
      * Create a new Obfuscator instance from a HTML string
      */
-    public static function createFromString(string $source, string $key): self
+    public static function createFromString(string $source): self
     {
         $isPartial = !str_contains($source, '</body>');
 
-        return new self(Support::createDocument($source), key: $key, isPartial: $isPartial);
+        return new self(Support::createDocument($source), isPartial: $isPartial);
     }
 
     /**
      * Create an empty instance
      */
-    public static function createEmpty(string $key): self
+    public static function createEmpty(): self
     {
-        return new self(HTMLDocument::createEmpty(), $key);
+        return new self(HTMLDocument::createEmpty());
     }
 
     /**
      * Create an instance for rendering the client script only
      */
-    public static function createForClientScript(string $key): self
+    public static function createForClientScript(): self
     {
         ObfuscatorConfig::$hasInjectedClientScript = false;
-        return self::createEmpty($key);
+        return self::createEmpty();
     }
 
     /**
@@ -338,7 +333,7 @@ final class HTMLObfuscator
     private function createValue(string $original): ObfuscatedValue
     {
         return rand(0, 1) === 0
-            ? new XORValue($original, $this->key)
+            ? new XORValue($original)
             : new RevValue($original);
     }
 
@@ -396,7 +391,6 @@ final class HTMLObfuscator
         $script = $this->document->createElement('script');
         $script->textContent = $js;
 
-        $script->setAttribute('data-key', $this->key);
         $script->setAttribute('data-tagname', ObfuscatorConfig::getTagName());
 
         ($this->document->body ?? $this->document)->append($script);
