@@ -58,13 +58,16 @@ Custom elements representing a text node _do_ decode the value immediately on <c
 
 <code>href</code> attributes of obfuscated links also stay empty until interaction.
 
-## Features
+## Main Features
 
-- Works without any configuration
-- Works with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
-- Can be easily customized using a fluent [API](#api)
-- Fully compatible with HTML5
-- Doesn't interfere with Accessibility
+- There is **no visual difference** between obfuscated and de-obfuscated content in the browser
+- Works automatically with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
+
+## Other Features
+
+- Works without configuration, but can be customized using a fluent [API](#api)
+- Fully compatible with HTML5 (thanks to PHP 8.4's new `\Dom\HTMLDocument` and friends)
+- Doesn't interfere with accessibility
 - Extensively tested with [unit](tests/Unit), [integration](tests/Integration) and [e2e](tests/e2e) tests
 
 ## Installation
