@@ -18,11 +18,8 @@ This is a libary to obfuscate emails and phone numbers in HTML using modern web 
 
 - add matching tests for each new feature
 - run `composer test`, `composer analyse` and `pnpm run test:e2e`
-- never edit files in `resources/dist` directly. Write in `resources/src` instead and run `pnpm run build` to generate the dist files.
-
-## Commits
-
-- Before committing a feature/fix, suggest a changeset message and level (patch/minor/major) and write it into the `./.changesets` folder. Commit it together with the changes
+- never edit files in `resources/dist` directly. Edit `resources/src` instead and run `pnpm run build` to generate the dist files.
+- If it makes sense for a change, suggest a changeset message and level (patch/minor/major) and write it into the `./.changeset` folder. Commit it together with the changes
 
 ## Agent skills
 
