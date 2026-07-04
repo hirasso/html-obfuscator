@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- 822f852: Add ROT47 obfuscation strategy
+
 ## 0.4.0
 
 ### Minor Changes
