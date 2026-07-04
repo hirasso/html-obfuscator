@@ -127,6 +127,7 @@ function decodeROT47(data) {
 
 //#endregion
 //#region resources/src/ObfuscatedElement.ts
+/** a logger, if debug is true */
 let logger$1;
 /**
 * Render an obfuscated element that can reveal itself or a parent element's attribute
