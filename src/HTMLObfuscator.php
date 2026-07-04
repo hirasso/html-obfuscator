@@ -332,9 +332,11 @@ final class HTMLObfuscator
      */
     private function createValue(string $original): ObfuscatedValue
     {
-        return rand(0, 1) === 0
-            ? new XORValue($original)
-            : new RevValue($original);
+        return match (rand(0, 2)) {
+            0 => new XORValue($original),
+            1 => new RevValue($original),
+            default => new ROT47Value($original),
+        };
     }
 
     /**

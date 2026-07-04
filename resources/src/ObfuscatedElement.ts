@@ -1,4 +1,6 @@
-import { decode, detectGlobalInteraction, Logger } from "./helpers.js";
+import { decode } from "./decode.js";
+import { detectGlobalInteraction, Logger } from "./helpers.js";
+
 
 let logger: Logger | undefined;
 
