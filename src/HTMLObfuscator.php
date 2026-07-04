@@ -221,7 +221,7 @@ final class HTMLObfuscator
         foreach ($this->document->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
             $el->removeAttribute(self::OBFUSCATE_TEXT_ATTR);
             foreach (Support::getTextNodes($this->document, $el) as $node) {
-                $obfuscated = new XORValue($node->data, $this->key);
+                $obfuscated = $this->createValue($node->data);
                 $node->replaceWith($this->createObfuscatedTextElement($obfuscated));
             }
         }
@@ -260,7 +260,7 @@ final class HTMLObfuscator
             return;
         }
 
-        $obfuscatedValue = new XORValue($value, $this->key);
+        $obfuscatedValue = $this->createValue($value);
         $obfuscated = $this->createObfuscatedAttributeElement($obfuscatedValue, $attibuteName);
 
         $el->prepend($obfuscated);
@@ -333,6 +333,16 @@ final class HTMLObfuscator
     }
 
     /**
+     * Create an obfuscated value, randomized from our pool
+     */
+    private function createValue(string $original): ObfuscatedValue
+    {
+        return rand(0, 1) === 0
+            ? new XORValue($original, $this->key)
+            : new RevValue($original);
+    }
+
+    /**
      * Obfuscate a text node
      */
     private function obfuscateTextNode(Text $node, string $pattern): void
@@ -343,7 +353,7 @@ final class HTMLObfuscator
         $value = preg_replace_callback(
             $pattern,
             function ($matches) {
-                $obfuscated = new XORValue($matches[0], $this->key);
+                $obfuscated = $this->createValue($matches[0]);
                 $el = $this->createObfuscatedTextElement($obfuscated);
 
                 return Support::outerHTML($el);

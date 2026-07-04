@@ -6,7 +6,9 @@ namespace Hirasso\HTMLObfuscator\Contracts;
 
 interface ObfuscatedValue
 {
-    public function __construct(string $original, string $key);
+    /** Encode the original value */
+    public function encode(): string;
 
+    /** Return the value attribute string for the custom element */
     public function getAttribute(): string;
 }
