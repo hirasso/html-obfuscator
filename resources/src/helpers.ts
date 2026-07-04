@@ -1,4 +1,3 @@
-import { debug, key } from "./defs.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const prefix = "html-obfuscator";
@@ -89,6 +88,27 @@ export const detectInteraction = (() => {
   };
 })();
 
+function decodeXOR(data: string, key: string): string | undefined {
+  const encoded = atob(data);
+  if (!encoded) return undefined;
+  return [...encoded]
+    .map((c, i) =>
+      String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+    )
+    .join("");
+}
+
+function decodeRev(data: string): string | undefined {
+  const encoded = atob(data);
+  if (!encoded) return undefined;
+  return [...encoded].reverse().join("");
+}
+
+const decoders = {
+  xor: (data: string, params: string[]) => decodeXOR(data, params[0] ?? ""),
+  rev: (data: string, _params: string[]) => decodeRev(data),
+};
+
 /**
  * Decode a value
  */
@@ -99,25 +119,25 @@ export const decode = (() => {
     const raw = el.getAttribute("value");
     if (!raw) return;
 
-    const [value, key] = raw.split(':xor:');
-    const encoded = atob(value);
+    const [strategy, data, ...params] = raw.split(":");
 
-    if (!encoded) {
+    if (!strategy || !data) return undefined;
+
+    const decoder = decoders[strategy as keyof typeof decoders];
+    if (!decoder) {
+      logger?.warn(`Unknown strategy: ${strategy}`);
       return undefined;
     }
 
-    if (cache.has(encoded)) {
-      logger?.log(`Cache hit for ${encoded}`);
-      return cache.get(encoded);
+    if (cache.has(raw)) {
+      logger?.log(`Cache hit for ${raw}`);
+      return cache.get(raw);
     }
 
-    const decoded = [...encoded]
-      .map((c, i) =>
-        String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
-      )
-      .join("");
+    const decoded = decoder(data, params);
+    if (!decoded) return undefined;
 
-    cache.set(encoded, decoded);
+    cache.set(raw, decoded);
 
     return decoded;
   };

@@ -63,6 +63,20 @@ const detectInteraction = (() => {
 		return promises.get(target);
 	};
 })();
+function decodeXOR(data, key) {
+	const encoded = atob(data);
+	if (!encoded) return void 0;
+	return [...encoded].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+}
+function decodeRev(data) {
+	const encoded = atob(data);
+	if (!encoded) return void 0;
+	return [...encoded].reverse().join("");
+}
+const decoders = {
+	xor: (data, params) => decodeXOR(data, params[0] ?? ""),
+	rev: (data, _params) => decodeRev(data)
+};
 /**
 * Decode a value
 */
@@ -71,15 +85,20 @@ const decode = (() => {
 	return (el, logger) => {
 		const raw = el.getAttribute("value");
 		if (!raw) return;
-		const [value, key] = raw.split(":xor:");
-		const encoded = atob(value);
-		if (!encoded) return;
-		if (cache.has(encoded)) {
-			logger?.log(`Cache hit for ${encoded}`);
-			return cache.get(encoded);
+		const [strategy, data, ...params] = raw.split(":");
+		if (!strategy || !data) return void 0;
+		const decoder = decoders[strategy];
+		if (!decoder) {
+			logger?.warn(`Unknown strategy: ${strategy}`);
+			return;
 		}
-		const decoded = [...encoded].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
-		cache.set(encoded, decoded);
+		if (cache.has(raw)) {
+			logger?.log(`Cache hit for ${raw}`);
+			return cache.get(raw);
+		}
+		const decoded = decoder(data, params);
+		if (!decoded) return void 0;
+		cache.set(raw, decoded);
 		return decoded;
 	};
 })();

@@ -8,22 +8,23 @@ use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
 
 final readonly class XORValue implements ObfuscatedValue
 {
-    public string $encoded;
-
     public function __construct(
-        public string $original,
-        public string $key
+        private string $original,
+        private string $key
     ) {
-        $this->encoded = $this->encode($original, $key);
     }
 
     public function getAttribute(): string
     {
-        return "{$this->encoded}:xor:{$this->key}";
+        $encoded = $this->encode();
+        return "xor:{$encoded}:{$this->key}";
     }
 
-    private function encode(string $value, string $key): string
+    public function encode(): string
     {
+        $value = $this->original;
+        $key = $this->key;
+
         $out = '';
         for ($i = 0; $i < mb_strlen($value); $i++) {
             $out .= mb_substr($value, $i, 1) ^ mb_substr($key, $i % mb_strlen($key), 1);
