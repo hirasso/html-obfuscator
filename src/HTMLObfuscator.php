@@ -7,7 +7,7 @@ namespace Hirasso\HTMLObfuscator;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
-use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
+use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 use Hirasso\HTMLObfuscator\Support\Support;
 
 /**
@@ -268,7 +268,7 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated element for a text node
      */
-    private function createObfuscatedTextElement(ObfuscatedValue $value): Element
+    private function createObfuscatedTextElement(ObfuscationStrategy $value): Element
     {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('value', $value->getAttribute());
@@ -289,11 +289,11 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated element targeting a parent's attribute
      */
-    private function createObfuscatedAttributeElement(ObfuscatedValue $value, string $attribute): Element
+    private function createObfuscatedAttributeElement(ObfuscationStrategy $value, string $attribute): Element
     {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('attr', $attribute);
-        // $el->setAttribute('value', $value->encoded);
+
         $el->setAttribute('value', $value->getAttribute());
         $el->setAttribute('style', 'display:none');
 
@@ -330,12 +330,12 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated value, randomized from our pool
      */
-    private function createValue(string $original): ObfuscatedValue
+    private function createValue(string $original): ObfuscationStrategy
     {
         return match (rand(0, 2)) {
-            0 => new XORValue($original),
-            1 => new RevValue($original),
-            default => new ROT47Value($original),
+            0 => new XORStrategy($original),
+            1 => new RevStrategy($original),
+            default => new ROT47Strategy($original),
         };
     }
 

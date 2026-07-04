@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator;
 
-use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
+use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 
-final readonly class RevValue implements ObfuscatedValue
+final readonly class RevStrategy implements ObfuscationStrategy
 {
     public function __construct(
         public string $original,
@@ -15,10 +15,10 @@ final readonly class RevValue implements ObfuscatedValue
 
     public function getAttribute(): string
     {
-        return 'rev:' . $this->encode();
+        return 'rev:' . $this->obfuscate();
     }
 
-    public function encode(): string
+    public function obfuscate(): string
     {
         return base64_encode(strrev($this->original));
     }

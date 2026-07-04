@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator\Contracts;
 
-interface ObfuscatedValue
+interface ObfuscationStrategy
 {
-    /** Encode the original value */
-    public function encode(): string;
+    /** Apply obfuscation to the original value */
+    public function obfuscate(): string;
 
     /** Return the value attribute string for the custom element */
     public function getAttribute(): string;

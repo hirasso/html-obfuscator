@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator;
 
-use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
+use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 
-final readonly class XORValue implements ObfuscatedValue
+final readonly class XORStrategy implements ObfuscationStrategy
 {
     public function __construct(
         private string $original,
@@ -15,10 +15,10 @@ final readonly class XORValue implements ObfuscatedValue
 
     public function getAttribute(): string
     {
-        return "xor:{$this->encode()}";
+        return "xor:{$this->obfuscate()}";
     }
 
-    public function encode(): string
+    public function obfuscate(): string
     {
         $value = $this->original;
         $key = random_bytes(16);

@@ -1,34 +1,34 @@
 <?php
 
-use Hirasso\HTMLObfuscator\XORValue;
-use Hirasso\HTMLObfuscator\RevValue;
-use Hirasso\HTMLObfuscator\ROT47Value;
+use Hirasso\HTMLObfuscator\XORStrategy;
+use Hirasso\HTMLObfuscator\RevStrategy;
+use Hirasso\HTMLObfuscator\ROT47Strategy;
 
-test('XORValue getAttribute() has the correct format', function () {
-    $value = new XORValue('mail@example.com');
+test('XORStrategy getAttribute() has the correct format', function () {
+    $value = new XORStrategy('mail@example.com');
     [$strategy, $data] = explode(':', $value->getAttribute(), 2);
     expect($strategy)->toBe('xor');
     $decoded = base64_decode($data);
     expect(strlen($decoded))->toBeGreaterThan(16);
 });
 
-test('RevValue getAttribute() has the correct format', function () {
-    $value = new RevValue('mail@example.com');
+test('RevStrategy getAttribute() has the correct format', function () {
+    $value = new RevStrategy('mail@example.com');
     [$strategy, $data] = explode(':', $value->getAttribute(), 2);
     expect($strategy)->toBe('rev');
     expect(base64_decode($data))->not->toBe('');
 });
 
-test('ROT47Value getAttribute() has the correct format', function () {
-    $value = new ROT47Value('mail@example.com');
+test('ROT47Strategy getAttribute() has the correct format', function () {
+    $value = new ROT47Strategy('mail@example.com');
     [$strategy, $data] = explode(':', $value->getAttribute(), 2);
     expect($strategy)->toBe('rot47');
     expect(base64_decode($data))->not->toBe('');
 });
 
-test('ROT47Value is self-inverse', function () {
+test('ROT47Strategy is self-inverse', function () {
     $original = 'mail@example.com';
-    $encoded = base64_decode((new ROT47Value($original))->encode());
+    $encoded = base64_decode((new ROT47Strategy($original))->obfuscate());
     $roundtrip = '';
     for ($i = 0, $len = strlen($encoded); $i < $len; $i++) {
         $c = ord($encoded[$i]);
