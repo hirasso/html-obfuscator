@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- 777998a: Add `rev` as a second obfuscation strategy alongside `xor`. Strategies are now applied at random per value. The value attribute format changed to be strategy-first: `xor:<base64>` and `rev:<base64>`
+- 5d129b5: Remove the required `$key` parameter from all public API functions (`obfuscate()`, `clientScript()`, and the named constructors on `HTMLObfuscator`). XOR now generates a random 16-byte key per value and inlines it into the encoded blob. The `data-key` attribute is no longer injected on the client script tag
+
+### Patch Changes
+
+- 5d129b5: Add `readme:generate` command: parses README.md and injects it into the demo page with Shiki (nord theme) syntax highlighting. Replace Prism.js with Shiki in the demo; relative README links are rewritten to absolute GitHub URLs
+- 5d129b5: Introduce `Contracts\ObfuscatedValue` interface to support multiple obfuscation strategies. Rename `ObfuscatedValue` to `XORValue` (implements `Contracts\ObfuscatedValue`)
+
 ## 0.3.0
 
 ### Minor Changes
