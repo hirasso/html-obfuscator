@@ -7,7 +7,7 @@ namespace Hirasso\HTMLObfuscator;
 use Dom\Element;
 use Dom\HTMLDocument;
 use Dom\Text;
-use Hirasso\HTMLObfuscator\Contracts\ObfuscatedValue;
+use Hirasso\HTMLObfuscator\Strategies\Strategy;
 use Hirasso\HTMLObfuscator\Support\Support;
 
 /**
@@ -216,8 +216,7 @@ final class HTMLObfuscator
         foreach ($this->document->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
             $el->removeAttribute(self::OBFUSCATE_TEXT_ATTR);
             foreach (Support::getTextNodes($this->document, $el) as $node) {
-                $obfuscated = $this->createValue($node->data);
-                $node->replaceWith($this->createObfuscatedTextElement($obfuscated));
+                $node->replaceWith($this->createObfuscatedTextElement(new Strategy($node->data)));
             }
         }
     }
@@ -255,8 +254,11 @@ final class HTMLObfuscator
             return;
         }
 
-        $obfuscatedValue = $this->createValue($value);
-        $obfuscated = $this->createObfuscatedAttributeElement($obfuscatedValue, $attibuteName);
+
+        $obfuscated = $this->createObfuscatedAttributeElement(
+            new Strategy($value),
+            $attibuteName
+        );
 
         $el->prepend($obfuscated);
 
@@ -268,10 +270,14 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated element for a text node
      */
-    private function createObfuscatedTextElement(ObfuscatedValue $value): Element
+    private function createObfuscatedTextElement(Strategy $strategy): Element
     {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
-        $el->setAttribute('value', $value->getAttribute());
+        $el->setAttribute('value', $strategy->getAttribute());
+
+        if ($this->debug) {
+            $el->setAttribute('identifier', $strategy->getIdentifier());
+        }
 
         if ($this->ariaLabel) {
             $el->setAttribute('aria-label', $this->ariaLabel);
@@ -289,12 +295,16 @@ final class HTMLObfuscator
     /**
      * Create an obfuscated element targeting a parent's attribute
      */
-    private function createObfuscatedAttributeElement(ObfuscatedValue $value, string $attribute): Element
+    private function createObfuscatedAttributeElement(Strategy $strategy, string $attribute): Element
     {
         $el = $this->document->createElement(ObfuscatorConfig::getTagName());
         $el->setAttribute('attr', $attribute);
-        // $el->setAttribute('value', $value->encoded);
-        $el->setAttribute('value', $value->getAttribute());
+
+        if ($this->debug) {
+            $el->setAttribute('identifier', $strategy->getIdentifier());
+        }
+
+        $el->setAttribute('value', $strategy->getAttribute());
         $el->setAttribute('style', 'display:none');
 
         return $el;
@@ -328,18 +338,6 @@ final class HTMLObfuscator
     }
 
     /**
-     * Create an obfuscated value, randomized from our pool
-     */
-    private function createValue(string $original): ObfuscatedValue
-    {
-        return match (rand(0, 2)) {
-            0 => new XORValue($original),
-            1 => new RevValue($original),
-            default => new ROT47Value($original),
-        };
-    }
-
-    /**
      * Obfuscate a text node
      */
     private function obfuscateTextNode(Text $node, string $pattern): void
@@ -350,8 +348,7 @@ final class HTMLObfuscator
         $value = preg_replace_callback(
             $pattern,
             function ($matches) {
-                $obfuscated = $this->createValue($matches[0]);
-                $el = $this->createObfuscatedTextElement($obfuscated);
+                $el = $this->createObfuscatedTextElement(new Strategy($matches[0]));
 
                 return Support::outerHTML($el);
             },

@@ -9,7 +9,7 @@ use function Hirasso\HTMLObfuscator\clientScript;
 
 $contactHtml = obfuscate(<<<HTML
 <p>You can reach me by email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or by phone at <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
-HTML, 'demo');
+HTML)->debug(true);
 
 $currentYear = date('Y');
 
@@ -20,7 +20,7 @@ $currentYear = date('Y');
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HTML Obfuscator</title>
-  <?= clientScript('demo') ?>
+  <?= clientScript() ?>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="demo.css">
 </head>
@@ -53,7 +53,10 @@ $currentYear = date('Y');
 
     <!-- README.md:start -->
 
-    <?php include('./readme.html') ?>
+    <?php
+        // @phpstan-ignore include.fileNotFound
+        include('./readme.html')
+?>
 
     <!-- README.md:end -->
 
