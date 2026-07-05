@@ -22,6 +22,6 @@ final readonly class XORStrategy implements ObfuscationStrategy
         for ($i = 0; $i < mb_strlen($value); $i++) {
             $out .= mb_substr($value, $i, 1) ^ $key[$i % 16];
         }
-        return base64_encode($key . $out);
+        return $key . $out;
     }
 }

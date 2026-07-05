@@ -22,6 +22,6 @@ final readonly class ROT47Strategy implements ObfuscationStrategy
                 ? chr(33 + ($c - 33 + 47) % 94)
                 : $this->original[$i];
         }
-        return base64_encode($result);
+        return $result;
     }
 }

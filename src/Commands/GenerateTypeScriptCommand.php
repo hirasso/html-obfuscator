@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Hirasso\HTMLObfuscator\Commands;
 
-use Hirasso\HTMLObfuscator\Strategies\RandomStrategy;
+use Hirasso\HTMLObfuscator\Strategies\Strategy;
 use Spatie\TypeScriptTransformer\Enums\RunnerMode;
 use Spatie\TypeScriptTransformer\Formatters\PrettierFormatter;
 use Spatie\TypeScriptTransformer\Runners\Runner;
@@ -53,7 +53,7 @@ class GenerateTypeScriptCommand extends Command
 
     private function generateStrategies(): void
     {
-        $names = array_keys(RandomStrategy::STRATEGIES);
+        $names = array_keys(Strategy::STRATEGIES);
         $items = implode(', ', array_map(fn ($n) => "\"{$n}\"", $names));
 
         $content = <<<TS

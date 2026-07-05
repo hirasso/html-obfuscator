@@ -32,7 +32,7 @@ export class ObfuscatedElement extends HTMLElement {
   }
 
   connectedCallback() {
-    const decoded = decode(this, logger);
+    const decoded = decode(this.getAttribute('value') ?? '', logger);
 
     if (!decoded) {
       this.remove();

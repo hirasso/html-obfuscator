@@ -15,6 +15,6 @@ final readonly class RevStrategy implements ObfuscationStrategy
 
     public function obfuscate(): string
     {
-        return base64_encode(strrev($this->original));
+        return strrev($this->original);
     }
 }

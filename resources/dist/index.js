@@ -82,57 +82,62 @@ const decoderMap = {
 	rev: decodeRev,
 	rot47: decodeROT47
 };
-/** Ordered by index, matching RandomStrategy::STRATEGIES */
+/** Ordered by index, matching Strategy::STRATEGIES */
 const decoders = strategyOrder.map((name) => decoderMap[name]);
 /**
 * Decode a value
 */
 const decode = (() => {
 	const cache = /* @__PURE__ */ new Map();
-	return (el, logger) => {
-		const raw = el.getAttribute("value");
-		if (!raw) return;
-		const colonIdx = raw.indexOf(":");
-		if (colonIdx === -1) return void 0;
-		const index = parseInt(raw.slice(0, colonIdx), 10);
-		const data = raw.slice(colonIdx + 1);
-		if (!data || isNaN(index)) return void 0;
+	return (value, logger) => {
+		const cached = cache.get(value);
+		if (cached) {
+			logger?.log(`Cache hit for ${value}`);
+			return cached;
+		}
+		const { index, data } = unwrapAttribute(atob(value)) ?? {};
+		if (index == null || !data) return;
 		const decoder = decoders[index];
 		if (!decoder) {
 			logger?.warn(`Unknown strategy index: ${index}`);
 			return;
 		}
-		if (cache.has(raw)) {
-			logger?.log(`Cache hit for ${raw}`);
-			return cache.get(raw);
-		}
-		const decoded = decoder(data);
-		if (!decoded) return void 0;
-		cache.set(raw, decoded);
-		return decoded;
+		const result = decoder(data);
+		if (!result) return;
+		cache.set(value, result);
+		return result;
 	};
 })();
 /**
-* Decode a base64 blob where the first 16 bytes are
+* Unwrap an obfuscated attribute
+* checks if the value has the format {number}:{string}
+* if so, parses and returns both in an object
+*/
+function unwrapAttribute(value) {
+	if (!value) return;
+	const match = value.match(/^(?<key>\d+):(?<data>.+)/s)?.groups;
+	if (!match) return;
+	return {
+		index: parseInt(match.key, 10),
+		data: match.data
+	};
+}
+/**
+* Decode a blob string where the first 16 bytes are
 * the key and the rest is the XOR ciphertext
 */
-function decodeXOR(data) {
-	const decoded = atob(data);
-	if (!decoded) return void 0;
-	const key = decoded.slice(0, 16);
-	return [...decoded.slice(16)].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
+function decodeXOR(value) {
+	const key = value.slice(0, 16);
+	return [...value.slice(16)].map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join("");
 }
-/** Decode a base64-encoded reversed string */
-function decodeRev(data) {
-	const encoded = atob(data);
-	if (!encoded) return void 0;
-	return [...encoded].reverse().join("");
+/** Decode a reversed string */
+function decodeRev(value) {
+	if (!value) return void 0;
+	return [...value].reverse().join("");
 }
-/** Decode a base64-encoded ROT47 string */
-function decodeROT47(data) {
-	const decoded = atob(data);
-	if (!decoded) return void 0;
-	return [...decoded].map((c) => {
+/** Decode a ROT47 string */
+function decodeROT47(value) {
+	return [...value].map((c) => {
 		const n = c.charCodeAt(0);
 		return n >= 33 && n <= 126 ? String.fromCharCode(33 + (n - 33 + 47) % 94) : c;
 	}).join("");
@@ -165,7 +170,7 @@ var ObfuscatedElement = class ObfuscatedElement extends HTMLElement {
 		this.shadow = this.attachShadow({ mode: "closed" });
 	}
 	connectedCallback() {
-		const decoded = decode(this, logger$1);
+		const decoded = decode(this.getAttribute("value") ?? "", logger$1);
 		if (!decoded) {
 			this.remove();
 			return;

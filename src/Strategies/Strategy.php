@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Hirasso\HTMLObfuscator\Strategies;
 
 use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
-use Override;
 
-final readonly class RandomStrategy implements ObfuscationStrategy
+final readonly class Strategy
 {
     /** Maps client-side decoder name → strategy class, in index order */
     public const array STRATEGIES = [
@@ -27,14 +26,13 @@ final readonly class RandomStrategy implements ObfuscationStrategy
         $this->strategy = new $strategies[$this->index]($original);
     }
 
-    #[Override]
-    public function obfuscate(): string
-    {
-        return $this->strategy->obfuscate();
-    }
-
     public function getAttribute(): string
     {
-        return "{$this->index}:{$this->strategy->obfuscate()}";
+        return base64_encode("{$this->index}:{$this->strategy->obfuscate()}");
+    }
+
+    public function getIdentifier(): string
+    {
+        return array_keys(self::STRATEGIES)[$this->index];
     }
 }
