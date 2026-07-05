@@ -56,7 +56,7 @@ test('debug(false) injects the un-obfuscated frontend script', function () {
 test('emails(false) disables email obfuscation', function () {
     $result = (string) obfuscate('<a href="mailto:mail@example.com">email</a>')
         ->emails(false);
-    dump($result);
+
     expect($result)->toContain('mailto:mail@example.com');
     expect($result)->not->toContain('tests-obfuscated');
 });
