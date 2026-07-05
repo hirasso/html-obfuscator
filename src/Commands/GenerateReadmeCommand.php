@@ -20,14 +20,14 @@ class GenerateReadmeCommand extends Command
 {
     protected function configure(): void
     {
-        $this->setDescription('Generate demo/readme.html from README.md');
+        $this->setDescription('Generate demo/readme.generated.html from README.md');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $root = dirname(__DIR__, 2);
         $readmePath = "{$root}/README.md";
-        $outputPath = "{$root}/demo/readme.html";
+        $outputPath = "{$root}/demo/readme.generated.html";
 
         $markdown = file_get_contents($readmePath);
         if ($markdown === false) {

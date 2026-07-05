@@ -50,15 +50,7 @@ $currentYear = date('Y');
         <?= $contactHtml ?>
     </section>
 
-
-    <!-- README.md:start -->
-
-    <?php
-        // @phpstan-ignore include.fileNotFound
-        include('./readme.html')
-?>
-
-    <!-- README.md:end -->
+    <?php include('./readme.generated.html'); ?>
 
   </main>
   <footer class="container-fluid">
