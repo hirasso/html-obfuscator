@@ -53,7 +53,10 @@ $currentYear = date('Y');
 
     <!-- README.md:start -->
 
-    <?php include('./readme.html') ?>
+    <?php
+        // @phpstan-ignore include.fileNotFound
+        include('./readme.html')
+?>
 
     <!-- README.md:end -->
 
