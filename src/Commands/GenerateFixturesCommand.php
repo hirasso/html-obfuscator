@@ -20,7 +20,9 @@ class GenerateFixturesCommand extends Command
     private const array INPUTS = [
         'hello@example.com',
         '+1 (555) 123-4567',
-        'user+tag@sub.domain.org',
+        'user+tag@sub.domain.example.org',
+        'münchen@ümlaute.example.com',
+        '😍😍😍@emojis.example.com'
     ];
 
     protected function configure(): void
@@ -31,7 +33,7 @@ class GenerateFixturesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $root = dirname(__DIR__, 2);
-        $outputPath = "{$root}/tests/unit/fixtures/decode.json";
+        $outputPath = "{$root}/tests/vitest/fixtures/decode.json";
 
         $obfuscator = new Obfuscator();
         $fixtures = [];

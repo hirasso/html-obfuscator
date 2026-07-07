@@ -104,8 +104,9 @@ const decode = (() => {
 		}
 		const result = decoder(data);
 		if (!result) return;
-		cache.set(value, result);
-		return result;
+		const utf8result = byteStringToUtf8(result);
+		cache.set(value, utf8result);
+		return utf8result;
 	};
 })();
 /**
@@ -141,6 +142,10 @@ function decodeROT47(value) {
 		const n = c.charCodeAt(0);
 		return n >= 33 && n <= 126 ? String.fromCharCode(33 + (n - 33 + 47) % 94) : c;
 	}).join("");
+}
+/** Convert a binary string (from atob) to a UTF-8 string */
+function byteStringToUtf8(str) {
+	return new TextDecoder().decode(Uint8Array.from(str, (c) => c.charCodeAt(0)));
 }
 
 //#endregion
