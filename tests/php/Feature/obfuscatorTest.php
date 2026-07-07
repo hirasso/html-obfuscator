@@ -192,6 +192,37 @@ test('[obfuscate-text] skips whitespace-only text nodes', function () {
     expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(1);
 });
 
+test('withAriaLabel() sets a custom aria-label', function () {
+    $result = (string) obfuscate('mail@example.com')->withAriaLabel('Contact us');
+    expect($result)->toContain('aria-label="Contact us"');
+});
+
+test('withAriaLabel(null) removes the aria-label', function () {
+    $result = (string) obfuscate('mail@example.com')->withAriaLabel(null);
+    expect($result)->not->toContain('aria-label');
+});
+
+test('withNoscriptText() sets a custom noscript fallback', function () {
+    $result = (string) obfuscate('mail@example.com')->withNoscriptText('JS required');
+    expect($result)->toContain('<noscript>JS required</noscript>');
+});
+
+test('withNoscriptText(null) removes the noscript fallback', function () {
+    $result = (string) obfuscate('mail@example.com')->withNoscriptText(null);
+    expect($result)->not->toContain('<noscript>');
+});
+
+test('Links with an empty href are not obfuscated', function () {
+    $result = (string) obfuscate('<a href="">click</a>');
+    expect($result)->not->toContain(TESTS_TAG_NAME);
+});
+
+test('withTagName() throws when changing an already-customized tag name', function () {
+    HTMLObfuscator::createFromString('')->withTagName('my-tag');
+    expect(fn () => HTMLObfuscator::createFromString('')->withTagName('other-tag'))
+        ->toThrow(InvalidArgumentException::class, 'globally stable');
+});
+
 test('renders the client script', function () {
     $debug_result = (string) clientScript()->withTagName(TESTS_TAG_NAME)->debug(true);
     expect($debug_result)->toContain('<script data-tagname="tests-obfuscated">');

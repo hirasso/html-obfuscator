@@ -105,7 +105,7 @@ final class Obfuscator
         );
 
         if ($index === null) {
-            throw new \LogicException("Strategy {$this->strategy} not found in STRATEGIES");
+            throw new \LogicException("Strategy {$this->strategy} not found in STRATEGIES"); // @codeCoverageIgnore
         }
 
         return $index;

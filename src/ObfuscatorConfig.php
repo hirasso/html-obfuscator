@@ -18,7 +18,7 @@ final class ObfuscatorConfig
 
     private function __construct()
     {
-    }
+    } // @codeCoverageIgnore
 
     public static function getTagName(): string
     {

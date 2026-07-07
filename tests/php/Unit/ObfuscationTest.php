@@ -6,6 +6,11 @@ test('Obfuscator::STRATEGIES keys match client decoder names', function () {
     expect(array_keys(Obfuscator::STRATEGIES))->toBe(['xor', 'revxor', 'rot47']);
 });
 
+test('Obfuscator::getStrategy() returns a valid strategy class', function () {
+    $obfuscator = new Obfuscator();
+    expect($obfuscator->getStrategy())->toBeIn(array_values(Obfuscator::STRATEGIES));
+});
+
 test('Obfuscator::getAttribute() produces "index:data" format', function () {
     $obfuscation = new Obfuscator();
     $attr = $obfuscation->obfuscate('mail@example.com');
