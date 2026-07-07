@@ -61,7 +61,7 @@ Custom elements representing a text node _do_ decode the value immediately on <c
 ## Main Features
 
 - There is **no visual difference** between obfuscated and de-obfuscated content in the browser
-- Works automatically with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
+- Works seamlessly with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
 
 ## Other Features
 
