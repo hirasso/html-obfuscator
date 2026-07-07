@@ -4,5 +4,3 @@ parameters:
     - src/
     - tests/
     - demo/
-  ignoreErrors:
-    - '#Path in include\(\) "./readme.generated.html" is not a file or it does not exist.#'
