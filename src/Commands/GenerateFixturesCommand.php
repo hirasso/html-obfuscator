@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Hirasso\HTMLObfuscator\Commands;
 
 use Hirasso\HTMLObfuscator\Obfuscation\Obfuscator;
-use Hirasso\HTMLObfuscator\Obfuscation\ROT47Strategy;
-use Hirasso\HTMLObfuscator\Obfuscation\RevStrategy;
+use Hirasso\HTMLObfuscator\Obfuscation\Rot47Strategy;
+use Hirasso\HTMLObfuscator\Obfuscation\RevXorStrategy;
 use Hirasso\HTMLObfuscator\Obfuscation\XorStrategy;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -38,7 +38,7 @@ class GenerateFixturesCommand extends Command
         $obfuscator = new Obfuscator();
         $fixtures = [];
 
-        foreach ([XorStrategy::class, RevStrategy::class, ROT47Strategy::class] as $strategyClass) {
+        foreach ([XorStrategy::class, RevXorStrategy::class, Rot47Strategy::class] as $strategyClass) {
             $obfuscator->setStrategy($strategyClass);
             foreach (self::INPUTS as $plain) {
                 $fixtures[] = [

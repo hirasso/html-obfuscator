@@ -6,7 +6,7 @@ namespace Hirasso\HTMLObfuscator\Obfuscation;
 
 use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 
-final readonly class ROT47Strategy implements ObfuscationStrategy
+final readonly class Rot47Strategy implements ObfuscationStrategy
 {
     public static function obfuscate(string $value): string
     {

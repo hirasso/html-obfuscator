@@ -14,7 +14,7 @@ Do not add an injection seam here.
 
 - **One adapter, not two.** There is only one production adapter (`Obfuscator`). A test-only stub would be the only second adapter. Per the design principle: one adapter = hypothetical seam; two adapters = real one.
 
-- **Deterministic strategies are already pinnable.** `RevStrategy` and `ROT47Strategy` are deterministic. Tests that need to assert on encoded values can already call `->setStrategy(RevStrategy::class)` and check the exact output without injection.
+- **Deterministic strategies are already pinnable.** `RevStrategy` and `Rot47Strategy` are deterministic. Tests that need to assert on encoded values can already call `->setStrategy(RevStrategy::class)` and check the exact output without injection.
 
 - **Round-trip correctness is tested cross-language by design.** `GenerateFixturesCommand` exports PHP-encoded fixtures to `tests/vitest/fixtures/decode.json`. `decode.test.ts` verifies those fixtures decode correctly in JS. This is the deliberate answer to round-trip testing — not a PHP-side decoder or a stub encoder.
 

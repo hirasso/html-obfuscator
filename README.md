@@ -135,11 +135,11 @@ Pin the obfuscation algorithm instead of picking one at random each time. Availa
 ```php
 use Hirasso\HTMLObfuscator\Obfuscation\XorStrategy;
 use Hirasso\HTMLObfuscator\Obfuscation\RevStrategy;
-use Hirasso\HTMLObfuscator\Obfuscation\ROT47Strategy;
+use Hirasso\HTMLObfuscator\Obfuscation\Rot47Strategy;
 
 echo obfuscate($html)->setStrategy(XorStrategy::class);
 echo obfuscate($html)->setStrategy(RevStrategy::class);
-echo obfuscate($html)->setStrategy(ROT47Strategy::class);
+echo obfuscate($html)->setStrategy(Rot47Strategy::class);
 ```
 
 An `\InvalidArgumentException` is thrown for unknown strategy classes.
