@@ -15,13 +15,13 @@
 <p>Everything but the scheme is stripped from the <code>href</code> attribute. The link gets a hidden obfuscated element with <code>[attr=&quot;href&quot;]</code> injected as a child:</p>
 <pre class="shiki" style="background-color: #232136"><code><span class="line"><span style="color:#908CAA;font-style: italic">&lt;!--</span><span style="color:#6E6A86;font-style: italic"> before: </span><span style="color:#908CAA;font-style: italic">--&gt;</span></span>
 <span class="line"><span style="color:#6E6A86">&lt;</span><span style="color:#9CCFD8">a</span><span style="color:#E0DEF4"> </span><span style="color:#C4A7E7;font-style: italic">href</span><span style="color:#908CAA">=</span><span style="color:#F6C177">&quot;mailto:mail@example.com&quot;</span><span style="color:#6E6A86">&gt;</span></span>
-<span class="line"><span style="color:#E0DEF4">  Write us an email</span></span>
+<span class="line"><span style="color:#E0DEF4">  Email us</span></span>
 <span class="line"><span style="color:#6E6A86">&lt;/</span><span style="color:#9CCFD8">a</span><span style="color:#6E6A86">&gt;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#908CAA;font-style: italic">&lt;!--</span><span style="color:#6E6A86;font-style: italic"> after: </span><span style="color:#908CAA;font-style: italic">--&gt;</span></span>
 <span class="line"><span style="color:#6E6A86">&lt;</span><span style="color:#9CCFD8">a</span><span style="color:#E0DEF4"> </span><span style="color:#C4A7E7;font-style: italic">href</span><span style="color:#908CAA">=</span><span style="color:#F6C177">&quot;mailto:&quot;</span><span style="color:#6E6A86">&gt;</span></span>
 <span class="line"><span style="color:#E0DEF4">  </span><span style="color:#6E6A86">&lt;</span><span style="color:#9CCFD8">ob-fus-ca-ted</span><span style="color:#E0DEF4"> </span><span style="color:#C4A7E7;font-style: italic">attr</span><span style="color:#908CAA">=</span><span style="color:#F6C177">&quot;href&quot;</span><span style="color:#E0DEF4"> </span><span style="color:#C4A7E7;font-style: italic">value</span><span style="color:#908CAA">=</span><span style="color:#F6C177">&quot;...&quot;</span><span style="color:#E0DEF4"> </span><span style="color:#C4A7E7;font-style: italic">style</span><span style="color:#908CAA">=</span><span style="color:#F6C177">&quot;display: none;&quot;</span><span style="color:#6E6A86">&gt;&lt;/</span><span style="color:#9CCFD8">ob-fus-ca-ted</span><span style="color:#6E6A86">&gt;</span></span>
-<span class="line"><span style="color:#E0DEF4">  Write us an email</span></span>
+<span class="line"><span style="color:#E0DEF4">  Email us</span></span>
 <span class="line"><span style="color:#6E6A86">&lt;/</span><span style="color:#9CCFD8">a</span><span style="color:#6E6A86">&gt;</span></span>
 <span class="line"></span></code></pre>
 <blockquote>
@@ -44,7 +44,7 @@ The scheme in obfuscated <code>href</code> attributes is preserved to prevent a 
 <li>Works without configuration, but can be customized using a fluent <a href="#api">API</a></li>
 <li>Fully compatible with HTML5 (thanks to PHP 8.4's new <code>\Dom\HTMLDocument</code> and friends)</li>
 <li>Doesn't interfere with accessibility</li>
-<li>Extensively tested with <a href="https://github.com/hirasso/html-obfuscator/tree/main/tests/Unit">unit</a>, <a href="https://github.com/hirasso/html-obfuscator/tree/main/tests/Integration">integration</a> and <a href="https://github.com/hirasso/html-obfuscator/tree/main/tests/e2e">e2e</a> tests</li>
+<li>Extensively tested on both ends – PHP, JavaScript, e2e, basic benchmarks</li>
 </ul>
 <h2 id="installation">Installation<a href="#installation" class="anchor" title="Permalink">#</a></h2>
 <pre class="shiki" style="background-color: #232136"><code><span class="line"><span style="color:#908CAA;font-style: italic">#</span><span style="color:#6E6A86;font-style: italic"> requires PHP &gt;= 8.4</span></span>

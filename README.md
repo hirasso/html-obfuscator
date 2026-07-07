@@ -4,7 +4,7 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage (whatever that entails)](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Make crawlers earn it. Obfuscates emails, phone numbers, and other sensitive data with PHP and modern browser features.**
+**Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.**
 
 ## Motivation
 
@@ -33,13 +33,13 @@ Everything but the scheme is stripped from the `href` attribute. The link gets a
 ```html
 <!-- before: -->
 <a href="mailto:mail@example.com">
-  Write us an email
+  Email us
 </a>
 
 <!-- after: -->
 <a href="mailto:">
   <ob-fus-ca-ted attr="href" value="..." style="display: none;"></ob-fus-ca-ted>
-  Write us an email
+  Email us
 </a>
 ```
 
@@ -68,7 +68,7 @@ Custom elements representing a text node _do_ decode the value immediately on <c
 - Works without configuration, but can be customized using a fluent [API](#api)
 - Fully compatible with HTML5 (thanks to PHP 8.4's new `\Dom\HTMLDocument` and friends)
 - Doesn't interfere with accessibility
-- Extensively tested with [unit](tests/Unit), [integration](tests/Integration) and [e2e](tests/e2e) tests
+- Extensively tested on both ends – PHP, JavaScript, e2e, basic benchmarks
 
 ## Installation
 
