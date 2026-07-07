@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+### Minor Changes
+
+- d9ef307: Rename `RevStrategy` strategy to `RevXorStrategy` and strengthen it with position-based XOR on top of reversal
+
 ## 0.5.1
 
 ### Patch Changes
