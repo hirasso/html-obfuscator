@@ -4,7 +4,7 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.**
+**Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features. Require interaction to de-obfuscate.**
 
 &rarr; **[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)**
 
@@ -131,7 +131,7 @@ echo obfuscate($html)->debug(true);
 
 ### `->setStrategy(string)`
 
-Pin the obfuscation algorithm instead of picking one at random each time. Available strategies are in `Hirasso\HTMLObfuscator\Obfuscation\Obfuscator::STRATEGIES`:
+Pin the obfuscation algorithm instead of picking one at random each time:
 
 ```php
 use Hirasso\HTMLObfuscator\Obfuscation\XorStrategy;

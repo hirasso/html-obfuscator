@@ -34,9 +34,14 @@ $currentYear = date('Y');
 
     <header>
         <hgroup>
-            <p><a href="https://github.com/hirasso/html-obfuscator" role="button" class="pill outline">hirasso/html-obfuscator</a></p>
             <h1>HTML Obfuscator</h1>
-            <p><strong>Tl;dr</strong>: Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.<br></p>
+            <p>
+                <strong>
+                    Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.
+                    Require interaction to de-obfuscate.
+                </strong>
+            </p>
+            <p><strong>&rarr; <a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></strong></p>
         </hgroup>
     </header>
 

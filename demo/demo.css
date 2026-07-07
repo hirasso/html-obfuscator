@@ -1,5 +1,5 @@
 :root {
-  --pico-font-size: 18px;
+  --pico-font-size: clamp(16px, 2vw, 18px);
   --pico-border-radius: 1.3rem !important;
   --pico-form-element-spacing-vertical: 0.1em;
   --pico-form-element-spacing-horizontal: 0.8em;
@@ -18,6 +18,7 @@
   --pico-primary-hover-underline: oklch(54% 0.24 28);
   --pico-primary-focus: oklch(62% 0.24 28 / 50%);
   --pico-primary-inverse: #fff;
+  --pico-muted-color: black;
 }
 
 [data-theme=dark] {
@@ -31,12 +32,16 @@
   --pico-primary-hover-underline: oklch(80% 0.22 28);
   --pico-primary-focus: oklch(72% 0.24 28 / 50%);
   --pico-primary-inverse: #fff;
+  --pico-muted-color: black;
 }
 
 body {
   padding-block: 2rem;
   max-width: 900px;
   margin-inline: auto;
+}
+strong {
+  color: inherit;
 }
 [role="button"].pill {
   font-size: 0.8rem;
@@ -151,4 +156,9 @@ footer {
   text-align: center;
   max-width: 600px;
   margin-block: 2rem;
+}
+
+code {
+  display: inline;
+  overflow-wrap: break-word;
 }
