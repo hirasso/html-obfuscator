@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1
+
+### Patch Changes
+
+- bd76483: Add PHPBench with baseline benchmarks for obfuscation performance
+- 14af52f: Fix encoding/decoding of non-ASCII characters (umlauts, emojis, etc.)
+- 18b86f9: Encode the numeric strategy index together with the obfuscated value in a single base64-encoded string
+- a010713: Rename `Support` to `DomHelper`, prune to `parseHtmlFragment` and `getTextNodes`
+
 ## 0.5.0
 
 ### Minor Changes
