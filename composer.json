@@ -30,6 +30,7 @@
     "league/commonmark": "^2.8",
     "pestphp/pest": "^3.7",
     "pestphp/pest-plugin-watch": "^3.0",
+    "phpbench/phpbench": "^1.7",
     "phpstan/phpstan": "^2.1",
     "spatie/commonmark-shiki-highlighter": "^2.5",
     "spatie/shiki-php": "^2.4",
@@ -64,6 +65,7 @@
     ],
     "generate-types": "bin/console typescript:transform",
     "generate-readme": "bin/console readme:generate",
+    "bench": "./vendor/bin/phpbench run --report=aggregate",
     "generate-fixtures": "bin/console fixtures:generate",
     "post-install-cmd": [
       "[ -n \"$CI\" ] || pnpm install",
