@@ -9,20 +9,24 @@ use Hirasso\HTMLObfuscator\Obfuscation\Obfuscator;
 
 use function Hirasso\HTMLObfuscator\obfuscate;
 
+/** render a nav link */
+function navLink(string $label, string $href, bool $active): string
+{
+    $ariaCurrent = $active ? ' aria-current="page"' : '';
+    return "<a href=\"{$href}\"{$ariaCurrent}>{$label}</a>";
+}
+
 $defaultTagName = HTMLObfuscator::DEFAULT_TAG_NAME;
-
 $strategyKey = $_GET['strategy'] ?? null;
-$strategyClass = $strategyKey !== null ? (Obfuscator::STRATEGIES[$strategyKey] ?? null) : null;
+$strategyClass = Obfuscator::STRATEGIES[$strategyKey] ?? null;
 
-$navLinks = array_map(function (string $key) use ($strategyKey): string {
-    $active = $key === $strategyKey ? ' aria-current="page"' : '';
-    return "<a href=\"/?strategy={$key}\"{$active}>{$key}</a>";
-}, array_keys(Obfuscator::STRATEGIES));
-
-$randomActive = $strategyKey === null ? ' aria-current="page"' : '';
-array_unshift($navLinks, "<a href=\"/\"{$randomActive}>random</a>");
-
-$nav = implode('', $navLinks);
+$nav = implode('', [
+    navLink('random', '/', $strategyKey === null),
+    ...array_map(
+        fn (string $key) => navLink($key, "/?strategy={$key}", $key === $strategyKey),
+        array_keys(Obfuscator::STRATEGIES)
+    ),
+]);
 
 $obfuscator = obfuscate(<<<HTML
 <!DOCTYPE html>
@@ -31,7 +35,7 @@ $obfuscator = obfuscate(<<<HTML
   <meta charset="utf-8">
   <title>Fixture</title>
   <style>
-    $defaultTagName, a[href="mailto:"], a[href="tel:"] { color: red }
+    {$defaultTagName}, a:has({$defaultTagName}[attr="href"]) { color: red }
     body {
         font-family: system-ui;
         --rounded: 0.5rem;
