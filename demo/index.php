@@ -37,8 +37,7 @@ $currentYear = date('Y');
             <h1>HTML Obfuscator</h1>
             <p>
                 <strong>
-                    Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.
-                    Require interaction to de-obfuscate.
+                    Obfuscate emails, phone numbers, and other sensitive data in PHP — invisible to humans, hidden from bots until they interact.
                 </strong>
             </p>
             <p><strong>&rarr; <a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></strong></p>
