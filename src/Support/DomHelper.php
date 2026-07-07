@@ -10,27 +10,8 @@ use Dom\HTMLDocument;
 use Dom\XPath;
 use InvalidArgumentException;
 
-final class Support
+final class DomHelper
 {
-    /**
-     * Create a document from a HTML string
-     */
-    public static function createDocument(string $html): HTMLDocument
-    {
-        return HTMLDocument::createFromString(
-            $html,
-            LIBXML_NOERROR,
-        );
-    }
-
-    /**
-     * Extract the innerHTML from a document's <body>
-     */
-    public static function extractBodyHTML(HTMLDocument $document): string
-    {
-        return $document->body->innerHTML ?? '';
-    }
-
     /**
      * Parse a HTML fragment
      */
@@ -40,7 +21,7 @@ final class Support
             throw new InvalidArgumentException('Can only parse HTML fragments, not full documents'); // @codeCoverageIgnore
         }
 
-        $document ??= self::createDocument($html);
+        $document ??= HTMLDocument::createFromString($html, LIBXML_NOERROR);
 
         /** parse using ->innerHTML */
         $div = $document->createElement('div');
@@ -68,34 +49,4 @@ final class Support
             )
         ));
     }
-
-    /**
-     * Trim lines from a string of text
-     */
-    public static function trimLines(string $text): string
-    {
-        return implode("\n", array_map(
-            'trim',
-            preg_split("/\R/", $text) ?: []
-        ));
-    }
-
-    /**
-     * Trim whitespace from a string of text
-     */
-    public static function trimWhitespace(string $text): string
-    {
-        return str_replace("\n", '', self::trimLines($text));
-    }
-
-    /**
-     * Get the outer HTML of an element (not implemented natively, yet)
-     */
-    public static function outerHTML(Element $el): string
-    {
-        $doc = HTMLDocument::createEmpty();
-        $doc->appendChild($doc->importNode($el, true));
-        return $doc->saveHTML();
-    }
-
 }
