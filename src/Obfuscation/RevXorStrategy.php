@@ -6,8 +6,10 @@ namespace Hirasso\HTMLObfuscator\Obfuscation;
 
 use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 
-// Reverses the string, then XORs each byte with a position-dependent key (i % 6 + 1).
-// The JS decoder XORs with the same key sequence and reverses to recover the original.
+/**
+ * Reverses the string, then XORs each byte with a position-dependent key (i % 6 + 1).
+ * The JS decoder XORs with the same key sequence and reverses to recover the original.
+ */
 final readonly class RevXorStrategy implements ObfuscationStrategy
 {
     public static function obfuscate(string $value): string

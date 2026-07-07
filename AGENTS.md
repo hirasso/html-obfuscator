@@ -14,6 +14,10 @@ This is a libary to obfuscate emails and phone numbers in HTML using modern web 
 | `pnpm run test:e2e` | Run e2e tests |
 
 
+## Code style
+
+- Use `/** */` block comments (not `//`) for class / method / function explanations
+
 ## Writing new code
 
 - add matching tests for each new feature
