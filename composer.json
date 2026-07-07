@@ -19,7 +19,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Tests\\": "tests/"
+      "Tests\\": "tests/php/"
     }
   },
   "require": {
@@ -44,7 +44,7 @@
       "Composer\\Config::disableProcessTimeout",
       "vendor/bin/pest --watch"
     ],
-    "test:coverage": "php -d zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-84-arm64.so -d xdebug.mode=coverage ./vendor/bin/pest --coverage --coverage-html ./tests/reports",
+    "test:coverage": "php -d zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-84-arm64.so -d xdebug.mode=coverage ./vendor/bin/pest --coverage --coverage-html ./tests/php/reports",
     "test:ci": "./vendor/bin/pest --coverage-clover coverage.xml",
     "analyse": "./vendor/bin/phpstan analyse --memory-limit=2G",
     "demo": [
@@ -64,6 +64,7 @@
     ],
     "generate-types": "bin/console typescript:transform",
     "generate-readme": "bin/console readme:generate",
+    "generate-fixtures": "bin/console fixtures:generate",
     "post-install-cmd": [
       "[ -n \"$CI\" ] || pnpm install",
       "ln -s AGENTS.md CLAUDE.md || exit 0"

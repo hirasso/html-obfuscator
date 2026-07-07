@@ -40,6 +40,19 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
+  client-unit-tests:
+    name: Client Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run Unit Tests
+        run: pnpm run test:unit
+
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest

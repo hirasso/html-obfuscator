@@ -6,13 +6,10 @@
 export default {
   "**/*.php": ["composer analyse", "composer format"],
   "*.ts": [() => "pnpm run build"],
-  "*.(ts|php)": () => [
+  "*.(ts|php|md)": () => [
     "composer build",
     "pnpm run analyse",
-    "git add resources/dist",
+    "git add resources/dist resources/src/generated",
+    "git add demo/readme.generated.html",
   ],
-  "README.md": () => [
-    'composer generate-readme',
-    'git add demo/readme.generated.html'
-  ]
 };

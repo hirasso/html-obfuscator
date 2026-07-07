@@ -1,0 +1,77 @@
+[
+    {
+        "strategy": "xor",
+        "plain": "hello@example.com",
+        "encoded": "MDrTWUuYokcYvIwqdjmIocD2uzwn9M0HfcTtRwZV7Y+jmb4="
+    },
+    {
+        "strategy": "xor",
+        "plain": "+1 (555) 123-4567",
+        "encoded": "MDps0SggNslTFvz70SO4lBESR+AICAP8Zj\/cyuMQlaAkJFs="
+    },
+    {
+        "strategy": "xor",
+        "plain": "user+tag@sub.domain.example.org",
+        "encoded": "MDoNy0xLXIpKHV97szTDEBPjeLgpOXf+K3ofCMZW7XR8jmyiImU58itwLxfWGqxidA=="
+    },
+    {
+        "strategy": "xor",
+        "plain": "münchen@ümlaute.example.com",
+        "encoded": "MDp6bUYv5tLPkuzsBqsBMATUF676QYW6qvysL7rGbVFxoB9DI1eHv7\/+icJlxGw="
+    },
+    {
+        "strategy": "xor",
+        "plain": "😍😍😍@emojis.example.com",
+        "encoded": "MDqEvZruFN4fy\/uyybOPXLUWdCICY+RBh0YLLVE+zznYee7U6cBxpn6mi96snewz2A=="
+    },
+    {
+        "strategy": "rev",
+        "plain": "hello@example.com",
+        "encoded": "MTptb2MuZWxwbWF4ZUBvbGxlaA=="
+    },
+    {
+        "strategy": "rev",
+        "plain": "+1 (555) 123-4567",
+        "encoded": "MTo3NjU0LTMyMSApNTU1KCAxKw=="
+    },
+    {
+        "strategy": "rev",
+        "plain": "user+tag@sub.domain.example.org",
+        "encoded": "MTpncm8uZWxwbWF4ZS5uaWFtb2QuYnVzQGdhdCtyZXN1"
+    },
+    {
+        "strategy": "rev",
+        "plain": "münchen@ümlaute.example.com",
+        "encoded": "MTptb2MuZWxwbWF4ZS5ldHVhbG28w0BuZWhjbrzDbQ=="
+    },
+    {
+        "strategy": "rev",
+        "plain": "😍😍😍@emojis.example.com",
+        "encoded": "MTptb2MuZWxwbWF4ZS5zaWpvbWVAjZif8I2Yn\/CNmJ\/w"
+    },
+    {
+        "strategy": "rot47",
+        "plain": "hello@example.com",
+        "encoded": "Mjo5Nj09QG82STI+QT02XTRAPg=="
+    },
+    {
+        "strategy": "rot47",
+        "plain": "+1 (555) 123-4567",
+        "encoded": "MjpaYCBXZGRkWCBgYWJcY2RlZg=="
+    },
+    {
+        "strategy": "rot47",
+        "plain": "user+tag@sub.domain.example.org",
+        "encoded": "MjpGRDZDWkUyOG9ERjNdNUA+Mjo\/XTZJMj5BPTZdQEM4"
+    },
+    {
+        "strategy": "rot47",
+        "plain": "münchen@ümlaute.example.com",
+        "encoded": "Mjo+w7w\/NDk2P2\/DvD49MkZFNl02STI+QT02XTRAPg=="
+    },
+    {
+        "strategy": "rot47",
+        "plain": "😍😍😍@emojis.example.com",
+        "encoded": "Mjrwn5iN8J+YjfCfmI1vNj5AOzpEXTZJMj5BPTZdNEA+"
+    }
+]

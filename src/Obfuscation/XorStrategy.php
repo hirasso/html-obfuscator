@@ -13,8 +13,8 @@ final readonly class XorStrategy implements ObfuscationStrategy
         $key = random_bytes(16);
 
         $out = '';
-        for ($i = 0; $i < mb_strlen($value); $i++) {
-            $out .= mb_substr($value, $i, 1) ^ $key[$i % 16];
+        for ($i = 0, $len = strlen($value); $i < $len; $i++) {
+            $out .= $value[$i] ^ $key[$i % 16];
         }
         return $key . $out;
     }

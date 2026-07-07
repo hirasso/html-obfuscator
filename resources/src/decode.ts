@@ -39,9 +39,10 @@ export const decode = (() => {
     const result = decoder(data);
     if (!result) return;
 
-    cache.set(value, result);
+    const utf8result = byteStringToUtf8(result);
+    cache.set(value, utf8result);
 
-    return result;
+    return utf8result;
   };
 })();
 
@@ -94,4 +95,9 @@ function decodeROT47(value: string): string | undefined {
         : c;
     })
     .join("");
+}
+
+/** Convert a binary string (from atob) to a UTF-8 string */
+function byteStringToUtf8(str: string): string {
+  return new TextDecoder().decode(Uint8Array.from(str, (c) => c.charCodeAt(0)));
 }
