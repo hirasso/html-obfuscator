@@ -24,6 +24,7 @@
 <span class="line"></span></code></pre>
 <h2 id="features">Features<a href="#features" class="anchor" title="Permalink">#</a></h2>
 <ul>
+<li><strong>Framework agnostic</strong> — works in any PHP project, independent of framework or frontend toolchain</li>
 <li>There is <strong>no visual difference</strong> between obfuscated and de-obfuscated content in the browser</li>
 <li>Works seamlessly with dynamically loaded content (AJAX/fetch, <a href="https://swup.js.org/">swup</a>, <a href="https://htmx.org/">htmx</a>, <a href="https://unpoly.com/">Unpoly</a>, ...)</li>
 <li>Works without configuration, but can be customized using a <a href="#fluent-api">fluent API</a></li>
@@ -131,3 +132,8 @@ The scheme in obfuscated <code>href</code> attributes is preserved to prevent a 
 <span class="line"><span style="color:#EA9A97">obfuscate</span><span style="color:#908CAA">(</span><span style="color:#908CAA;font-style: italic">$</span><span style="color:#E0DEF4;font-style: italic">doc</span><span style="color:#908CAA">)</span><span style="color:#3E8FB0">-&gt;</span><span style="color:#EA9A97">saveDocument</span><span style="color:#908CAA">();</span></span>
 <span class="line"><span style="color:#908CAA;font-style: italic">//</span><span style="color:#6E6A86;font-style: italic"> $doc is now obfuscated in place</span></span>
 <span class="line"></span></code></pre>
+<h2 id="attribution">Attribution<a href="#attribution" class="anchor" title="Permalink">#</a></h2>
+<p>Before writing this, I found a few existing solutions worth mentioning.</p>
+<p><a href="https://github.com/mokhosh/muddle">muddle</a> by <a href="https://github.com/mokhosh">@mokhosh</a> is a PHP obfuscation package with a thoughtful set of strategies — but it relies on inline <code>&lt;script&gt;</code> tags for deobfuscation, which browsers won't execute when content is injected into the DOM dynamically (AJAX, fetch, ...). It also doesn't require interaction, so browser-based crawlers will be able to see the content immediately.</p>
+<p><a href="https://github.com/TrueWinter/astro-obfuscate">astro-obfuscate</a> and <a href="https://github.com/andreas-brunner/astro-mail-obfuscation">astro-mail-obfuscation</a> are both Astro integrations that handle obfuscation well within that ecosystem — but they're tied to the Astro build pipeline and don't translate outside of it. I adopted the idea with the <a href="https://github.com/andreas-brunner/astro-mail-obfuscation#configuration"><code>fallbackText</code></a> from the latter, though.</p>
+<p>I needed something that works in any PHP project, independent of framework or frontend toolchain, with no visible flash during deobfuscation and no &quot;[please wait]&quot; placeholders. None of the existing options fit, so I built this.</p>

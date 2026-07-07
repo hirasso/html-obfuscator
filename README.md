@@ -47,6 +47,7 @@ echo obfuscate($html);
 
 ## Features
 
+- **Framework agnostic** — works in any PHP project, independent of framework or frontend toolchain
 - There is **no visual difference** between obfuscated and de-obfuscated content in the browser
 - Works seamlessly with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
 - Works without configuration, but can be customized using a [fluent API](#fluent-api)
@@ -218,6 +219,16 @@ obfuscate($doc)->saveDocument();
 // $doc is now obfuscated in place
 ```
 
+## Attribution
+
+Before writing this, I found a few existing solutions worth mentioning.
+
+[muddle](https://github.com/mokhosh/muddle) by [@mokhosh](https://github.com/mokhosh) is a PHP obfuscation package with a thoughtful set of strategies — but it relies on inline `<script>` tags for deobfuscation, which browsers won't execute when content is injected into the DOM dynamically (AJAX, fetch, ...). It also doesn't require interaction, so browser-based crawlers will be able to see the content immediately.
+
+[astro-obfuscate](https://github.com/TrueWinter/astro-obfuscate) and [astro-mail-obfuscation](https://github.com/andreas-brunner/astro-mail-obfuscation) are both Astro integrations that handle obfuscation well within that ecosystem — but they're tied to the Astro build pipeline and don't translate outside of it. I adopted the idea with the [`fallbackText`](https://github.com/andreas-brunner/astro-mail-obfuscation#configuration) from the latter, though.
+
+I needed something that works in any PHP project, independent of framework or frontend toolchain, with no visible flash during deobfuscation and no "[please wait]" placeholders. None of the existing options fit, so I built this.
+
 <!-- demo-readme:end -->
 
-&rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.
+&rarr; Browse <a href="./tests/php/Feature/obfuscatorTest.php">obfuscatorTest.php</a> to see more usage examples.
