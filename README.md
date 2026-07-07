@@ -6,9 +6,7 @@
 
 **Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.**
 
-## Demo
-
-[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)
+&rarr; **[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)**
 
 <!-- demo-readme:start -->
 ## Motivation
