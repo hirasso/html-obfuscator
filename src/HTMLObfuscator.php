@@ -9,7 +9,7 @@ use Dom\HTMLDocument;
 use Dom\Text;
 use Hirasso\HTMLObfuscator\Contracts\ObfuscationStrategy;
 use Hirasso\HTMLObfuscator\Obfuscation\Obfuscator;
-use Hirasso\HTMLObfuscator\Support\Support;
+use Hirasso\HTMLObfuscator\Support\DomHelper;
 
 /**
  * Obfuscate emails and phone numbers to protect them from spam bots
@@ -61,7 +61,7 @@ final class HTMLObfuscator
     {
         $isPartial = !str_contains($source, '</body>');
 
-        return new self(Support::createDocument($source), isPartial: $isPartial);
+        return new self(HTMLDocument::createFromString($source, LIBXML_NOERROR), isPartial: $isPartial);
     }
 
     /**
@@ -230,7 +230,7 @@ final class HTMLObfuscator
     {
         foreach ($this->document->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
             $el->removeAttribute(self::OBFUSCATE_TEXT_ATTR);
-            foreach (Support::getTextNodes($this->document, $el) as $node) {
+            foreach (DomHelper::getTextNodes($this->document, $el) as $node) {
                 $el = $this->createObfuscatedTextElement($node->data);
                 $node->replaceWith($el);
             }
@@ -347,7 +347,7 @@ final class HTMLObfuscator
         $patterns = [...$this->builtinPatterns(), ...$this->customPatterns];
 
         foreach ($patterns as $pattern) {
-            foreach (Support::getTextNodes($this->document) as $node) {
+            foreach (DomHelper::getTextNodes($this->document) as $node) {
                 $this->obfuscateTextNode($node, $pattern);
             }
         }
@@ -366,7 +366,9 @@ final class HTMLObfuscator
             function ($matches) {
                 $el = $this->createObfuscatedTextElement($matches[0]);
 
-                return Support::outerHTML($el);
+                $doc = HTMLDocument::createEmpty();
+                $doc->appendChild($doc->importNode($el, true));
+                return $doc->saveHTML();
             },
             $value
         ) ?? $value;
@@ -382,7 +384,7 @@ final class HTMLObfuscator
             return; // @codeCoverageIgnore
         }
 
-        $fragment = Support::parseHtmlFragment($value, $this->document);
+        $fragment = DomHelper::parseHtmlFragment($value, $this->document);
 
         $node->replaceWith($fragment);
 
