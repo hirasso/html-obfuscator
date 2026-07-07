@@ -7,5 +7,5 @@ namespace Hirasso\HTMLObfuscator\Contracts;
 interface ObfuscationStrategy
 {
     /** Apply obfuscation to the original value */
-    public function obfuscate(): string;
+    public static function obfuscate(string $value): string;
 }

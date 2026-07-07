@@ -9,7 +9,7 @@ const decoderMap: Record<string, Decoder> = {
   rot47: decodeROT47,
 };
 
-/** Ordered by index, matching Strategy::STRATEGIES */
+/** Ordered by index, matching Obfusator::STRATEGIES */
 const decoders: Decoder[] = strategyOrder.map((name) => decoderMap[name]);
 
 /**

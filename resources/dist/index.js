@@ -82,7 +82,7 @@ const decoderMap = {
 	rev: decodeRev,
 	rot47: decodeROT47
 };
-/** Ordered by index, matching Strategy::STRATEGIES */
+/** Ordered by index, matching Obfusator::STRATEGIES */
 const decoders = strategyOrder.map((name) => decoderMap[name]);
 /**
 * Decode a value
