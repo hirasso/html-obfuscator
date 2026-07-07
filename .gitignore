@@ -10,7 +10,7 @@ node_modules
 
 # tests
 coverage.xml
-tests/reports
+tests/php/reports
 
 # phpbench
 .phpbench

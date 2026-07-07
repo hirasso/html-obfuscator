@@ -2,17 +2,17 @@
     {
         "strategy": "xor",
         "plain": "hello@example.com",
-        "encoded": "MDpvQ5pf5Uo11cA\/ng01JYfqByb2M4oKUK2hUu5hUAvkhQI="
+        "encoded": "MDp3pUSCmi+teNourPv+NW5ZH8Ao7vVvyAC7Q9yXmxsNNho="
     },
     {
         "strategy": "xor",
         "plain": "+1 (555) 123-4567",
-        "encoded": "MDr775B40FY1Cg6vs4yppQSw0N6wUOVjACMunoG\/hJExhsw="
+        "encoded": "MDraRDBXPBaEEqJ0VoWDoPQ18XUQfwkjsTuCRWS2rpTBA+0="
     },
     {
         "strategy": "xor",
         "plain": "user+tag@sub.domain.org",
-        "encoded": "MDo7mcQ6FekeFVycCto85yKJTuqhSD6df3Ic73+4EoNN5FrwqhR6m3k="
+        "encoded": "MDpaZA7tj3I5hBMz+WxZ9940Lxdrn6QGWONTQIwOd5OxWTsNYMPgAF4="
     },
     {
         "strategy": "rev",
