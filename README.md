@@ -6,9 +6,56 @@
 
 **Transparently obfuscate emails, phone numbers, and other sensitive data with PHP and modern browser features.**
 
+## Demo
+
+[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)
+
+<!-- demo-readme:start -->
 ## Motivation
 
 Contrary to popular belief, [this article by Spencer Mortensen](https://spencermortensen.com/articles/email-obfuscation/) shows that even moderate obfuscation dramatically reduces email harvesting by spam bots. Most bots simply scan raw HTML and don't simulate user interaction.
+
+## Installation
+
+```shell
+# requires PHP >= 8.4
+composer require hirasso/html-obfuscator
+```
+
+## Minimal Example
+
+Obfuscate emails and phone numbers in `$html` and automatically inject the client script that reveals `<ob-fus-ca-ted>` custom elements in the frontend:
+
+```php
+use function Hirasso\HTMLObfuscator\obfuscate;
+
+echo obfuscate($html);
+```
+
+## Manually load the client script
+
+By default, the client `<script>` is auto-injected into the document. If you want more control (e.g. want the script in the `<head>`), use `clientScript()` and echo it yourself:
+
+```php
+use function Hirasso\HTMLObfuscator\obfuscate;
+use function Hirasso\HTMLObfuscator\clientScript;
+
+// 1. Render the script in your <head>
+echo clientScript();
+
+// 2. Obfuscate your HTML — script injection is skipped because it was already rendered
+echo obfuscate($html);
+```
+
+## Features
+
+- There is **no visual difference** between obfuscated and de-obfuscated content in the browser
+- Works seamlessly with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
+- Works without configuration, but can be customized using a [fluent API](#fluent-api)
+- Fully compatible with HTML5 (thanks to PHP 8.4's new `\Dom\HTMLDocument` and friends)
+- Doesn't interfere with accessibility
+- Extensively tested on both ends – PHP, JavaScript, e2e, basic benchmarks
+
 
 ## How it works
 
@@ -58,51 +105,7 @@ Custom elements representing a text node _do_ decode the value immediately on <c
 
 <code>href</code> attributes of obfuscated links also stay empty until interaction.
 
-## Main Features
-
-- There is **no visual difference** between obfuscated and de-obfuscated content in the browser
-- Works seamlessly with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
-
-## Other Features
-
-- Works without configuration, but can be customized using a fluent [API](#api)
-- Fully compatible with HTML5 (thanks to PHP 8.4's new `\Dom\HTMLDocument` and friends)
-- Doesn't interfere with accessibility
-- Extensively tested on both ends – PHP, JavaScript, e2e, basic benchmarks
-
-## Installation
-
-```shell
-# requires PHP >= 8.4
-composer require hirasso/html-obfuscator
-```
-
-## Minimal Example
-
-Obfuscate emails and phone numbers in `$html` and automatically inject the client script that reveals `<ob-fus-ca-ted>` custom elements in the frontend:
-
-```php
-use function Hirasso\HTMLObfuscator\obfuscate;
-
-echo obfuscate($html);
-```
-
-## Manually load the client script
-
-By default, the client `<script>` is auto-injected into the document. If you want more control (e.g. want the script in the `<head>`), use `clientScript()` and echo it yourself:
-
-```php
-use function Hirasso\HTMLObfuscator\obfuscate;
-use function Hirasso\HTMLObfuscator\clientScript;
-
-// 1. Render the script in your <head>
-echo clientScript();
-
-// 2. Obfuscate your HTML — script injection is skipped because it was already rendered
-echo obfuscate($html);
-```
-
-## API
+## Fluent API
 
 ### `->emails(bool)`
 
@@ -183,6 +186,8 @@ echo obfuscate($html)
 
 The pattern must be a valid PCRE regex with delimiters. Each call to `->addRegex()` appends one pattern; you can chain as many as you need. An `\InvalidArgumentException` is thrown for invalid patterns.
 
+## Advanced
+
 ### `[obfuscate-text]`
 
 Add an `obfuscate-text` attribute to any element to obfuscate all of its text content — no pattern matching needed. This is a simpler alternative to `->addRegex()` when you control the markup:
@@ -202,7 +207,7 @@ Every text node inside is obfuscated wholesale, and the attribute is removed fro
 
 The `<ob-fus-ca-ted>` elements handle deobfuscation as usual. Content inside `<pre>`, `<code>`, `<script>`, and other excluded elements is left untouched even when nested inside an `[obfuscate-text]` element.
 
-## Obfuscating a `HTMLDocument`
+### Obfuscating a `HTMLDocument`
 
 When passing a `\Dom\HTMLDocument`, the obfuscation is applied directly to the document:
 
@@ -214,5 +219,7 @@ $doc = HTMLDocument::createFromString($html);
 obfuscate($doc)->saveDocument();
 // $doc is now obfuscated in place
 ```
+
+<!-- demo-readme:end -->
 
 &rarr; Browse the <a href="./tests">tests folder</a> for more usage examples.

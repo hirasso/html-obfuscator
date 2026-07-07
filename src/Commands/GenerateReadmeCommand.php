@@ -35,8 +35,12 @@ class GenerateReadmeCommand extends Command
             return Command::FAILURE;
         }
 
-        // Strip everything before the first ## heading (title + badges)
-        $markdown = preg_replace('/\A.*?(?=^## )/ms', '', $markdown) ?? $markdown;
+        // Extract only the part between <!-- demo-readme:start --> and <!-- demo-readme:end -->
+        if (!preg_match('/<!--\s*demo-readme:start\s*-->(.*?)<!--\s*demo-readme:end\s*-->/s', $markdown, $matches)) {
+            $output->writeln('<error>Could not find <!-- demo-readme:start/end --> markers in README.md</error>');
+            return Command::FAILURE;
+        }
+        $markdown = trim($matches[1]);
 
         // Render > [!NOTE] as a styled blockquote
         $markdown = preg_replace('/^> \[!NOTE\]$/m', '> **Note:**', $markdown) ?? $markdown;
