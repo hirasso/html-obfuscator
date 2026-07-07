@@ -64,6 +64,7 @@
     ],
     "generate-types": "bin/console typescript:transform",
     "generate-readme": "bin/console readme:generate",
+    "generate-fixtures": "bin/console fixtures:generate",
     "post-install-cmd": [
       "[ -n \"$CI\" ] || pnpm install",
       "ln -s AGENTS.md CLAUDE.md || exit 0"

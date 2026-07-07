@@ -1,0 +1,47 @@
+[
+    {
+        "strategy": "xor",
+        "plain": "hello@example.com",
+        "encoded": "MDpRyLiSNz6dRyNzG9X\/jj1QOa3U\/lh++D9CHmu5mqBePzw="
+    },
+    {
+        "strategy": "xor",
+        "plain": "+1 (555) 123-4567",
+        "encoded": "MDqZaV98lVeuq1Q8NtsWX0NHslh\/VKBim4J0DQToO2t2ca4="
+    },
+    {
+        "strategy": "xor",
+        "plain": "user+tag@sub.domain.org",
+        "encoded": "MDp5Uzlew3YP1ohBWnPq5CdwDCBcLOgCbrHIMi8RxIBIHRg6V3CsBGg="
+    },
+    {
+        "strategy": "rev",
+        "plain": "hello@example.com",
+        "encoded": "MTptb2MuZWxwbWF4ZUBvbGxlaA=="
+    },
+    {
+        "strategy": "rev",
+        "plain": "+1 (555) 123-4567",
+        "encoded": "MTo3NjU0LTMyMSApNTU1KCAxKw=="
+    },
+    {
+        "strategy": "rev",
+        "plain": "user+tag@sub.domain.org",
+        "encoded": "MTpncm8ubmlhbW9kLmJ1c0BnYXQrcmVzdQ=="
+    },
+    {
+        "strategy": "rot47",
+        "plain": "hello@example.com",
+        "encoded": "Mjo5Nj09QG82STI+QT02XTRAPg=="
+    },
+    {
+        "strategy": "rot47",
+        "plain": "+1 (555) 123-4567",
+        "encoded": "MjpaYCBXZGRkWCBgYWJcY2RlZg=="
+    },
+    {
+        "strategy": "rot47",
+        "plain": "user+tag@sub.domain.org",
+        "encoded": "MjpGRDZDWkUyOG9ERjNdNUA+Mjo\/XUBDOA=="
+    }
+]
