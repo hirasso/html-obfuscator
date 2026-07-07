@@ -3,7 +3,7 @@
 use Hirasso\HTMLObfuscator\Obfuscation\Obfuscator;
 
 test('Obfuscator::STRATEGIES keys match client decoder names', function () {
-    expect(array_keys(Obfuscator::STRATEGIES))->toBe(['xor', 'rev', 'rot47']);
+    expect(array_keys(Obfuscator::STRATEGIES))->toBe(['xor', 'revxor', 'rot47']);
 });
 
 test('Obfuscator::getAttribute() produces "index:data" format', function () {

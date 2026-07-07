@@ -12,8 +12,8 @@ final class Obfuscator
     /** Maps client-side decoder name → strategy class, in index order */
     public const array STRATEGIES = [
         'xor'   => XorStrategy::class,
-        'rev'   => RevStrategy::class,
-        'rot47' => ROT47Strategy::class,
+        'revxor'   => RevXorStrategy::class,
+        'rot47' => Rot47Strategy::class,
     ];
 
     /** @var class-string<ObfuscationStrategy> */

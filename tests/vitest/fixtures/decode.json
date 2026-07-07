@@ -2,52 +2,52 @@
     {
         "strategy": "xor",
         "plain": "hello@example.com",
-        "encoded": "MDrTWUuYokcYvIwqdjmIocD2uzwn9M0HfcTtRwZV7Y+jmb4="
+        "encoded": "MDp2K0Z0RUNU1J2eXSfIUWfDHk4qGCoDMaz88y1LrX8ErBs="
     },
     {
         "strategy": "xor",
         "plain": "+1 (555) 123-4567",
-        "encoded": "MDps0SggNslTFvz70SO4lBESR+AICAP8Zj\/cyuMQlaAkJFs="
+        "encoded": "MDoNm5GHOasprob4lRXM3yspJqqxrwyeHIemyacm4eseHzo="
     },
     {
         "strategy": "xor",
         "plain": "user+tag@sub.domain.example.org",
-        "encoded": "MDoNy0xLXIpKHV97szTDEBPjeLgpOXf+K3ofCMZW7XR8jmyiImU58itwLxfWGqxidA=="
+        "encoded": "MDrl9GwYib\/pU7Ipra+sy9GJkIcJaqLLiDTyWtjNgq++5ISdAjbsx4g+wkXIgcO5tg=="
     },
     {
         "strategy": "xor",
         "plain": "münchen@ümlaute.example.com",
-        "encoded": "MDp6bUYv5tLPkuzsBqsBMATUF676QYW6qvysL7rGbVFxoB9DI1eHv7\/+icJlxGw="
+        "encoded": "MDrYXoEmTZRnIY0u\/l4R1+QxtZ09SC78Ak\/N7UIzfbaRRb1w5F4s+RdN6ACdMXw="
     },
     {
         "strategy": "xor",
         "plain": "😍😍😍@emojis.example.com",
-        "encoded": "MDqEvZruFN4fy\/uyybOPXLUWdCICY+RBh0YLLVE+zznYee7U6cBxpn6mi96snewz2A=="
+        "encoded": "MDrZJKrv4wrUAwszJiztUkg5KbsyYhOVTI77rL6hrTclVrNN2cGGcrVue19DAo49JQ=="
     },
     {
-        "strategy": "rev",
+        "strategy": "revxor",
         "plain": "hello@example.com",
-        "encoded": "MTptb2MuZWxwbWF4ZUBvbGxlaA=="
+        "encoded": "MTpsbWAqYGpxb2J8YEZubm9hbQ=="
     },
     {
-        "strategy": "rev",
+        "strategy": "revxor",
         "plain": "+1 (555) 123-4567",
-        "encoded": "MTo3NjU0LTMyMSApNTU1KCAxKw=="
+        "encoded": "MTo2NDYwKDUzMyMtMDM0KiM1Lg=="
     },
     {
-        "strategy": "rev",
+        "strategy": "revxor",
         "plain": "user+tag@sub.domain.example.org",
-        "encoded": "MTpncm8uZWxwbWF4ZS5uaWFtb2QuYnVzQGdhdCtyZXN1"
+        "encoded": "MTpmcGwqYGpxb2J8YChva2JpamIvYHZ3RWFgdih2YHV0"
     },
     {
-        "strategy": "rev",
+        "strategy": "revxor",
         "plain": "münchen@ümlaute.example.com",
-        "encoded": "MTptb2MuZWxwbWF4ZS5ldHVhbG28w0BuZWhjbrzDbQ=="
+        "encoded": "MTpsbWAqYGpxb2J8YChkdnZlaWu9wUNqYG5ibL\/HaA=="
     },
     {
-        "strategy": "rev",
+        "strategy": "revxor",
         "plain": "😍😍😍@emojis.example.com",
-        "encoded": "MTptb2MuZWxwbWF4ZS5zaWpvbWVAjZif8I2Yn\/CNmJ\/w"
+        "encoded": "MTpsbWAqYGpxb2J8YChya2lraGNBj5ub9YuZnfOJnZnx"
     },
     {
         "strategy": "rot47",

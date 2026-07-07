@@ -5,7 +5,7 @@ type Decoder = (data: string) => string | undefined;
 
 const decoderMap: Record<string, Decoder> = {
   xor: decodeXOR,
-  rev: decodeRev,
+  revxor: decodeRevXor,
   rot47: decodeROT47,
 };
 
@@ -78,11 +78,15 @@ function decodeXOR(value: string): string | undefined {
     .join("");
 }
 
-/** Decode a reversed string */
-function decodeRev(value: string): string | undefined {
+/** Decode a reversed + position-XOR'd string */
+function decodeRevXor(value: string): string | undefined {
   if (!value) return undefined;
 
-  return [...value].reverse().join("");
+  const unxored = [...value]
+    .map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ (i % 6 + 1)))
+    .join("");
+
+  return [...unxored].reverse().join("");
 }
 
 /** Decode a ROT47 string */
