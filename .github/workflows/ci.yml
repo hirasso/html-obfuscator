@@ -91,7 +91,13 @@ jobs:
           php-version: '8.4'
 
       - name: Run Benchmarks
-        run: composer bench -- --progress=none
+        run: |
+          OUTPUT=$(composer bench -- --progress=none 2>&1)
+          echo "$OUTPUT"
+          echo "## Benchmark Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
   format:
     name: Format Code
