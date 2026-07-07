@@ -128,6 +128,22 @@ Inject the client script unminified and with logging
 echo obfuscate($html)->debug(true);
 ```
 
+### `->setStrategy(string)`
+
+Pin the obfuscation algorithm instead of picking one at random each time. Available strategies are in `Hirasso\HTMLObfuscator\Obfuscation\Obfuscator::STRATEGIES`:
+
+```php
+use Hirasso\HTMLObfuscator\Obfuscation\XorStrategy;
+use Hirasso\HTMLObfuscator\Obfuscation\RevStrategy;
+use Hirasso\HTMLObfuscator\Obfuscation\ROT47Strategy;
+
+echo obfuscate($html)->setStrategy(XorStrategy::class);
+echo obfuscate($html)->setStrategy(RevStrategy::class);
+echo obfuscate($html)->setStrategy(ROT47Strategy::class);
+```
+
+An `\InvalidArgumentException` is thrown for unknown strategy classes.
+
 ### `->withAriaLabel(?string)`
 
 Customize or disable the `aria-label` on each obfuscated element. Pass `null` to omit it entirely:

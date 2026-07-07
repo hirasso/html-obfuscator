@@ -152,6 +152,18 @@ test('addRegex() throws on invalid pattern', function () {
         ->toThrow(InvalidArgumentException::class);
 });
 
+test('setStrategy() pins the obfuscation algorithm', function () {
+    $result = (string) obfuscate('mail@example.com')
+        ->setStrategy(\Hirasso\HTMLObfuscator\Obfuscation\XorStrategy::class);
+    expect($result)->toContain('identifier="xor"');
+});
+
+test('setStrategy() throws for an unknown strategy', function () {
+    // @phpstan-ignore-next-line (testing for unknown strategy)
+    expect(fn () => obfuscate('mail@example.com')->setStrategy('UnknownStrategy'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
 test('[obfuscate-text] obfuscates all text nodes inside', function () {
     $result = (string) obfuscate('<div obfuscate-text><span>foobar@</span>example.com</div>');
     expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(2);

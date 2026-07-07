@@ -11,4 +11,8 @@ export default {
     "pnpm run analyse",
     "git add resources/dist",
   ],
+  "README.md": () => [
+    'composer generate-readme',
+    'git add demo/readme.generated.html'
+  ]
 };
