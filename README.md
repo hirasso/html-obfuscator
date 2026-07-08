@@ -72,19 +72,20 @@ Matching parts get replaced with an obfuscated element and instructions how to r
 <p>Call us at  <ob-fus-ca-ted value="..." aria-label="Interact with the page to reveal"><noscript>Please activate JavaScript</noscript></ob-fus-ca-ted>.</p>
 ```
 
-### Links with matching `href` attribute
+### Links with matching `href` and/or `title` attribute
 
-Everything but the scheme is stripped from the `href` attribute. The link gets a hidden obfuscated element with `[attr="href"]` injected as a child:
+Everything but the scheme is stripped from the `href` attribute. The link gets a hidden obfuscated element with `[attr="href"]` injected as a child. The same applies to `title` attributes:
 
 ```html
 <!-- before: -->
-<a href="mailto:mail@example.com">
+<a href="mailto:mail@example.com" title="mail@example.com">
   Email us
 </a>
 
 <!-- after: -->
-<a href="mailto:">
+<a href="mailto:" title="">
   <ob-fus-ca-ted attr="href" value="..." style="display: none;"></ob-fus-ca-ted>
+  <ob-fus-ca-ted attr="title" value="..." style="display: none;"></ob-fus-ca-ted>
   Email us
 </a>
 ```
