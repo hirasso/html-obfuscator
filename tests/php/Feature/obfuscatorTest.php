@@ -18,6 +18,25 @@ test('Obfuscates emails in links', function () {
     );
 });
 
+test('Obfuscates email in link title attribute', function () {
+    $doc = obfuscate(<<<HTML
+        <a href="mailto:mail@example.com" title="mail@example.com">mail@example.com</a>
+    HTML)->saveDocument();
+
+    $elements = $doc->querySelectorAll(TESTS_TAG_NAME);
+    expect($elements)->toHaveCount(3);
+
+    expect($elements->item(0)?->getAttribute('attr'))->toBe('href');
+    expect($elements->item(1)?->getAttribute('attr'))->toBe('title');
+    expect($elements->item(2)?->getAttribute('attr'))->toBe(null);
+});
+
+test('Does not obfuscate non-sensitive link title attributes', function () {
+    $doc = obfuscate('<a href="#" title="Visit our website">link</a>')->saveDocument();
+    expect($doc->querySelector('a')?->getAttribute('title'))->toBe('Visit our website');
+    expect($doc->querySelector(TESTS_TAG_NAME))->toBe(null);
+});
+
 test('Keeps the scheme in the href for consistent styling', function () {
     $doc = obfuscate(<<<HTML
         <a href="mailto:mail@example.com">email</a><a href="tel:+49 12 345 67">tel</a>

@@ -243,6 +243,7 @@ final class HTMLObfuscator
     private function obfuscateLinks(): void
     {
         foreach ($this->document->querySelectorAll('a[href]') as $el) {
+            $this->obfuscateAttribute('title', $el);
             $this->obfuscateAttribute('href', $el);
         }
     }
@@ -261,20 +262,17 @@ final class HTMLObfuscator
         }
 
         /** apply only the first regex that matches */
-        $pattern = \array_find(
+        $matches = \array_find(
             $this->builtinPatterns(),
             fn ($p) => !!preg_match($p, $value)
         );
 
-        if (!$pattern) {
+        if (!$matches) {
             return;
         }
 
 
-        $obfuscated = $this->createObfuscatedAttributeElement(
-            $value,
-            $attibuteName
-        );
+        $obfuscated = $this->createObfuscatedAttributeElement($value, $attibuteName);
 
         $el->prepend($obfuscated);
 
