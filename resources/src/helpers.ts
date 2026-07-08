@@ -61,30 +61,34 @@ export const detectInteraction = (() => {
       "pointerdown",
       "keydown",
     ],
-  ): Promise<T> => {
+  ) => {
     if (hasInteracted) return Promise.resolve(target);
 
-    if (!promises.has(target)) {
-      promises.set(
-        target,
-        new Promise<T>((resolve) => {
-          const abortCtrl = new AbortController();
+    const existingPromise = promises.get(target);
+    if (existingPromise) return existingPromise;
 
-          events.forEach((eventName) => {
-            target.addEventListener(
-              eventName,
-              () => {
-                abortCtrl.abort();
-                hasInteracted = true;
-                resolve(target);
-              },
-              { signal: abortCtrl.signal },
-            );
-          });
-        }),
-      );
-    }
+    const newPromise = new Promise<T>((resolve) => {
+      const abortCtrl = new AbortController();
 
-    return promises.get(target)! as Promise<T>;
+      events.forEach((eventName) => {
+
+        target.addEventListener(
+          eventName,
+          (e) => {
+
+            abortCtrl.abort();
+            hasInteracted = true;
+            resolve(target);
+
+          },
+          { signal: abortCtrl.signal },
+        );
+
+      });
+    });
+
+    promises.set(target, newPromise);
+
+    return newPromise;
   };
 })();

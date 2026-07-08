@@ -5,7 +5,7 @@ import { replacePlugin } from "rolldown/plugins";
 export default defineConfig([
   /** The unminified development build */
   {
-    input: "resources/src",
+    input: "resources/src/index.js",
     output: [
       {
         format: "es",
@@ -23,7 +23,7 @@ export default defineConfig([
   },
   /** The aggressively minified production build */
   {
-    input: "resources/src",
+    input: "resources/src/index.js",
     output: [
       {
         format: "es",

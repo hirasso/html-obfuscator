@@ -52,17 +52,20 @@ const detectInteraction = (() => {
 		"keydown"
 	]) => {
 		if (hasInteracted) return Promise.resolve(target);
-		if (!promises.has(target)) promises.set(target, new Promise((resolve) => {
+		const existingPromise = promises.get(target);
+		if (existingPromise) return existingPromise;
+		const newPromise = new Promise((resolve) => {
 			const abortCtrl = new AbortController();
 			events.forEach((eventName) => {
-				target.addEventListener(eventName, () => {
+				target.addEventListener(eventName, (e) => {
 					abortCtrl.abort();
 					hasInteracted = true;
 					resolve(target);
 				}, { signal: abortCtrl.signal });
 			});
-		}));
-		return promises.get(target);
+		});
+		promises.set(target, newPromise);
+		return newPromise;
 	};
 })();
 
