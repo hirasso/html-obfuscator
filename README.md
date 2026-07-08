@@ -4,7 +4,7 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Obfuscate emails, phone numbers, and other sensitive data in PHP — invisible to humans, hidden from bots until they interact.**
+**Obfuscate emails, phone numbers, and other sensitive data in PHP. Invisible to humans, hidden from bots until they interact.**
 
 &rarr; **[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)**
 
@@ -219,15 +219,23 @@ obfuscate($doc)->saveDocument();
 // $doc is now obfuscated in place
 ```
 
-## Attribution
+## Credits
+
+### Inspiration
 
 Before writing this, I found a few existing solutions worth mentioning.
 
-[muddle](https://github.com/mokhosh/muddle) by [@mokhosh](https://github.com/mokhosh) is a PHP obfuscation package with a thoughtful set of strategies — but it relies on inline `<script>` tags for deobfuscation, which browsers won't execute when content is injected into the DOM dynamically (AJAX, fetch, ...). It also doesn't require interaction, so browser-based crawlers will be able to see the content immediately.
+[muddle](https://github.com/mokhosh/muddle) is a PHP package with many interesting obfuscation strategies. But it relies on inline `<script>` tags for deobfuscation, which browsers won't execute when content is injected into the DOM dynamically (AJAX, fetch, ...). It also doesn't require interaction, so browser-based crawlers will be able to see the content immediately.
 
-[astro-obfuscate](https://github.com/TrueWinter/astro-obfuscate) and [astro-mail-obfuscation](https://github.com/andreas-brunner/astro-mail-obfuscation) are both Astro integrations that handle obfuscation well within that ecosystem — but they're tied to the Astro build pipeline and don't translate outside of it. I adopted the idea with the [`fallbackText`](https://github.com/andreas-brunner/astro-mail-obfuscation#configuration) from the latter, though.
+[astro-obfuscate](https://github.com/TrueWinter/astro-obfuscate) and [astro-mail-obfuscation](https://github.com/andreas-brunner/astro-mail-obfuscation) are both Astro integrations that handle obfuscation well within that ecosystem. But they're tied to the Astro build pipeline and don't translate outside of it. I adopted the idea with the [`fallbackText`](https://github.com/andreas-brunner/astro-mail-obfuscation#configuration) from the latter, though.
 
-I needed something that works in any PHP project, independent of framework or frontend toolchain, with no visible flash during deobfuscation and no "[please wait]" placeholders. None of the existing options fit, so I built this.
+I needed something that works **in any PHP project, independent of framework or frontend toolchain, with no visible flash during deobfuscation**. Also, I this package gave me the excuse to play around with the tooling involved with building a robust FOSS package: 
+
+### Tools used
+
+[PHPStan](https://phpstan.org/) for static analysis. [PHPUnit](https://phpunit.de/index.html)/[Pest](https://pestphp.com/) for feature and unit tests. [Vitest](https://vitest.dev/) for unit tests of the client script. [Playwright](https://playwright.dev/) for end-to-end tests. [Changesets](https://github.com/changesets/changesets) for changelog gneration. [FTP-Deploy-Action](https://github.com/SamKirkland/FTP-Deploy-Action) for automatic deployment of the [demo site](https://html-obfuscator.rassohilber.com/) on every release. 
+
+And last, but not least, [Claude Code](https://claude.com/product/claude-code) in combination with [mattpocock/skills](https://github.com/mattpocock/skills) for grilling sessions and code quality improvements. Not sure if that actually saved or cost me development time 😅
 
 <!-- demo-readme:end -->
 
