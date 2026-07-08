@@ -33,6 +33,7 @@ $obfuscator = obfuscate(<<<HTML
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fixture</title>
   <style>
     {$defaultTagName}, a:has({$defaultTagName}[attr="href"]) { color: red }
@@ -65,7 +66,7 @@ $obfuscator = obfuscate(<<<HTML
     <main>
         <p>This is a plaintext email address: mail@example.com. It should not cause layout shift when de-obfuscated.</p>
         <p>contact@example.com</p>
-        <p>This is a plaintext phone number: +1 555 123 4567. It should not cause layout shift when de-obfuscated.</p>
+        <p>This is a plaintext phone number: +1 555 123 4567. And the same one with non-breaking spaces: +1&nbsp;555&nbsp;123&nbsp;4567</p>
         <p>+1 555 123-4567</p>
         <a href="mailto:mail@example.com">Send email</a>
     </main>
