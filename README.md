@@ -233,7 +233,9 @@ I needed something that works **in any PHP project, independent of framework or 
 
 ### Tools used
 
-Static analyis using [PHPStan](https://phpstan.org/). PHP Integration and Unit tests using [PHPUnit](https://phpunit.de/index.html)/[Pest](https://pestphp.com/). JavaScript unit tests using [Vitest](https://vitest.dev/). End-to-end tests using [Playwright](https://playwright.dev/). Changelog generation using [Changesets](https://github.com/changesets/changesets). Automatic deployment of the [demo site](https://html-obfuscator.rassohilber.com/) on every release using [FTP-Deploy-Action](https://github.com/SamKirkland/FTP-Deploy-Action). And last, but not least, [Claude Code](https://claude.com/product/claude-code) in combination with [mattpocock/skills](https://github.com/mattpocock/skills) for grilling sessions and code quality improvements. Not sure if that actually saved or cost me development time 😅
+[PHPStan](https://phpstan.org/) for static analysis. [PHPUnit](https://phpunit.de/index.html)/[Pest](https://pestphp.com/) for feature and unit tests. [Vitest](https://vitest.dev/) for unit tests of the client script. [Playwright](https://playwright.dev/) for end-to-end tests. [Changesets](https://github.com/changesets/changesets) for changelog gneration. [FTP-Deploy-Action](https://github.com/SamKirkland/FTP-Deploy-Action) for automatic deployment of the [demo site](https://html-obfuscator.rassohilber.com/) on every release. 
+
+And last, but not least, [Claude Code](https://claude.com/product/claude-code) in combination with [mattpocock/skills](https://github.com/mattpocock/skills) for grilling sessions and code quality improvements. Not sure if that actually saved or cost me development time 😅
 
 <!-- demo-readme:end -->
 
