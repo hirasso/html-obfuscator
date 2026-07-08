@@ -20,6 +20,8 @@ $currentYear = date('Y');
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HTML Obfuscator</title>
+  <meta name="description" content="Obfuscate emails, phone numbers, and other sensitive data in PHP — invisible to humans, hidden from bots until they interact."></meta>
+  <meta property="og:image" content="/og-image.jpg">
   <?= clientScript() ?>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="demo.css">
