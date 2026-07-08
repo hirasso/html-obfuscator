@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.1
+
+### Patch Changes
+
+- 4cafb77: Obfuscate `title` attributes on links containing emails or phone numbers
+- 017a67b: Recognize phone numbers containing non-breaking spaces (`&nbsp;`)
+
 ## 0.6.0
 
 ### Minor Changes
