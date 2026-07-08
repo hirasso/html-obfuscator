@@ -251,3 +251,8 @@ test('renders the client script', function () {
     expect($minified_result)->toContain('<script data-tagname="tests-obfuscated">');
     expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
 });
+
+test('recognizes phone numbers with non-breaking spaces', function () {
+    $doc = obfuscate('+49&nbsp;176&nbsp;200&nbsp;20&nbsp;805')->saveDocument();
+    expect($doc->querySelectorAll(TESTS_TAG_NAME))->toHaveCount(1);
+});

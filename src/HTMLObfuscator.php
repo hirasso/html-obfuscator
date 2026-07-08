@@ -22,7 +22,8 @@ final class HTMLObfuscator
     public const string OBFUSCATE_TEXT_ATTR = 'obfuscate-text';
 
     private const string PATTERN_EMAIL = '/(?:mailto:)?[^\s@]+@[^\s@]+\.[^\s@]{2,}/';
-    private const string PATTERN_PHONE = '/(?:tel:)?[\+\d][\d \-\(\)\.]{6,20}(?<!\s)/';
+    /** \x{00A0} = non-breaking space (&nbsp;), requires /u flag for Unicode support */
+    private const string PATTERN_PHONE = '/(?:tel:)?[\+\d][\d \x{00A0} \-\(\)\.]{6,20}(?<!\s)/u';
 
     private ?string $ariaLabel = 'Interact with the page to reveal';
     private ?string $noscriptText = 'Please activate JavaScript';
