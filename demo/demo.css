@@ -1,40 +1,7 @@
 :root {
-  --pico-font-size: clamp(16px, 2vw, 18px);
-  --pico-border-radius: 1.3rem !important;
-  --pico-form-element-spacing-vertical: 0.1em;
-  --pico-form-element-spacing-horizontal: 0.8em;
   scroll-behavior: smooth;
+  font-size: clamp(1rem, 0.875rem + 0.5vw, 1.25rem);
 }
-
-:root:not([data-theme=dark]),
-[data-theme=light] {
-  --pico-primary: black;
-  --pico-primary-background: var(--pico-primary);
-  --pico-primary-border: var(--pico-primary);
-  --pico-primary-underline: var(--pico-primary);
-  --pico-primary-hover: oklch(54% 0.24 28);
-  --pico-primary-hover-background: oklch(54% 0.24 28);
-  --pico-primary-hover-border: oklch(54% 0.24 28);
-  --pico-primary-hover-underline: oklch(54% 0.24 28);
-  --pico-primary-focus: oklch(62% 0.24 28 / 50%);
-  --pico-primary-inverse: #fff;
-  --pico-muted-color: black;
-}
-
-[data-theme=dark] {
-  --pico-primary: oklch(72% 0.24 28);
-  --pico-primary-background: var(--pico-primary);
-  --pico-primary-border: var(--pico-primary);
-  --pico-primary-underline: oklch(72% 0.24 28 / 50%);
-  --pico-primary-hover: oklch(80% 0.22 28);
-  --pico-primary-hover-background: oklch(67% 0.24 28);
-  --pico-primary-hover-border: oklch(67% 0.24 28);
-  --pico-primary-hover-underline: oklch(80% 0.22 28);
-  --pico-primary-focus: oklch(72% 0.24 28 / 50%);
-  --pico-primary-inverse: #fff;
-  --pico-muted-color: black;
-}
-
 body {
   padding-block: 2rem;
   max-width: 900px;
@@ -43,97 +10,35 @@ body {
 strong {
   color: inherit;
 }
-[role="button"].pill {
-  font-size: 0.8rem;
-}
-h1 {
-  --pico-font-size: 2.5rem;
-}
 hgroup > * + * {
-  margin-block-start: 0.5rem;
+  margin-block: 0.5em 0;
+}
+main > * + * {
+  margin-block: 1rem 0;
 }
 hgroup {
   margin-block-end: 3rem;
 }
-
-main > * + * {
-  margin-block: 1.5em 0;
-}
-
-.hint {
-  font-style: italic;
-  opacity: 0.6;
-}
-
 pre {
   overflow-x: auto;
 }
-
-pre[class*="language-"],
-code[class*="language-"] {
+pre[class="shiki"],
+p.demo {
   font-size: 0.875em;
+  border-radius: 1em;
+  padding: 0;
 }
 
-details + details {
-  margin-block-start: 0.5rem;
-}
-
-a[href^="mailto:"],
-a[href^="tel:"] {
-  position: relative;
-  --tooltip-offset: 4px;
-
-  /* &::before,
-  &::after {
-    text-decoration: none;
-  }
-  &::before {
-    content: "Now machines can as well";
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(100% + 5px + var(--tooltip-offset));
-    white-space: nowrap;
-    background: black;
-    font-size: 0.7em;
-    color: white;
-    border-radius: 1em;
-    padding: 0.25em 1em 0.3em;
-    pointer-events: none;
-  }
-  &::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(100% + var(--tooltip-offset));
-    border: 6px solid transparent;
-    border-top-color: black;
-    border-bottom: none;
-    pointer-events: none;
-  } */
-}
-
-a[href="mailto:"],
-a[href="tel:"] {
-  /* &::before {
-    content: "Only humans can see this";
-  } */
-}
-
-summary {
-  font-weight: bold;
-  width: max-content;
-}
-
-pre[class*="language-"] {
-  font-size: 1rem;
-  border-radius: 1rem;
+p.demo {
+  background: #f8f8f8;
+  border: 1px solid #eee;
+  padding: var(--pico-spacing);
 }
 
 :is(h1, h2, h3, h4, h5, h6) {
-  scroll-margin-top: 2rem;
+  scroll-margin-top: 2em;
   position: relative;
+  margin-block: 2em 0 !important;
 
   .anchor {
     opacity: 0;
@@ -150,15 +55,19 @@ pre[class*="language-"] {
   .anchor:hover {
     opacity: 1 !important;
   }
-}
 
+}
 footer {
   text-align: center;
   max-width: 600px;
   margin-block: 2rem;
 }
-
 code {
   display: inline;
   overflow-wrap: break-word;
+}
+blockquote,
+p,
+ul {
+  margin-block-start: 0.75em;
 }

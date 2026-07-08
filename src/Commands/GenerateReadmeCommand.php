@@ -14,6 +14,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Hirasso\HTMLObfuscator\obfuscate;
+
 /** @codeCoverageIgnore */
 #[AsCommand(name: 'readme:generate')]
 class GenerateReadmeCommand extends Command
@@ -44,6 +46,8 @@ class GenerateReadmeCommand extends Command
 
         // Render > [!NOTE] as a styled blockquote
         $markdown = preg_replace('/^> \[!NOTE\]$/m', '> **Note:**', $markdown) ?? $markdown;
+
+        $markdown = $this->prependRealDemoMarkdown($markdown);
 
         $environment = new Environment([
             'heading_permalink' => [
@@ -81,8 +85,38 @@ class GenerateReadmeCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * Prepend the demo to the markdown string
+     */
+    private function prependRealDemoMarkdown(string $markdown): string
+    {
+        $demo = (string) obfuscate(<<<HTML
+            <p class="demo">Write me an email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or call me: <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
+        HTML)->injectClientScript(false);
+
+        // $source = htmlspecialchars($demo);
+
+        $prepended = $this->trimLines(<<<EOF
+            ## Demo
+
+            **There is NO visual difference between obfuscated and fully revealed state.**
+            To see the effect, you must inspect one of the two links in the following paragraph,
+            reload the page and then move your mouse or press any key:
+
+            $demo
+
+            **Crawlers that aren't able to simulate user interaction** will only ever see this:
+
+            ```html
+            $demo
+            ```
+        EOF);
+
+        return "{$prepended}\n\n{$markdown}";
+    }
+
     private function trimLines(string $text): string
     {
-        return implode("\n", array_map('trim', preg_split("/\R/", $text) ?: []));
+        return implode("\n", array_map('trim', preg_split("/\R/u", $text) ?: []));
     }
 }

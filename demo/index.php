@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-use function Hirasso\HTMLObfuscator\obfuscate;
 use function Hirasso\HTMLObfuscator\clientScript;
-
-$contactHtml = obfuscate(<<<HTML
-<p>You can reach me by email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or by phone at <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
-HTML)->debug(true);
 
 $currentYear = date('Y');
 
@@ -45,16 +40,6 @@ $currentYear = date('Y');
             <p><strong>&rarr; <a href="https://github.com/hirasso/html-obfuscator">github.com/hirasso/html-obfuscator</a></strong></p>
         </hgroup>
     </header>
-
-    <section>
-        <h2>Demo</h2>
-        <p class="hint">
-            <strong>There is NO visual difference between obfuscated and fully revealed state.</strong>
-            To see the effect, you must inspect on of the two links in the following paragraph,
-            reload the page and then move your mouse or press any key.
-        </p>
-        <?= $contactHtml ?>
-    </section>
 
     <?php include('./readme.generated.html'); ?>
 
