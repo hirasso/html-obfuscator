@@ -1,6 +1,6 @@
 {
   "name": "hirasso/html-obfuscator",
-  "description": "Obfuscate emails, phone numbers, and other sensitive data in PHP. Invisible to humans, hidden from crawlers and headless bots until they interact.",
+  "description": "Obfuscate emails, phone numbers, and other sensitive data in plain sight. Visible to humans, hidden from crawlers and headless bots until they interact.",
   "type": "library",
   "license": "MIT",
   "authors": [
