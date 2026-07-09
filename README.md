@@ -4,7 +4,7 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Obfuscate emails, phone numbers, and other sensitive data in PHP. Invisible to humans, hidden from crawlers and headless bots until they interact.**
+**Obfuscate emails, phone numbers, and other sensitive data in plain sight. Visible to humans, hidden from crawlers and headless bots until they interact.**
 
 &rarr; **[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)**
 
