@@ -4,12 +4,11 @@
 [![Test Status](https://img.shields.io/github/actions/workflow/status/hirasso/html-obfuscator/ci.yml?label=tests&color=3ef09d)](https://github.com/hirasso/html-obfuscator/actions/workflows/ci.yml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/hirasso/html-obfuscator?color=3ef09d)](https://app.codecov.io/gh/hirasso/html-obfuscator)
 
-**Obfuscate emails, phone numbers, and other sensitive data in plain sight. Visible to humans, hidden from crawlers and headless bots until they interact.**
+**Obfuscate emails, phone numbers, and other sensitive data using PHP the web platform. Visible to humans, hidden from crawlers and headless bots until they interact.**
 
 &rarr; **[html-obfuscator.rassohilber.com](https://html-obfuscator.rassohilber.com)**
 
 <!-- demo-readme:start -->
-## Motivation
 
 Contrary to popular belief, [this article by Spencer Mortensen](https://spencermortensen.com/articles/email-obfuscation/) shows that even moderate obfuscation dramatically reduces email harvesting by spam bots. Most bots simply scan raw HTML and don't simulate user interaction.
 
