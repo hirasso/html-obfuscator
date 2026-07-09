@@ -48,11 +48,11 @@ echo obfuscate($html);
 
 - **Framework agnostic** — works in any PHP project, independent of framework or frontend toolchain
 - There is **no visual difference** between obfuscated and de-obfuscated content in the browser
-- Works seamlessly with dynamically loaded content (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
-- Works without configuration, but can be customized using a [fluent API](#fluent-api)
-- Fully compatible with HTML5 (thanks to PHP 8.4's new `\Dom\HTMLDocument` and friends)
-- Doesn't interfere with accessibility
-- Extensively tested on both ends – PHP, JavaScript, e2e, basic benchmarks
+- Works seamlessly with **dynamically loaded content** (AJAX/fetch, [swup](https://swup.js.org/), [htmx](https://htmx.org/), [Unpoly](https://unpoly.com/), ...)
+- Works without configuration, but can be customized using a **[fluent API](#fluent-api)**
+- Fully **compatible with HTML5** (thanks to PHP 8.4's new `\Dom\HTMLDocument` and friends)
+- Doesn't interfere with **accessibility**
+- **Extensively tested** from all ends – PHP, JavaScript, e2e, basic benchmarks
 
 
 ## How it works
