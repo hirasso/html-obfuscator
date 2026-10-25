@@ -18,7 +18,7 @@ use Hirasso\HTMLObfuscator\Support\DomHelper;
  */
 final class HTMLObfuscator
 {
-    public const string DEFAULT_TAG_NAME = 'ob-fus-ca-ted';
+    public const string TAG_NAME = 'ob-fus-ca-ted';
     public const string OBFUSCATE_TEXT_ATTR = 'obfuscate-text';
 
     private const string PATTERN_EMAIL = '/(?:mailto:)?[^\s@]+@[^\s@]+\.[^\s@]{2,}/';
@@ -35,8 +35,6 @@ final class HTMLObfuscator
 
     /** @var list<string> */
     private array $customPatterns = [];
-
-    private bool $injectClientScript = true;
 
     private Obfuscator $obfuscation;
 
@@ -66,20 +64,14 @@ final class HTMLObfuscator
     }
 
     /**
-     * Create an empty instance
+     * Get the client script that reveals obfuscated elements, un-minified and with a logger in debug mode
      */
-    public static function createEmpty(): self
+    public static function getClientScript(bool $debug = false): string
     {
-        return new self(HTMLDocument::createEmpty());
-    }
+        $file = $debug ? 'index.js' : 'index.min.js';
+        $js = file_get_contents(dirname(__DIR__) . "/resources/dist/{$file}") ?: '';
 
-    /**
-     * Create an instance for rendering the client script only
-     */
-    public static function createForClientScript(): self
-    {
-        ObfuscatorConfig::$hasInjectedClientScript = false;
-        return self::createEmpty();
+        return "<script>{$js}</script>";
     }
 
     /**
@@ -128,16 +120,6 @@ final class HTMLObfuscator
     }
 
     /**
-     * Customize the tag name of the obfuscated element
-     * Must contain at least one "-", as defined by the Spec
-     */
-    public function withTagName(string $tagName): self
-    {
-        ObfuscatorConfig::setTagName($tagName);
-        return $this;
-    }
-
-    /**
      * Customize or disable the aria-label on obfuscated elements
      */
     public function withAriaLabel(?string $text = null): self
@@ -156,18 +138,7 @@ final class HTMLObfuscator
     }
 
     /**
-     * Should the deobfuscation script be injected or not?
-     */
-    public function injectClientScript(bool $enabled = true): self
-    {
-        $this->injectClientScript = $enabled;
-        return $this;
-    }
-
-    /**
-     * Activate debug mode. Currently, this has only one effect:
-     *
-     *  - The client script will be injected un-minified and with a logger
+     * Add debug identifiers to obfuscated elements
      */
     public function debug(bool $enabled = true): self
     {
@@ -180,8 +151,6 @@ final class HTMLObfuscator
      */
     public function apply(): self
     {
-        $this->maybeInjectClientScript();
-
         $this->processObfuscateTextElements();
         $this->obfuscateLinks();
         $this->obfuscateTextNodes();
@@ -287,7 +256,7 @@ final class HTMLObfuscator
      */
     private function createObfuscatedTextElement(string $value): Element
     {
-        $el = $this->document->createElement(ObfuscatorConfig::getTagName());
+        $el = $this->document->createElement(self::TAG_NAME);
         $el->setAttribute('value', $this->obfuscation->getAttribute($value));
 
         if ($this->debug) {
@@ -312,7 +281,7 @@ final class HTMLObfuscator
      */
     private function createObfuscatedAttributeElement(string $value, string $attribute): Element
     {
-        $el = $this->document->createElement(ObfuscatorConfig::getTagName());
+        $el = $this->document->createElement(self::TAG_NAME);
         $el->setAttribute('attr', $attribute);
 
         if ($this->debug) {
@@ -387,39 +356,5 @@ final class HTMLObfuscator
 
         $node->replaceWith($fragment);
 
-    }
-
-    /**
-     * Inject the script that de-obfuscates obfuscated emails in the frontend.
-     * This intentionally runs only ONCE per PHP process, since we only need it once
-     */
-    private function maybeInjectClientScript(): void
-    {
-        if (ObfuscatorConfig::$hasInjectedClientScript || !$this->injectClientScript) {
-            return;
-        }
-
-        ObfuscatorConfig::$hasInjectedClientScript = true;
-
-        /** the script tag */
-        $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');
-
-        $script = $this->document->createElement('script');
-        $script->textContent = $js;
-
-        $script->setAttribute('data-tagname', ObfuscatorConfig::getTagName());
-
-        ($this->document->body ?? $this->document)->append($script);
-    }
-
-    /**
-     * Get a resource, replace the default tag name with the actual tag name
-     */
-    private function getResource(string $path): string
-    {
-        $root = dirname(__DIR__);
-        $path = ltrim($path, "/");
-        $resource = file_get_contents("{$root}/resources/dist/$path") ?: '';
-        return str_replace(self::DEFAULT_TAG_NAME, ObfuscatorConfig::getTagName(), $resource);
     }
 }

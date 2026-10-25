@@ -1,14 +1,10 @@
 <?php
 
-use Dom\HTMLElement;
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
-use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 
 use function Hirasso\HTMLObfuscator\clientScript;
 
 const OBFUSCATE_TEXT_ATTR = HTMLObfuscator::OBFUSCATE_TEXT_ATTR;
-
-afterEach(fn () => ObfuscatorConfig::reset());
 
 test('Obfuscates emails in links', function () {
     expectObfuscatedElement(
@@ -60,31 +56,19 @@ test('Obfuscates phone numbers in plaintext', function () {
     expectObfuscatedElement((string) obfuscate('+49 12 345 67'));
 });
 
-test('debug(false) Injects the minified and mangled frontend script', function () {
-    $result = (string) obfuscate('')->debug(false)->injectClientScript(true);
-    expect($result)->toContain('new CustomEvent(n(t),{bubbles:!0})');
-});
-
-test('debug(false) injects the un-obfuscated frontend script', function () {
-    $result = (string) obfuscate('')
-        ->injectClientScript(true);
-
-    expect($result)->toContain('//#region resources/src/helpers.ts');
-});
-
 test('emails(false) disables email obfuscation', function () {
     $result = (string) obfuscate('<a href="mailto:mail@example.com">email</a>')
         ->emails(false);
 
     expect($result)->toContain('mailto:mail@example.com');
-    expect($result)->not->toContain('tests-obfuscated');
+    expect($result)->not->toContain(TESTS_TAG_NAME);
 });
 
 test('phoneNumbers(false) disables phone number obfuscation', function () {
     $result = (string) obfuscate('<a href="tel:+49 12 345 67">call us</a>')
         ->phoneNumbers(false);
     expect($result)->toContain('tel:+49 12 345 67');
-    expect($result)->not->toContain('tests-obfuscated');
+    expect($result)->not->toContain(TESTS_TAG_NAME);
 });
 
 test('obfuscate() outputs full HTML for non-partial input', function () {
@@ -101,28 +85,13 @@ test('__toString() returns the rendered output', function () {
 test('Invalid mailto: links are not obfuscated', function () {
     $result = (string) obfuscate('<a href="mailto:not-an-email">contact</a>');
     expect($result)->toContain('mailto:not-an-email');
-    expect($result)->not->toContain('tests-obfuscated');
+    expect($result)->not->toContain(TESTS_TAG_NAME);
 });
 
 test('Invalid tel: links are not obfuscated', function () {
     $result = (string) obfuscate('<a href="tel:123">call</a>');
     expect($result)->toContain('tel:123');
-    expect($result)->not->toContain('tests-obfuscated');
-});
-
-test("Allows to customize the custom element's tag name", function () {
-    $result = HTMLObfuscator::createFromString('mail@example.com')
-        ->withTagName('reveal-me')
-        ->injectClientScript(false)
-        ->saveDocument()
-        ->querySelector('reveal-me');
-
-    expect($result)->toBeInstanceOf(HTMLElement::class);
-});
-
-test('withTagName() throws if the element name is malformed', function () {
-    expect(fn () => obfuscate('mail@example.com')->withTagName('foobar'))
-        ->toThrow(InvalidArgumentException::class);
+    expect($result)->not->toContain(TESTS_TAG_NAME);
 });
 
 test('Returns a partial when receiving a partial', function () {
@@ -140,7 +109,7 @@ test('saveDocument() returns the underlying HTMLDocument', function () {
 
 test('obfuscates emails and phone numbers within the same text node', function () {
     $result = (string) obfuscate('this is an email: mail@example.com and a phone number: +49 12 345 67');
-    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(2);
     expect($result)->not->toContain('mail@example.com');
     expect($result)->not->toContain('+49 12 345 67');
 });
@@ -152,7 +121,7 @@ test('addRegex() obfuscates matching text nodes', function () {
         ->addRegex('/[^\s.]+(\.[^\s.]+)*\.[^\s.]{2,}/') // obfuscates the domain part ("example.com")
     ;
 
-    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(2);
     expect($result)->not->toContain('example.com');
     expect($result)->not->toContain('verylongemail@');
 });
@@ -161,7 +130,7 @@ test('addRegex() stacks multiple patterns', function () {
     $result = (string) obfuscate('foo-123 and bar-456')
         ->addRegex('/foo-\d+/')
         ->addRegex('/bar-\d+/');
-    expect(mb_substr_count($result, '<tests-obfuscated'))->toBe(2);
+    expect(mb_substr_count($result, '<' . TESTS_TAG_NAME))->toBe(2);
     expect($result)->not->toContain('foo-123');
     expect($result)->not->toContain('bar-456');
 });
@@ -236,20 +205,19 @@ test('Links with an empty href are not obfuscated', function () {
     expect($result)->not->toContain(TESTS_TAG_NAME);
 });
 
-test('withTagName() throws when changing an already-customized tag name', function () {
-    HTMLObfuscator::createFromString('')->withTagName('my-tag');
-    expect(fn () => HTMLObfuscator::createFromString('')->withTagName('other-tag'))
-        ->toThrow(InvalidArgumentException::class, 'globally stable');
+test('renders the client script', function () {
+    $minified = clientScript();
+    expect($minified)->toStartWith('<script>');
+    expect($minified)->toContain('new CustomEvent(n(t),{bubbles:!0})');
+    expect($minified)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
+
+    $debug = clientScript(debug: true);
+    expect($debug)->toContain('/*! hirasso/html-obfuscator | MIT License');
+    expect($debug)->toContain('//#region resources/src/helpers.ts');
 });
 
-test('renders the client script', function () {
-    $debug_result = (string) clientScript()->withTagName(TESTS_TAG_NAME)->debug(true);
-    expect($debug_result)->toContain('<script data-tagname="tests-obfuscated">');
-    expect($debug_result)->toContain('/*! hirasso/html-obfuscator | MIT License');
-
-    $minified_result = (string) clientScript()->withTagName(TESTS_TAG_NAME);
-    expect($minified_result)->toContain('<script data-tagname="tests-obfuscated">');
-    expect($minified_result)->not->toContain('/*! hirasso/html-obfuscator | MIT License');
+test('never injects the client script', function () {
+    expect((string) obfuscate('mail@example.com'))->not->toContain('<script');
 });
 
 test('recognizes phone numbers with non-breaking spaces', function () {

@@ -92,7 +92,7 @@ class GenerateReadmeCommand extends Command
     {
         $demo = (string) obfuscate(<<<HTML
             <p class="demo">Write me an email at <a href="mailto:mail@rassohilber.com">mail@rassohilber.com</a> or call me: <a href="tel:+4917620020805">+49 176 200 20 805</a>.</p>
-        HTML)->injectClientScript(false);
+        HTML);
 
         // $source = htmlspecialchars($demo);
 

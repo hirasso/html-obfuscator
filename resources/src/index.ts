@@ -1,17 +1,13 @@
 /*! hirasso/html-obfuscator | MIT License | Copyright (c) 2026 Rasso Hilber <mail@rassohilber.com> */
 
-import { debug, tagName } from "./defs.js";
+import { debug } from "./defs.js";
+import { tagName } from "./generated/constants.js";
 import { createLogger, detectGlobalInteraction, dispatch } from "./helpers.js";
 import { ObfuscatedElement } from "./ObfuscatedElement.js";
 
 const logger = debug ? createLogger() : undefined;
 
 (() => {
-  if (!tagName) {
-    logger?.error("required properties are missing:", { tagName });
-    return;
-  }
-
   logger?.log({ tagName });
 
   detectGlobalInteraction().then(() => {

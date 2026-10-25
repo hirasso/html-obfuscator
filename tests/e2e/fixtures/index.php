@@ -7,6 +7,7 @@ require_once dirname(__DIR__, 3) . '/vendor/autoload.php';
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
 use Hirasso\HTMLObfuscator\Obfuscation\Obfuscator;
 
+use function Hirasso\HTMLObfuscator\clientScript;
 use function Hirasso\HTMLObfuscator\obfuscate;
 
 /** render a nav link */
@@ -16,7 +17,8 @@ function navLink(string $label, string $href, bool $active): string
     return "<a href=\"{$href}\"{$ariaCurrent}>{$label}</a>";
 }
 
-$defaultTagName = HTMLObfuscator::DEFAULT_TAG_NAME;
+$tagName = HTMLObfuscator::TAG_NAME;
+$clientScript = clientScript();
 $strategyKey = $_GET['strategy'] ?? null;
 $strategyClass = Obfuscator::STRATEGIES[$strategyKey] ?? null;
 
@@ -35,8 +37,9 @@ $obfuscator = obfuscate(<<<HTML
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fixture</title>
+  {$clientScript}
   <style>
-    {$defaultTagName}, a:has({$defaultTagName}[attr="href"]) { color: red }
+    {$tagName}, a:has({$tagName}[attr="href"]) { color: red }
     body {
         font-family: system-ui;
         --rounded: 0.5rem;
