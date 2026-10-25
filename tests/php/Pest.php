@@ -30,7 +30,6 @@ function obfuscate(string $html): HTMLObfuscator
 {
     return HTMLObfuscator::createFromString($html)
         ->withTagName(TESTS_TAG_NAME)
-        ->injectClientScript(false)
         ->debug(true);
 }
 

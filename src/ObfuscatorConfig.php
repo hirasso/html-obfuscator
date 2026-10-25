@@ -14,7 +14,6 @@ use InvalidArgumentException;
 final class ObfuscatorConfig
 {
     private static string $tagName = HTMLObfuscator::DEFAULT_TAG_NAME;
-    public static bool $hasInjectedClientScript = false;
 
     private function __construct()
     {
@@ -43,6 +42,5 @@ final class ObfuscatorConfig
     public static function reset(): void
     {
         self::$tagName = HTMLObfuscator::DEFAULT_TAG_NAME;
-        self::$hasInjectedClientScript = false;
     }
 }

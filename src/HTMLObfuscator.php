@@ -36,7 +36,7 @@ final class HTMLObfuscator
     /** @var list<string> */
     private array $customPatterns = [];
 
-    private bool $injectClientScript = true;
+    private bool $injectClientScript = false;
 
     private Obfuscator $obfuscation;
 
@@ -78,8 +78,7 @@ final class HTMLObfuscator
      */
     public static function createForClientScript(): self
     {
-        ObfuscatorConfig::$hasInjectedClientScript = false;
-        return self::createEmpty();
+        return self::createEmpty()->injectClientScript();
     }
 
     /**
@@ -156,7 +155,7 @@ final class HTMLObfuscator
     }
 
     /**
-     * Should the deobfuscation script be injected or not?
+     * Inject the deobfuscation script into this document (off by default)
      */
     public function injectClientScript(bool $enabled = true): self
     {
@@ -390,16 +389,13 @@ final class HTMLObfuscator
     }
 
     /**
-     * Inject the script that de-obfuscates obfuscated emails in the frontend.
-     * This intentionally runs only ONCE per PHP process, since we only need it once
+     * Inject the script that de-obfuscates obfuscated emails in the frontend
      */
     private function maybeInjectClientScript(): void
     {
-        if (ObfuscatorConfig::$hasInjectedClientScript || !$this->injectClientScript) {
+        if (!$this->injectClientScript) {
             return;
         }
-
-        ObfuscatorConfig::$hasInjectedClientScript = true;
 
         /** the script tag */
         $js = $this->getResource($this->debug ? 'index.js' : 'index.min.js');

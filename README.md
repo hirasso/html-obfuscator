@@ -21,17 +21,7 @@ composer require hirasso/html-obfuscator
 
 ## Minimal Example
 
-Obfuscate emails and phone numbers in `$html` and automatically inject the client script that reveals `<ob-fus-ca-ted>` custom elements in the frontend:
-
-```php
-use function Hirasso\HTMLObfuscator\obfuscate;
-
-echo obfuscate($html);
-```
-
-## Manually load the client script
-
-By default, the client `<script>` is auto-injected into the document. If you want more control (e.g. want the script in the `<head>`), use `clientScript()` and echo it yourself:
+Render the client script that reveals `<ob-fus-ca-ted>` custom elements once (e.g. in your `<head>`), then obfuscate emails and phone numbers in `$html`:
 
 ```php
 use function Hirasso\HTMLObfuscator\obfuscate;
@@ -40,8 +30,16 @@ use function Hirasso\HTMLObfuscator\clientScript;
 // 1. Render the script in your <head>
 echo clientScript();
 
-// 2. Obfuscate your HTML — script injection is skipped because it was already rendered
+// 2. Obfuscate your HTML
 echo obfuscate($html);
+```
+
+## Inject the client script into the document
+
+No `<head>` hook available (e.g. a one-off page)? Let `obfuscate()` append the `<script>` to the document instead:
+
+```php
+echo obfuscate($html)->injectClientScript();
 ```
 
 ## Features
@@ -122,12 +120,20 @@ Keep phone numbers unobfuscated
 echo obfuscate($html)->phoneNumbers(false);
 ```
 
-### `->debug(bool)`
+### `->injectClientScript(bool)`
 
-Inject the client script unminified and with logging
+Append the client `<script>` to the document (off by default)
 
 ```php
-echo obfuscate($html)->debug(true);
+echo obfuscate($html)->injectClientScript();
+```
+
+### `->debug(bool)`
+
+Render the client script unminified and with logging
+
+```php
+echo clientScript()->debug(true);
 ```
 
 ### `->setStrategy(string)`

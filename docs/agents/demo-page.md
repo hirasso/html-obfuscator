@@ -40,5 +40,4 @@
 - Resulting `<ob-fus-ca-ted>` HTML output
 
 ## Implementation notes
-- Pre-generate raw obfuscated contact block with `->injectClientScript(false)` for the details display
-- Reset `HTMLObfuscator::$hasInjectedClientScript = false` before the full-page obfuscation call
+- Client script rendered once via `clientScript()` in `<head>`; `obfuscate()` never injects it by default

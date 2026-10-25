@@ -72,6 +72,10 @@ test('debug(false) injects the un-obfuscated frontend script', function () {
     expect($result)->toContain('//#region resources/src/helpers.ts');
 });
 
+test('does not inject the client script by default', function () {
+    expect((string) obfuscate('mail@example.com'))->not->toContain('<script');
+});
+
 test('emails(false) disables email obfuscation', function () {
     $result = (string) obfuscate('<a href="mailto:mail@example.com">email</a>')
         ->emails(false);

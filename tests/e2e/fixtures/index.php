@@ -72,7 +72,7 @@ $obfuscator = obfuscate(<<<HTML
     </main>
 </body>
 </html>
-HTML);
+HTML)->injectClientScript();
 
 if ($strategyClass !== null) {
     $obfuscator->setStrategy($strategyClass);
