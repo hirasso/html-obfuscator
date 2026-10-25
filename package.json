@@ -1,6 +1,6 @@
 {
   "name": "html-obfuscator",
-  "version": "0.6.1",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
   "devDependencies": {
