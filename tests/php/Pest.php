@@ -16,7 +16,7 @@ function dumpEnvironment(): void
 }
 dumpEnvironment();
 
-const TESTS_TAG_NAME = 'tests-obfuscated';
+const TESTS_TAG_NAME = HTMLObfuscator::TAG_NAME;
 
 /**
  * Obfuscate with sensible defaults for tests.
@@ -29,7 +29,6 @@ const TESTS_TAG_NAME = 'tests-obfuscated';
 function obfuscate(string $html): HTMLObfuscator
 {
     return HTMLObfuscator::createFromString($html)
-        ->withTagName(TESTS_TAG_NAME)
         ->debug(true);
 }
 

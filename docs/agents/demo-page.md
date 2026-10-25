@@ -40,4 +40,4 @@
 - Resulting `<ob-fus-ca-ted>` HTML output
 
 ## Implementation notes
-- Client script rendered once via `clientScript()` in `<head>`; `obfuscate()` never injects it by default
+- Client script rendered once via `clientScript()` in `<head>`; `obfuscate()` never injects it

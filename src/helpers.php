@@ -18,7 +18,7 @@ function obfuscate(string|\Dom\HTMLDocument $source): HTMLObfuscator
 /**
  * Render the client script for manual placement (e.g. in the <head>)
  */
-function clientScript(): HTMLObfuscator
+function clientScript(bool $debug = false): string
 {
-    return HTMLObfuscator::createForClientScript();
+    return HTMLObfuscator::getClientScript($debug);
 }

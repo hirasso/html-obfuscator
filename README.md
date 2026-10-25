@@ -34,12 +34,12 @@ echo clientScript();
 echo obfuscate($html);
 ```
 
-## Inject the client script into the document
+## Debugging the client script
 
-No `<head>` hook available (e.g. a one-off page)? Let `obfuscate()` append the `<script>` to the document instead:
+Render the client script un-minified and with logging:
 
 ```php
-echo obfuscate($html)->injectClientScript();
+echo clientScript(debug: true);
 ```
 
 ## Features
@@ -120,22 +120,6 @@ Keep phone numbers unobfuscated
 echo obfuscate($html)->phoneNumbers(false);
 ```
 
-### `->injectClientScript(bool)`
-
-Append the client `<script>` to the document (off by default)
-
-```php
-echo obfuscate($html)->injectClientScript();
-```
-
-### `->debug(bool)`
-
-Render the client script unminified and with logging
-
-```php
-echo clientScript()->debug(true);
-```
-
 ### `->setStrategy(string)`
 
 Pin the obfuscation algorithm instead of picking one at random each time:
@@ -168,14 +152,6 @@ Customize or disable the `<noscript>` fallback inside each obfuscated element. P
 ```php
 echo obfuscate($html)->withNoscriptText('Please activate JavaScript');
 echo obfuscate($html)->withNoscriptText(null); // disable
-```
-
-### `->withTagName(string)`
-
-Customize the tag name of the custom element
-
-```php
-echo obfuscate($html)->withTagName('reveal-me');
 ```
 
 ### `->addRegex(string)`

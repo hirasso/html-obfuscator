@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\php\Benchmarks;
 
 use Hirasso\HTMLObfuscator\HTMLObfuscator;
-use Hirasso\HTMLObfuscator\ObfuscatorConfig;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
@@ -26,8 +25,6 @@ class ObfuscateTextNodeBench
 
     public function setUp(): void
     {
-        ObfuscatorConfig::reset();
-
         /** ~5 obfuscatable items — realistic single page section */
         $this->sparse = <<<HTML
             <p>Contact us at hello@example.com or call +49 12 345 67.</p>
@@ -46,17 +43,13 @@ class ObfuscateTextNodeBench
 
     public function benchSparse(): void
     {
-        ObfuscatorConfig::reset();
         HTMLObfuscator::createFromString($this->sparse)
-            ->injectClientScript(false)
-            ->saveHTML();
+                ->saveHTML();
     }
 
     public function benchDense(): void
     {
-        ObfuscatorConfig::reset();
         HTMLObfuscator::createFromString($this->dense)
-            ->injectClientScript(false)
-            ->saveHTML();
+                ->saveHTML();
     }
 }
