@@ -51,12 +51,12 @@ final class DomHelper
     }
 
     /**
-     * Get the strings before and after the body's content of a HTML string.
+     * Split a HTML string into the strings before, inside and after the body's content.
      * Falls back to `</head>`, `<html>` or the doctype if there is no `<body>`
      *
-     * @return array{0: string, 1: string}
+     * @return array{0: string, 1: string, 2: string}
      */
-    public static function getBeforeAndAfterBody(string $source): array
+    public static function splitAtBody(string $source): array
     {
         /** blank out comments and raw text elements, so tags inside them aren't matched */
         $masked = preg_replace_callback(
@@ -75,7 +75,11 @@ final class DomHelper
             ?? self::getOffset($masked, '/<\/html\s*>/i', $start)
             ?? strlen($source);
 
-        return [substr($source, 0, $start), substr($source, $end)];
+        return [
+            substr($source, 0, $start),
+            substr($source, $start, $end - $start),
+            substr($source, $end),
+        ];
     }
 
     /**

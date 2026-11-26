@@ -102,6 +102,21 @@ test('Preserves a <body> wrapper verbatim', function () {
     expect((string) obfuscate('<body class="x">foobar</body>'))->toBe('<body class="x">foobar</body>');
 });
 
+test('Preserves whitespace around and inside the body verbatim', function () {
+    $sources = [
+        "   ",
+        " x ",
+        "<!doctype html>\n<p>a</p>",
+        "<head></head>\n<p>a</p>",
+        "<body>x</body>\n",
+        "<!doctype html>\n<html>\n<head></head>\n<body>\nx\n</body>\n</html>\n",
+    ];
+
+    foreach ($sources as $html) {
+        expect((string) obfuscate($html))->toBe($html);
+    }
+});
+
 test('Preserves everything around the body of a full document verbatim', function () {
     $before = "<!doctype html>\n<html lang=\"en\">\n<head><title>mail@example.com</title><!-- meta --></head>\n<body>";
     $after = "</body></html><!-- bottom -->";

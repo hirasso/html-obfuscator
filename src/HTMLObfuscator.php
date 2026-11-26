@@ -38,9 +38,12 @@ final class HTMLObfuscator
 
     private Obfuscator $obfuscation;
 
+    /**
+     * @param array{0: string, 1: string}|null $surroundings verbatim strings before and after the body of string input
+     */
     private function __construct(
         private HTMLDocument $document,
-        private ?string $source = null,
+        private ?array $surroundings = null,
     ) {
         $this->obfuscation = new Obfuscator();
     }
@@ -54,11 +57,17 @@ final class HTMLObfuscator
     }
 
     /**
-     * Create a new Obfuscator instance from a HTML string
+     * Create a new Obfuscator instance from a HTML string.
+     * Only the body's content is parsed, in body mode, which keeps its whitespace exact
      */
     public static function createFromString(string $source): self
     {
-        return new self(HTMLDocument::createFromString($source, LIBXML_NOERROR), $source);
+        [$before, $body, $after] = DomHelper::splitAtBody($source);
+
+        return new self(
+            HTMLDocument::createFromString('<!doctype html><body>' . $body, LIBXML_NOERROR),
+            [$before, $after],
+        );
     }
 
     /**
@@ -179,8 +188,8 @@ final class HTMLObfuscator
     {
         $this->apply();
 
-        if ($this->source !== null) {
-            [$before, $after] = DomHelper::getBeforeAndAfterBody($this->source);
+        if ($this->surroundings !== null) {
+            [$before, $after] = $this->surroundings;
 
             return $before . ($this->document->body->innerHTML ?? '') . $after;
         }
