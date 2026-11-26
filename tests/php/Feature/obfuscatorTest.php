@@ -98,8 +98,37 @@ test('Returns a partial when receiving a partial', function () {
     expect((string) obfuscate('foobar'))->toBe('foobar');
 });
 
-test('Returns a the full document when receiving at least a <body> element', function () {
-    expect((string) obfuscate('<body>foobar</body>'))->toContain('<html><head></head><body>foobar');
+test('Preserves a <body> wrapper verbatim', function () {
+    expect((string) obfuscate('<body class="x">foobar</body>'))->toBe('<body class="x">foobar</body>');
+});
+
+test('Preserves everything around the body of a full document verbatim', function () {
+    $before = "<!doctype html>\n<html lang=\"en\">\n<head><title>mail@example.com</title><!-- meta --></head>\n<body>";
+    $after = "</body></html><!-- bottom -->";
+
+    $result = (string) obfuscate($before . 'mail@example.com' . $after);
+
+    expect($result)
+        ->toStartWith($before)
+        ->toEndWith($after)
+        ->toContain(TESTS_TAG_NAME);
+});
+
+test('Only obfuscates inside the body', function () {
+    $doc = \Dom\HTMLDocument::createFromString('<!doctype html><body></body>', LIBXML_NOERROR);
+    $link = $doc->createElement('a');
+    $link->setAttribute('href', 'mailto:mail@example.com');
+    $doc->head?->append($link);
+
+    HTMLObfuscator::createFromDocument($doc)->saveDocument();
+
+    expect($link->getAttribute('href'))->toBe('mailto:mail@example.com');
+});
+
+test('Handles a document without a body', function () {
+    $doc = \Dom\HTMLDocument::createEmpty();
+
+    expect(HTMLObfuscator::createFromDocument($doc)->saveDocument())->toBe($doc);
 });
 
 test('saveDocument() returns the underlying HTMLDocument', function () {

@@ -34,6 +34,10 @@ echo clientScript();
 echo obfuscate($html);
 ```
 
+`obfuscate()` accepts an HTML fragment or a full (or partial) HTML document. Only the body is
+obfuscated; the doctype, `<head>`, body attributes, comments and anything wrapping the body are
+preserved verbatim.
+
 ## Debugging the client script
 
 Render the client script un-minified and with logging:

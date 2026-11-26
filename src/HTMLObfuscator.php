@@ -40,7 +40,7 @@ final class HTMLObfuscator
 
     private function __construct(
         private HTMLDocument $document,
-        private bool $isPartial = false,
+        private ?string $source = null,
     ) {
         $this->obfuscation = new Obfuscator();
     }
@@ -50,7 +50,7 @@ final class HTMLObfuscator
      */
     public static function createFromDocument(HTMLDocument $document): self
     {
-        return new self($document, isPartial: false);
+        return new self($document);
     }
 
     /**
@@ -58,9 +58,7 @@ final class HTMLObfuscator
      */
     public static function createFromString(string $source): self
     {
-        $isPartial = !str_contains($source, '</body>');
-
-        return new self(HTMLDocument::createFromString($source, LIBXML_NOERROR), isPartial: $isPartial);
+        return new self(HTMLDocument::createFromString($source, LIBXML_NOERROR), $source);
     }
 
     /**
@@ -151,9 +149,15 @@ final class HTMLObfuscator
      */
     public function apply(): self
     {
-        $this->processObfuscateTextElements();
-        $this->obfuscateLinks();
-        $this->obfuscateTextNodes();
+        $body = $this->document->body;
+
+        if ($body === null) {
+            return $this;
+        }
+
+        $this->processObfuscateTextElements($body);
+        $this->obfuscateLinks($body);
+        $this->obfuscateTextNodes($body);
 
         return $this;
     }
@@ -168,14 +172,17 @@ final class HTMLObfuscator
     }
 
     /**
-     * Apply obfuscation and return the result as a string
+     * Apply obfuscation and return the result as a string.
+     * String input: only the body is re-serialized, anything around it is kept verbatim
      */
     public function saveHTML(): string
     {
         $this->apply();
 
-        if ($this->isPartial) {
-            return $this->document->body->innerHTML ?? '';
+        if ($this->source !== null) {
+            [$before, $after] = DomHelper::getBeforeAndAfterBody($this->source);
+
+            return $before . ($this->document->body->innerHTML ?? '') . $after;
         }
 
         if ($this->document->documentElement) {
@@ -196,9 +203,9 @@ final class HTMLObfuscator
     /**
      * Obfuscate all text nodes inside [obfuscate-text] elements wholesale
      */
-    private function processObfuscateTextElements(): void
+    private function processObfuscateTextElements(Element $body): void
     {
-        foreach ($this->document->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
+        foreach ($body->querySelectorAll('[' . self::OBFUSCATE_TEXT_ATTR . ']') as $el) {
             $el->removeAttribute(self::OBFUSCATE_TEXT_ATTR);
             foreach (DomHelper::getTextNodes($this->document, $el) as $node) {
                 $el = $this->createObfuscatedTextElement($node->data);
@@ -210,9 +217,9 @@ final class HTMLObfuscator
     /**
      * Obfuscate links
      */
-    private function obfuscateLinks(): void
+    private function obfuscateLinks(Element $body): void
     {
-        foreach ($this->document->querySelectorAll('a[href]') as $el) {
+        foreach ($body->querySelectorAll('a[href]') as $el) {
             $this->obfuscateAttribute('title', $el);
             $this->obfuscateAttribute('href', $el);
         }
@@ -310,12 +317,12 @@ final class HTMLObfuscator
     /**
      * Obfuscate all text nodes
      */
-    private function obfuscateTextNodes(): void
+    private function obfuscateTextNodes(Element $body): void
     {
         $patterns = [...$this->builtinPatterns(), ...$this->customPatterns];
 
         foreach ($patterns as $pattern) {
-            foreach (DomHelper::getTextNodes($this->document) as $node) {
+            foreach (DomHelper::getTextNodes($this->document, $body) as $node) {
                 $this->obfuscateTextNode($node, $pattern);
             }
         }
