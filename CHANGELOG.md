@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- 207d24c: Only the `<body>` is obfuscated. For string input, anything around the body (doctype, `<head>`, body attributes, comments) is now preserved verbatim instead of being re-serialized, and wrappers are no longer added: `obfuscate('<body>x</body>')` returns `<body>x</body>` instead of `<html><head></head><body>x</body></html>`.
+
+### Patch Changes
+
+- 23433a1: Preserve whitespace around and inside the body of string input verbatim. Leading whitespace was dropped, and whitespace after `</body>` was duplicated into the body.
+
 ## 1.0.0
 
 ### Major Changes
